@@ -1,17 +1,33 @@
+/**
+ * TabComunicaciones.jsx
+ * ---------------------------------------------------------------------------
+ * Vista completa de la pestaña "Coms" dentro del módulo Medidores: combina
+ * el menú lateral de secciones (ComsSidebar) con el formulario de
+ * configuración de comunicaciones (ConfiguracionComunicaciones).
+ *
+ * Rol en el sistema:
+ * Es un componente de composición/layout; no maneja estado propio. Solo
+ * reenvía el medidor seleccionado y el usuario logueado al formulario, que
+ * es quien consulta el WebService y aplica los permisos por rol.
+ */
 import ComsSidebar from './ComsSidebar'
-import ComsForm from './ComsForm'
+import ConfiguracionComunicaciones from '../medidores/ConfiguracionComunicaciones'
 
-function TabComunicaciones() {
+// Props:
+// - medidor: medidor seleccionado en el catálogo.
+// - usuarioLogueado: usuario autenticado (para permisos por rol).
+function TabComunicaciones({ medidor, usuarioLogueado }) {
   return (
-    <div className="flex flex-1 flex-col gap-6 overflow-auto p-6 lg:flex-row">
-      <ComsSidebar />
+    // Contenedor con scroll propio, para pantallas donde el formulario sea más alto que el viewport.
+    <div className="flex-1 overflow-auto p-6">
+      {/* En pantallas grandes (lg+), sidebar y formulario se muestran lado a lado;
+          en pantallas pequeñas, se apilan en columna. */}
+      <div className="flex flex-col lg:flex-row gap-6 lg:items-start w-full">
+        <ComsSidebar />
 
-      <div className="flex-1 rounded-xl bg-white p-6 shadow-md">
-        <h2 className="border-b border-slate-200 pb-4 text-lg font-bold uppercase tracking-wide text-slate-800">
-          Configuración de comunicaciones
-        </h2>
-        <div className="pt-6">
-          <ComsForm />
+        {/* Formulario (ya incluye su propia tarjeta blanca y título). */}
+        <div className="w-full lg:w-3/4 xl:w-4/5">
+          <ConfiguracionComunicaciones medidor={medidor} usuarioLogueado={usuarioLogueado} />
         </div>
       </div>
     </div>

@@ -1,5 +1,29 @@
+/**
+ * TabValores5M.jsx
+ * ---------------------------------------------------------------------------
+ * Vista de "Últimos valores 5 minutales" del medidor: muestra las medidas
+ * acumuladas/promediadas cada 5 minutos, agrupadas por categoría (Energía,
+ * Potencia, Tensión y corriente, Factor de potencia, Distorsión armónica).
+ *
+ * Rol en el sistema:
+ * Análogo a TabInstantaneos.jsx pero para el intervalo de 5 minutos: permite
+ * seleccionar qué medidas incluir (individualmente o con "Seleccionar
+ * todos") y solicitarlas al medidor con el botón "Solicitar".
+ *
+ * Integración con el WebService (lectura de Valores 5 minutales):
+ * FILAS contiene datos de ejemplo. En producción, estos valores deberán
+ * llenarse con la respuesta del método del WebService que consulta el
+ * histórico de 5 minutos del medidor (por ejemplo, LeerValores5Min), y el
+ * botón "Solicitar" deberá enviar la petición usando las medidas marcadas
+ * en el estado `seleccionados`.
+ */
+import { useState } from 'react'
 import MonitorMedidaTile from '../common/MonitorMedidaTile'
 
+// Catálogo de variables de 5 minutos, agrupadas por categoría.
+// Cada `medida` tiene un id único (usado para el estado de selección),
+// título, valor de ejemplo y unidad. Los `null` son espacios vacíos para
+// mantener alineada la grilla cuando un grupo tiene menos elementos.
 const FILAS = [
   {
     id: 'energia',
@@ -63,25 +87,75 @@ const FILAS = [
   },
 ]
 
+// Lista plana de todos los ids de medidas existentes en FILAS (ignorando los
+// espacios vacíos `null`). Se usa para saber si "todas" están seleccionadas
+// y para poder seleccionarlas/deseleccionarlas de una sola vez.
+const TODOS_LOS_IDS = FILAS.flatMap((fila) =>
+  fila.medidas.filter(Boolean).map((medida) => medida.id),
+)
+
 function TabValores5M() {
+  // Conjunto (Set) con los ids de las medidas actualmente marcadas por el usuario.
+  const [seleccionados, setSeleccionados] = useState(() => new Set())
+
+  // true si todas las medidas de la pantalla están seleccionadas; controla
+  // el estado (checked) del checkbox maestro "Seleccionar todos".
+  const todosSeleccionados = TODOS_LOS_IDS.every((id) => seleccionados.has(id))
+
+  // Manejador del checkbox "Seleccionar todos": selecciona o limpia todas las
+  // medidas de golpe según el nuevo estado del checkbox.
+  const alternarTodos = (event) => {
+    setSeleccionados(event.target.checked ? new Set(TODOS_LOS_IDS) : new Set())
+  }
+
+  // Fábrica de manejadores para cada checkbox individual de MonitorMedidaTile:
+  // agrega o quita el id correspondiente del conjunto de seleccionados.
+  const alternarMedida = (id) => (event) => {
+    setSeleccionados((prev) => {
+      const siguiente = new Set(prev)
+      if (event.target.checked) {
+        siguiente.add(id)
+      } else {
+        siguiente.delete(id)
+      }
+      return siguiente
+    })
+  }
+
   return (
+    // Contenedor con scroll propio para acomodar todas las categorías de medidas.
     <div className="h-full overflow-auto bg-gray-50 p-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-6">
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        {/* Encabezado de la vista: título a la izquierda, checkbox maestro a la derecha. */}
+        <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-bold uppercase tracking-wide text-slate-800">
             Últimos valores 5 minutales
           </h2>
+
+          {/* Checkbox maestro "Seleccionar todos": marca/desmarca todas las
+              medidas visibles en esta pantalla de una sola vez. */}
+          <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-900">
+            <input
+              type="checkbox"
+              checked={todosSeleccionados}
+              onChange={alternarTodos}
+              className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+            />
+            Seleccionar todos
+          </label>
         </div>
 
+        {/* Una sección (tarjeta) por cada categoría de medidas. */}
         {FILAS.map((fila) => (
           <section
             key={fila.id}
             className="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-black/5"
           >
-            <h3 className="mb-6 text-xs font-semibold uppercase tracking-widest text-gray-400">
+            <h3 className="mb-6 text-xs font-semibold uppercase tracking-widest text-gray-900">
               {fila.etiqueta}
             </h3>
-            <div className="grid grid-cols-6 gap-6">
+            {/* Grilla responsiva de tarjetas de medida (2 a 6 columnas según el ancho de pantalla). */}
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
               {fila.medidas.map((medida, index) =>
                 medida ? (
                   <MonitorMedidaTile
@@ -89,8 +163,13 @@ function TabValores5M() {
                     titulo={medida.titulo}
                     valor={medida.valor}
                     unidad={medida.unidad}
+                    // Checkbox controlado: su estado viene del Set `seleccionados`
+                    // y sus cambios se notifican mediante `alternarMedida`.
+                    checked={seleccionados.has(medida.id)}
+                    onChange={alternarMedida(medida.id)}
                   />
                 ) : (
+                  // Espacio invisible para mantener la alineación de la grilla.
                   <div key={`${fila.id}-vacio-${index}`} className="invisible" />
                 ),
               )}
@@ -98,10 +177,13 @@ function TabValores5M() {
           </section>
         ))}
 
+        {/* Botón "Solicitar": estilo unificado con el resto de la aplicación.
+            Pendiente de conectar con el WebService para enviar la solicitud
+            de lectura de valores 5 minutales usando las medidas en `seleccionados`. */}
         <div className="flex justify-center pt-2">
           <button
             type="button"
-            className="rounded-lg bg-indigo-600 px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700"
+            className="transform cursor-pointer rounded-lg bg-blue-600 px-8 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md active:scale-95"
           >
             Solicitar
           </button>
