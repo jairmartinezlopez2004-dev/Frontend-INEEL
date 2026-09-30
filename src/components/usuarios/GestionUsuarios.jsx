@@ -165,11 +165,13 @@ function FormularioUsuario({ usuario, onGuardado, onCancelar }) {
             (el alta del backend los fija en activo y 60 minutos). */}
         {esEdicion && (
           <>
-            <Campo etiqueta="Tiempo de sesión (minutos)">
+            {/* El backend acepta entre 1 y 1440 minutos (24 h). */}
+            <Campo etiqueta="Tiempo de sesión (1 a 1440 minutos)">
               <input
                 type="number"
                 required
                 min={1}
+                max={1440}
                 value={form.tiempoSesion}
                 onChange={actualizar('tiempoSesion')}
                 className={CLASES_CONTROL}
