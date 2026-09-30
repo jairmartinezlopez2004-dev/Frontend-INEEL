@@ -17,6 +17,9 @@
  * /Auth/perfil) y los pinta en pantalla. Es un componente puramente de
  * presentación en lo que a datos de usuario se refiere.
  */
+import { useState } from 'react'
+import ConfirmDialog from './common/ConfirmDialog'
+
 const SYSTEM_TITLE = 'VISOR MEDICIÓN CALIDAD DE LA POTENCIA INEEL V1.0.1'
 
 // Ícono de menú hamburguesa (SVG) usado en el botón de colapsar/expandir el Sidebar.
@@ -62,6 +65,9 @@ function LogoutIcon() {
 // - onToggleSidebar: callback que App.jsx usa para alternar la visibilidad del Sidebar.
 // - onLogout: callback que App.jsx usa para cerrar la sesión y volver al Login.
 function Header({ currentUser, isSidebarOpen, onToggleSidebar, onLogout }) {
+  // true mientras se muestra la confirmación de "¿Cerrar sesión?".
+  const [confirmandoSalida, setConfirmandoSalida] = useState(false)
+
   return (
     // Barra superior fija con logo a la izquierda y perfil de usuario a la derecha (layout tipo Gmail).
     <header className="z-20 flex h-16 w-full shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 shadow-sm sm:px-6">
@@ -110,10 +116,11 @@ function Header({ currentUser, isSidebarOpen, onToggleSidebar, onLogout }) {
           </div>
         </div>
 
-        {/* Botón para cerrar sesión: borra el token y regresa al Login (ver App.jsx). */}
+        {/* Botón para cerrar sesión: primero pide confirmación; al aceptar,
+            borra el token y regresa al Login (ver App.jsx). */}
         <button
           type="button"
-          onClick={onLogout}
+          onClick={() => setConfirmandoSalida(true)}
           aria-label="Cerrar sesión"
           title="Cerrar sesión"
           className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-md text-slate-600 transition-colors hover:bg-red-50 hover:text-red-600"
@@ -121,6 +128,15 @@ function Header({ currentUser, isSidebarOpen, onToggleSidebar, onLogout }) {
           <LogoutIcon />
         </button>
       </div>
+
+      <ConfirmDialog
+        abierto={confirmandoSalida}
+        titulo="¿Cerrar sesión?"
+        mensaje="Tendrás que volver a ingresar tu correo y contraseña para entrar."
+        textoConfirmar="Cerrar sesión"
+        onConfirmar={onLogout}
+        onCancelar={() => setConfirmandoSalida(false)}
+      />
     </header>
   )
 }
