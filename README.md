@@ -1,16 +1,74 @@
-# React + Vite
+# Frontend INEEL — Visor de medición
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interfaz web del sistema de medición y calidad de la energía del INEEL. Consume la API REST de .NET
+[MedicionPQ](https://github.com/JosFus29/MedicionPQ), que desarrolla el equipo de backend.
 
-Currently, two official plugins are available:
+Construido con **React 19**, **Vite** y **Tailwind CSS**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Módulos
 
-## React Compiler
+| Módulo | Descripción |
+|---|---|
+| Login | Inicio de sesión con JWT; la sesión se conserva al recargar la página. |
+| Dashboard | Vista general. |
+| Medidores | Lista de medidores y detalle por medidor con las pestañas Coms, Instantáneos, Valores 5M, Calidad y Consumos. |
+| Usuarios | Alta y edición de usuarios (solo rol Administrador). |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Requisitos
 
-## Expanding the ESLint configuration
+- Node.js 20.19+ o 22.12+ (requerido por Vite)
+- Backend MedicionPQ corriendo en `https://localhost:7090`
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Puesta en marcha
+
+```bash
+npm install
+npm run dev
+```
+
+La aplicación queda en http://localhost:5173.
+
+### Conexión con el backend
+
+En desarrollo, las peticiones a `/api` pasan por el proxy de Vite (`vite.config.js`) hacia
+`https://localhost:7090`, así que no hay problemas de CORS ni hace falta configurar nada más.
+El backend debe arrancarse con el perfil **https**.
+
+Para apuntar a otra URL (por ejemplo, en producción), define `VITE_API_URL` en un archivo `.env`:
+
+```bash
+VITE_API_URL=https://servidor/api
+```
+
+Los usuarios para iniciar sesión se dan de alta en la base de datos del backend; pídelos al equipo de backend.
+
+## Scripts
+
+| Comando | Qué hace |
+|---|---|
+| `npm run dev` | Servidor de desarrollo con recarga en caliente |
+| `npm run build` | Compila para producción en `dist/` |
+| `npm run preview` | Sirve localmente la compilación de `dist/` |
+| `npm run lint` | Revisa el código con ESLint |
+
+## Estructura
+
+```
+src/
+├── App.jsx              # Flujo de sesión y navegación principal
+├── components/
+│   ├── Login.jsx
+│   ├── Header.jsx, Sidebar.jsx, StatusBar.jsx
+│   ├── MainForm.jsx     # Pestañas del detalle de un medidor
+│   ├── dashboard/  medidores/  coms/  instantaneos/
+│   ├── valores5m/  calidad/  consumos/
+│   └── usuarios/        # Gestión de usuarios
+└── services/            # Comunicación con la API
+    ├── api.js           # Cliente HTTP: URL base, token JWT y manejo de errores
+    ├── authService.js   # Login, restaurar y cerrar sesión
+    ├── usuariosService.js
+    └── medidoresService.js
+```
+
+Los componentes no llaman a `fetch` directamente: todo pasa por `src/services/`, que adjunta el
+token y convierte los errores de la API en mensajes para el usuario.
