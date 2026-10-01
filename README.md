@@ -10,8 +10,8 @@ Construido con **React 19**, **Vite** y **Tailwind CSS**.
 | Módulo | Descripción |
 |---|---|
 | Login | Inicio de sesión con JWT; la sesión se conserva al recargar la página. |
-| Dashboard | Vista general. |
 | Medidores | Lista de medidores y detalle por medidor con las pestañas Coms, Instantáneos, Valores 5M, Calidad y Consumos. |
+| Controladores RF | Lista de controladores de radiofrecuencia; alta y edición solo para el rol Administrador. |
 | Usuarios | Alta y edición de usuarios (solo rol Administrador). |
 
 ## Requisitos
@@ -60,7 +60,7 @@ src/
 │   ├── Login.jsx
 │   ├── Header.jsx, Sidebar.jsx, StatusBar.jsx
 │   ├── MainForm.jsx     # Pestañas del detalle de un medidor
-│   ├── dashboard/  medidores/  coms/  instantaneos/
+│   ├── medidores/  coms/  instantaneos/
 │   ├── valores5m/  calidad/  consumos/
 │   └── usuarios/        # Gestión de usuarios
 └── services/            # Comunicación con la API

@@ -12,8 +12,8 @@
  *   usuario autenticado, sección activa del menú y visibilidad del sidebar.
  *   Estos estados se pasan hacia abajo como props (elevación de estado /
  *   lifting state up) a los componentes hijos que los necesitan.
- * - Actúa como enrutador simple entre los módulos principales (Dashboard,
- *   Medidores, Controladores RF, Usuarios) según el ítem seleccionado en el Sidebar.
+ * - Actúa como enrutador simple entre los módulos principales (Medidores,
+ *   Controladores RF, Usuarios) según el ítem seleccionado en el Sidebar.
  * - Dentro del módulo Medidores controla la navegación de dos niveles:
  *   Catálogo (ListaMedidores) -> Detalle (DetalleMedidor, con sus pestañas),
  *   guardando en `medidorSeleccionado` el equipo elegido con "Detalles".
@@ -23,7 +23,6 @@ import Sidebar from './components/Sidebar'
 import StatusBar from './components/StatusBar'
 import ListaMedidores from './components/medidores/ListaMedidores'
 import DetalleMedidor from './components/medidores/DetalleMedidor'
-import TabDashboard from './components/dashboard/TabDashboard'
 import Login from './components/Login'
 import GestionUsuarios from './components/usuarios/GestionUsuarios'
 import GestionControladoresRF from './components/controladoresRF/GestionControladoresRF'
@@ -33,7 +32,6 @@ import { restaurarSesion, cerrarSesion } from './services/authService'
 // Diccionario de títulos "amigables" para cada sección del menú (uso futuro,
 // por ejemplo para mostrarlos en un breadcrumb o en el <title> del documento).
 const PAGE_TITLES = {
-  dashboard: 'Dashboard',
   medidores: 'Medidores',
   controladoresRF: 'Controladores RF',
   usuarios: 'Usuarios',
@@ -50,7 +48,8 @@ function App() {
   // Identificador del módulo/sección actualmente seleccionado en el Sidebar.
   const [activeItem, setActiveItem] = useState('medidores')
   // Controla si el menú lateral (Sidebar) está expandido o colapsado.
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  // Empieza colapsado al cargar la página y vuelve a colapsarse al cerrar sesión.
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   // Medidor elegido en el catálogo con el botón "Detalles".
   // null = se muestra el Catálogo; objeto = se muestra su detalle (pestañas).
   const [medidorSeleccionado, setMedidorSeleccionado] = useState(null)
@@ -66,11 +65,14 @@ function App() {
   }, [])
 
   // Cierra la sesión: borra el token y regresa a la pantalla de Login.
+  // También deja la navegación en su estado inicial (Medidores, menú colapsado)
+  // para que el siguiente inicio de sesión no herede cómo quedó la pantalla.
   const handleLogout = () => {
     cerrarSesion()
     setCurrentUser(null)
     setMedidorSeleccionado(null)
     setActiveItem('medidores')
+    setIsSidebarOpen(false)
   }
 
   // Cambio de módulo desde el Sidebar. Se limpia el medidor seleccionado para
@@ -125,10 +127,9 @@ function App() {
 
         {/* CONTENIDO PRINCIPAL DINÁMICO */}
         {/* Renderizado condicional de vistas: según el ítem activo del Sidebar
-            se monta el módulo correspondiente (Dashboard, Medidores,
-            Controladores RF o Usuarios). */}
+            se monta el módulo correspondiente (Medidores, Controladores RF
+            o Usuarios). */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50 relative">
-          {activeItem === 'dashboard' && <TabDashboard />}
           {/* Módulo Medidores: navegación Catálogo -> Detalle.
               `key` fuerza a React a reiniciar el estado de la vista de detalle
               cada vez que se elige un medidor distinto. */}
