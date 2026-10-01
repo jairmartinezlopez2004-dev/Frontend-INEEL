@@ -65,7 +65,8 @@ export async function listarAdministradores({ signal } = {}) {
 }
 
 /**
- * Da de alta un usuario. La contraseña debe tener al menos 8 caracteres.
+ * Da de alta un usuario. La contraseña debe tener exactamente 8 caracteres
+ * (el backend valida el mínimo de 8; el máximo de 8 lo limita el formulario).
  * @param {{ correo: string, contrasena: string, nombreUsuario: string, rol: 'Administrador'|'Usuario' }} datos
  * @returns {Promise<object>} Usuario creado (misma forma que listarUsuarios).
  */

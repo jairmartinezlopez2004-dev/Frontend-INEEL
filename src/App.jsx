@@ -26,6 +26,7 @@ import DetalleMedidor from './components/medidores/DetalleMedidor'
 import TabDashboard from './components/dashboard/TabDashboard'
 import Login from './components/Login'
 import GestionUsuarios from './components/usuarios/GestionUsuarios'
+import GestionControladoresRF from './components/controladoresRF/GestionControladoresRF'
 import Header from './components/Header'
 import { restaurarSesion, cerrarSesion } from './services/authService'
 
@@ -34,6 +35,7 @@ import { restaurarSesion, cerrarSesion } from './services/authService'
 const PAGE_TITLES = {
   dashboard: 'Dashboard',
   medidores: 'Medidores',
+  controladoresRF: 'Controladores RF',
   configuracion: 'Configuración',
   usuarios: 'Usuarios',
 }
@@ -145,6 +147,8 @@ function App() {
                 onVerDetalles={setMedidorSeleccionado}
               />
             ))}
+          {/* Módulo Controladores RF: todos consultan; solo el Administrador da de alta y edita. */}
+          {activeItem === 'controladoresRF' && <GestionControladoresRF esAdmin={esAdmin} />}
           {/* Módulo Usuarios: solo Administrador (el Sidebar ya oculta la opción). */}
           {activeItem === 'usuarios' && esAdmin && <GestionUsuarios />}
           {activeItem === 'configuracion' && (

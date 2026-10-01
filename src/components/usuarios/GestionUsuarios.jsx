@@ -19,6 +19,10 @@ import {
   crearUsuario,
   actualizarUsuario,
 } from '../../services/usuariosService'
+import { useValidacion } from '../../hooks/useValidacion'
+import { validarTexto, validarCorreo, validarEntero } from '../../utils/validaciones'
+import CampoFormulario from '../common/CampoFormulario'
+import { claseControl } from '../common/clasesFormulario'
 
 // Encabezados de la tabla (se mantienen en un arreglo para no repetir markup).
 const COLUMNAS = ['Nombre', 'Correo', 'Rol', 'Estado', 'Sesión (min)', '']
@@ -33,18 +37,35 @@ const FORM_NUEVO = {
   tiempoSesion: 60,
 }
 
-// Clases compartidas por inputs y selects.
-const CLASES_CONTROL =
-  'rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500'
+// Largo exacto de la contraseña (el backend exige mínimo 8; el máximo lo fija el formulario).
+const LARGO_CONTRASENA = 8
 
-// Etiqueta + control.
-function Campo({ etiqueta, children }) {
-  return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-sm font-semibold text-slate-900">{etiqueta}</span>
-      {children}
-    </label>
-  )
+// Rango de tiempo de sesión que acepta el backend (minutos).
+const SESION_MIN = 1
+const SESION_MAX = 1440
+
+// Reglas de cada campo, en el orden en que aparecen en pantalla. La contraseña
+// solo se valida en el alta y el tiempo de sesión solo en la edición.
+function validadoresPara(esEdicion) {
+  return {
+    nombreUsuario: (v) => validarTexto(v, { nombre: 'El nombre' }),
+    correo: validarCorreo,
+    ...(esEdicion
+      ? {
+          tiempoSesion: (v) =>
+            validarEntero(v, { nombre: 'El tiempo de sesión', minimo: SESION_MIN, maximo: SESION_MAX }),
+        }
+      : {
+          contrasena: (v) =>
+            validarTexto(v, {
+              nombre: 'La contraseña',
+              minimo: LARGO_CONTRASENA,
+              maximo: LARGO_CONTRASENA,
+              recortar: false,
+              femenino: true,
+            }),
+        }),
+  }
 }
 
 // Badge de estado activo/inactivo.
@@ -72,23 +93,48 @@ function EstadoUsuario({ activo }) {
 // - onCancelar: callback para cerrar el formulario sin guardar.
 function FormularioUsuario({ usuario, onGuardado, onCancelar }) {
   const esEdicion = usuario !== null
-  const [form, setForm] = useState(esEdicion ? { ...usuario, contrasena: '' } : FORM_NUEVO)
+  // `tiempoSesion` se guarda como texto mientras se escribe y se convierte a número al enviar.
+  const [form, setForm] = useState(
+    esEdicion
+      ? { ...usuario, contrasena: '', tiempoSesion: String(usuario.tiempoSesion) }
+      : FORM_NUEVO,
+  )
   const [guardando, setGuardando] = useState(false)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState(null) // Error devuelto por el WebService.
+  const { errorDe, ariaDe, validarAlEnviar } = useValidacion(
+    form,
+    validadoresPara(esEdicion),
+    'usuario',
+  )
 
-  // Genera un manejador onChange para el campo indicado.
+  // Genera un manejador onChange para el campo indicado (texto, select o checkbox).
   const actualizar = (campo) => (e) => {
     const { type, checked, value } = e.target
-    const valor = type === 'checkbox' ? checked : type === 'number' ? Number(value) : value
-    setForm((prev) => ({ ...prev, [campo]: valor }))
+    setForm((prev) => ({ ...prev, [campo]: type === 'checkbox' ? checked : value }))
   }
+
+  // Props comunes de los inputs validados: valor, eventos, estilos y accesibilidad.
+  const propsDe = (campo) => ({
+    ...ariaDe(campo),
+    value: form[campo],
+    onChange: actualizar(campo),
+    className: claseControl(Boolean(errorDe(campo))),
+  })
 
   const guardar = async (e) => {
     e.preventDefault()
+    // Si hay errores, se muestran todos y se enfoca el primero; no se llama al WebService.
+    if (!validarAlEnviar()) return
+
     setGuardando(true)
     setError(null)
     try {
-      const datos = { ...form, correo: form.correo.trim(), nombreUsuario: form.nombreUsuario.trim() }
+      const datos = {
+        ...form,
+        correo: form.correo.trim(),
+        nombreUsuario: form.nombreUsuario.trim(),
+        tiempoSesion: Number(form.tiempoSesion),
+      }
       if (esEdicion) {
         await actualizarUsuario(usuario.id, datos)
         onGuardado('Usuario actualizado correctamente.')
@@ -103,7 +149,8 @@ function FormularioUsuario({ usuario, onGuardado, onCancelar }) {
   }
 
   return (
-    <form onSubmit={guardar} className="border-b border-slate-200 bg-slate-50 px-6 py-5">
+    // noValidate desactiva los globos del navegador: se valida con validadoresPara().
+    <form noValidate onSubmit={guardar} className="border-b border-slate-200 bg-slate-50 px-6 py-5">
       <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-800">
         {esEdicion ? `Editar usuario: ${usuario.nombreUsuario}` : 'Nuevo usuario'}
       </h3>
@@ -116,67 +163,65 @@ function FormularioUsuario({ usuario, onGuardado, onCancelar }) {
 
       {/* <fieldset disabled> bloquea todos los controles mientras se guarda. */}
       <fieldset disabled={guardando} className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Campo etiqueta="Nombre">
-          <input
-            type="text"
-            required
-            value={form.nombreUsuario}
-            onChange={actualizar('nombreUsuario')}
-            className={CLASES_CONTROL}
-          />
-        </Campo>
+        <CampoFormulario id="usuario-nombreUsuario" etiqueta="Nombre" error={errorDe('nombreUsuario')}>
+          <input type="text" {...propsDe('nombreUsuario')} />
+        </CampoFormulario>
 
-        <Campo etiqueta="Correo">
+        <CampoFormulario id="usuario-correo" etiqueta="Correo" error={errorDe('correo')}>
           <input
             type="email"
-            required
-            value={form.correo}
-            onChange={actualizar('correo')}
-            className={CLASES_CONTROL}
+            autoComplete="off"
+            placeholder="usuario@dominio.com"
+            {...propsDe('correo')}
           />
-        </Campo>
+        </CampoFormulario>
 
         {/* La contraseña solo se captura en el alta: el PUT del backend no la modifica. */}
         {!esEdicion && (
-          <Campo etiqueta="Contraseña (mínimo 8 caracteres)">
+          <CampoFormulario
+            id="usuario-contrasena"
+            etiqueta="Contraseña"
+            error={errorDe('contrasena')}
+            ayuda={`Exactamente ${LARGO_CONTRASENA} caracteres.`}
+          >
             <input
               type="password"
-              required
-              minLength={8}
+              maxLength={LARGO_CONTRASENA}
               autoComplete="new-password"
-              value={form.contrasena}
-              onChange={actualizar('contrasena')}
-              className={CLASES_CONTROL}
+              {...propsDe('contrasena')}
             />
-          </Campo>
+          </CampoFormulario>
         )}
 
-        <Campo etiqueta="Rol">
-          <select value={form.rol} onChange={actualizar('rol')} className={CLASES_CONTROL}>
+        <CampoFormulario id="usuario-rol" etiqueta="Rol">
+          <select
+            id="usuario-rol"
+            value={form.rol}
+            onChange={actualizar('rol')}
+            className={claseControl()}
+          >
             {ROLES.map((rol) => (
               <option key={rol} value={rol}>
                 {rol}
               </option>
             ))}
           </select>
-        </Campo>
+        </CampoFormulario>
 
         {/* Estado y tiempo de sesión solo se pueden cambiar al editar
             (el alta del backend los fija en activo y 60 minutos). */}
         {esEdicion && (
           <>
-            {/* El backend acepta entre 1 y 1440 minutos (24 h). */}
-            <Campo etiqueta="Tiempo de sesión (1 a 1440 minutos)">
-              <input
-                type="number"
-                required
-                min={1}
-                max={1440}
-                value={form.tiempoSesion}
-                onChange={actualizar('tiempoSesion')}
-                className={CLASES_CONTROL}
-              />
-            </Campo>
+            {/* El backend acepta entre 1 y 1440 minutos (24 h). Es type="text" para
+                que, si se escribe una letra, se vea el mensaje propio. */}
+            <CampoFormulario
+              id="usuario-tiempoSesion"
+              etiqueta="Tiempo de sesión (minutos)"
+              error={errorDe('tiempoSesion')}
+              ayuda={`Entre ${SESION_MIN} y ${SESION_MAX} minutos (24 horas).`}
+            >
+              <input type="text" inputMode="numeric" {...propsDe('tiempoSesion')} />
+            </CampoFormulario>
 
             <label className="flex items-center gap-2 pt-6">
               <input
