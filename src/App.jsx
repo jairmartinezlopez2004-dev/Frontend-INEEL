@@ -13,7 +13,7 @@
  *   Estos estados se pasan hacia abajo como props (elevación de estado /
  *   lifting state up) a los componentes hijos que los necesitan.
  * - Actúa como enrutador simple entre los módulos principales (Dashboard,
- *   Medidores, Configuración) según el ítem seleccionado en el Sidebar.
+ *   Medidores, Controladores RF, Usuarios) según el ítem seleccionado en el Sidebar.
  * - Dentro del módulo Medidores controla la navegación de dos niveles:
  *   Catálogo (ListaMedidores) -> Detalle (DetalleMedidor, con sus pestañas),
  *   guardando en `medidorSeleccionado` el equipo elegido con "Detalles".
@@ -36,7 +36,6 @@ const PAGE_TITLES = {
   dashboard: 'Dashboard',
   medidores: 'Medidores',
   controladoresRF: 'Controladores RF',
-  configuracion: 'Configuración',
   usuarios: 'Usuarios',
 }
 
@@ -126,8 +125,8 @@ function App() {
 
         {/* CONTENIDO PRINCIPAL DINÁMICO */}
         {/* Renderizado condicional de vistas: según el ítem activo del Sidebar
-            se monta el módulo correspondiente (Dashboard, Medidores o el
-            placeholder de Configuración). */}
+            se monta el módulo correspondiente (Dashboard, Medidores,
+            Controladores RF o Usuarios). */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50 relative">
           {activeItem === 'dashboard' && <TabDashboard />}
           {/* Módulo Medidores: navegación Catálogo -> Detalle.
@@ -151,11 +150,6 @@ function App() {
           {activeItem === 'controladoresRF' && <GestionControladoresRF esAdmin={esAdmin} />}
           {/* Módulo Usuarios: solo Administrador (el Sidebar ya oculta la opción). */}
           {activeItem === 'usuarios' && esAdmin && <GestionUsuarios />}
-          {activeItem === 'configuracion' && (
-            <div className="flex h-full items-center justify-center text-gray-400">
-              Módulo Configuración en construcción
-            </div>
-          )}
         </main>
       </div>
 
