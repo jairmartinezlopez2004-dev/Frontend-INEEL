@@ -4,8 +4,8 @@
  * Vista de detalle de un medidor seleccionado en el Catálogo de Medidores.
  *
  * Rol en el sistema:
- * - Se monta desde App.jsx cuando el usuario pulsa "Detalles" en
- *   ListaMedidores.
+ * - Se monta desde GestionControladoresRF al pulsar "Detalles" en un medidor
+ *   del detalle de su controlador (DetalleControlador).
  * - Muestra un encabezado fijo con los datos generales del medidor y el
  *   botón para regresar al catálogo.
  * - Debajo monta MainForm, que contiene las pestañas de solicitud de datos
@@ -30,8 +30,14 @@ function DatoMedidor({ etiqueta, valor }) {
 // - medidor: objeto { id, idCtrlRF, nombreControlador, dirRed, dirRF, descripcion, edo, dirIP }
 //   elegido en el catálogo (ver medidoresService.js).
 // - usuarioLogueado: usuario autenticado (se reenvía a las pestañas para los permisos por rol).
-// - onVolver: callback para regresar al Catálogo de Medidores.
-export default function DetalleMedidor({ medidor, usuarioLogueado, onVolver }) {
+// - onVolver: callback para regresar a la vista anterior.
+// - textoVolver: texto del enlace de regreso (p. ej. "Volver a RF PRUEBA").
+export default function DetalleMedidor({
+  medidor,
+  usuarioLogueado,
+  onVolver,
+  textoVolver = 'Volver',
+}) {
   return (
     <div className="flex flex-col gap-4">
       {/* ── Encabezado: regreso al catálogo + datos generales del medidor ── */}
@@ -41,7 +47,7 @@ export default function DetalleMedidor({ medidor, usuarioLogueado, onVolver }) {
           onClick={onVolver}
           className="mb-3 cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
         >
-          ← Volver al catálogo
+          ← {textoVolver}
         </button>
 
         <div className="flex flex-wrap items-start justify-between gap-3">

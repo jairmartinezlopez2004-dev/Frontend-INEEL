@@ -10,8 +10,7 @@ Construido con **React 19**, **Vite** y **Tailwind CSS**.
 | Módulo | Descripción |
 |---|---|
 | Login | Inicio de sesión con JWT; la sesión se conserva al recargar la página. |
-| Medidores | Lista de medidores QP agrupados por controlador RF; alta y edición solo para el rol Administrador. Detalle por medidor con las pestañas Coms, Instantáneos, Valores 5M, Calidad y Consumos. |
-| Controladores RF | Lista de controladores de radiofrecuencia; alta y edición solo para el rol Administrador. |
+| Controladores RF | Lista de controladores de radiofrecuencia; al entrar a uno se ven los medidores agrupados en él y, desde ahí, el detalle de cada medidor. Alta y edición de controladores y medidores solo para el rol Administrador. |
 | Usuarios | Alta y edición de usuarios (solo rol Administrador). |
 
 ## Requisitos

@@ -12,17 +12,13 @@
  *   usuario autenticado, sección activa del menú y visibilidad del sidebar.
  *   Estos estados se pasan hacia abajo como props (elevación de estado /
  *   lifting state up) a los componentes hijos que los necesitan.
- * - Actúa como enrutador simple entre los módulos principales (Medidores,
- *   Controladores RF, Usuarios) según el ítem seleccionado en el Sidebar.
- * - Dentro del módulo Medidores controla la navegación de dos niveles:
- *   Catálogo (ListaMedidores) -> Detalle (DetalleMedidor, con sus pestañas),
- *   guardando en `medidorSeleccionado` el equipo elegido con "Detalles".
+ * - Actúa como enrutador simple entre los módulos principales (Controladores
+ *   RF y Usuarios) según el ítem seleccionado en el Sidebar. Los medidores se
+ *   consultan dentro de su controlador (ver GestionControladoresRF.jsx).
  */
 import { useEffect, useState } from 'react'
 import Sidebar from './components/Sidebar'
 import StatusBar from './components/StatusBar'
-import ListaMedidores from './components/medidores/ListaMedidores'
-import DetalleMedidor from './components/medidores/DetalleMedidor'
 import Login from './components/Login'
 import GestionUsuarios from './components/usuarios/GestionUsuarios'
 import GestionControladoresRF from './components/controladoresRF/GestionControladoresRF'
@@ -32,7 +28,6 @@ import { restaurarSesion, cerrarSesion } from './services/authService'
 // Diccionario de títulos "amigables" para cada sección del menú (uso futuro,
 // por ejemplo para mostrarlos en un breadcrumb o en el <title> del documento).
 const PAGE_TITLES = {
-  medidores: 'Medidores',
   controladoresRF: 'Controladores RF',
   usuarios: 'Usuarios',
 }
@@ -46,13 +41,10 @@ function App() {
   // de /Auth/login o /Auth/perfil (nombre, apellido, rol, iniciales, etc.).
   const [currentUser, setCurrentUser] = useState(null)
   // Identificador del módulo/sección actualmente seleccionado en el Sidebar.
-  const [activeItem, setActiveItem] = useState('medidores')
+  const [activeItem, setActiveItem] = useState('controladoresRF')
   // Controla si el menú lateral (Sidebar) está expandido o colapsado.
   // Empieza colapsado al cargar la página y vuelve a colapsarse al cerrar sesión.
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  // Medidor elegido en el catálogo con el botón "Detalles".
-  // null = se muestra el Catálogo; objeto = se muestra su detalle (pestañas).
-  const [medidorSeleccionado, setMedidorSeleccionado] = useState(null)
   // true mientras se valida el token guardado (evita que parpadee el Login al recargar).
   const [verificandoSesion, setVerificandoSesion] = useState(true)
 
@@ -65,21 +57,13 @@ function App() {
   }, [])
 
   // Cierra la sesión: borra el token y regresa a la pantalla de Login.
-  // También deja la navegación en su estado inicial (Medidores, menú colapsado)
+  // También deja la navegación en su estado inicial (Controladores RF, menú colapsado)
   // para que el siguiente inicio de sesión no herede cómo quedó la pantalla.
   const handleLogout = () => {
     cerrarSesion()
     setCurrentUser(null)
-    setMedidorSeleccionado(null)
-    setActiveItem('medidores')
+    setActiveItem('controladoresRF')
     setIsSidebarOpen(false)
-  }
-
-  // Cambio de módulo desde el Sidebar. Se limpia el medidor seleccionado para
-  // que, al volver a "Medidores", siempre se entre por el Catálogo.
-  const handleSelectItem = (itemId) => {
-    setActiveItem(itemId)
-    setMedidorSeleccionado(null)
   }
 
   // Renderizado condicional de vistas: si todavía no hay sesión iniciada,
@@ -120,35 +104,20 @@ function App() {
         {/* SIDEBAR COLAPSABLE */}
         <Sidebar
           activeItem={activeItem}
-          onSelectItem={handleSelectItem}
+          onSelectItem={setActiveItem}
           isOpen={isSidebarOpen}
           esAdmin={esAdmin}
         />
 
         {/* CONTENIDO PRINCIPAL DINÁMICO */}
         {/* Renderizado condicional de vistas: según el ítem activo del Sidebar
-            se monta el módulo correspondiente (Medidores, Controladores RF
-            o Usuarios). */}
+            se monta el módulo correspondiente (Controladores RF o Usuarios). */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50 relative">
-          {/* Módulo Medidores: navegación Catálogo -> Detalle.
-              `key` fuerza a React a reiniciar el estado de la vista de detalle
-              cada vez que se elige un medidor distinto. */}
-          {activeItem === 'medidores' &&
-            (medidorSeleccionado ? (
-              <DetalleMedidor
-                key={medidorSeleccionado.id}
-                medidor={medidorSeleccionado}
-                usuarioLogueado={currentUser}
-                onVolver={() => setMedidorSeleccionado(null)}
-              />
-            ) : (
-              <ListaMedidores
-                usuarioLogueado={currentUser}
-                onVerDetalles={setMedidorSeleccionado}
-              />
-            ))}
-          {/* Módulo Controladores RF: todos consultan; solo el Administrador da de alta y edita. */}
-          {activeItem === 'controladoresRF' && <GestionControladoresRF esAdmin={esAdmin} />}
+          {/* Módulo Controladores RF: lista -> controlador con sus medidores -> medidor.
+              Todos consultan; solo el Administrador da de alta y edita. */}
+          {activeItem === 'controladoresRF' && (
+            <GestionControladoresRF esAdmin={esAdmin} usuarioLogueado={currentUser} />
+          )}
           {/* Módulo Usuarios: solo Administrador (el Sidebar ya oculta la opción). */}
           {activeItem === 'usuarios' && esAdmin && <GestionUsuarios />}
         </main>

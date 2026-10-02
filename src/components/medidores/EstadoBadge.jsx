@@ -2,8 +2,8 @@
  * EstadoBadge.jsx
  * ---------------------------------------------------------------------------
  * Badge (etiqueta de color) que representa el estado operativo (`edo`) de
- * un medidor. Se usa tanto en el catálogo (ListaMedidores) como en el
- * encabezado de la vista de detalle (DetalleMedidor), para que ambos
+ * un medidor. Se usa tanto en la tabla de medidores de un controlador
+ * (DetalleControlador) como en el encabezado de DetalleMedidor, para que ambos
  * muestren exactamente los mismos colores y textos.
  *
  * Estados (catálogo del backend, ver ESTADOS_MEDIDOR en medidoresService.js):

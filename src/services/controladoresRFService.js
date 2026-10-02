@@ -12,12 +12,14 @@
  *   POST /ControladorRF       -> alta { numSerie, dirIP, nombre, edo }   (Administrador)
  *   PUT  /ControladorRF/{id}  -> edición, mismos campos                  (Administrador)
  *
- * Los GET incluyen `medidores` (los medidores QP asociados); aquí solo se
- * guarda cuántos son. El backend no tiene endpoint para eliminar controladores. `edo` es un
+ * Los GET incluyen `medidores` (los medidores QP asociados), que se
+ * normalizan con parsearMedidor de medidoresService.js. El backend no tiene
+ * endpoint para eliminar controladores. `edo` es un
  * entero cuyo catálogo (activo, mantenimiento, inactivo) aún no está
  * definido, por lo que se maneja tal cual llega.
  */
 import { apiGet, apiPost, apiPut } from './api'
+import { parsearMedidor } from './medidoresService'
 
 // Ruta del WebService usada en este módulo (relativa a la URL base).
 const RUTA = '/ControladorRF'
@@ -33,7 +35,9 @@ function parsearControlador(c) {
     dirIP: c.dirIP,
     nombre: c.nombre,
     edo: c.edo,
-    totalMedidores: c.medidores?.length ?? 0,
+    medidores: (c.medidores ?? [])
+      .map((m) => parsearMedidor(m, c))
+      .sort((a, b) => a.dirRed - b.dirRed),
   }
 }
 
@@ -44,7 +48,7 @@ function aCuerpo({ numSerie, dirIP, nombre, edo }) {
 
 /**
  * Lista todos los controladores RF.
- * @returns {Promise<Array<{ id, numSerie, dirIP, nombre, edo, totalMedidores }>>}
+ * @returns {Promise<Array<{ id, numSerie, dirIP, nombre, edo, medidores }>>}
  */
 export async function listarControladoresRF({ signal } = {}) {
   const controladores = await apiGet(RUTA, { signal })
@@ -54,7 +58,7 @@ export async function listarControladoresRF({ signal } = {}) {
 /**
  * Consulta el detalle de un controlador RF.
  * @param {number} id
- * @returns {Promise<object>} Misma forma que listarControladoresRF.
+ * @returns {Promise<object>} Misma forma que listarControladoresRF (incluye sus medidores).
  */
 export async function obtenerControladorRF(id, { signal } = {}) {
   return parsearControlador(await apiGet(`${RUTA}/${id}`, { signal }))

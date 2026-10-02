@@ -4,7 +4,8 @@
  * Formulario de alta / edición de un medidor QP (solo Administrador).
  *
  * Rol en el sistema:
- * - Se abre desde ListaMedidores con "+ Nuevo medidor" o "Editar".
+ * - Se abre con "+ Nuevo medidor" o "Editar" desde el detalle de un
+ *   controlador (DetalleControlador).
  * - Envía POST /MedidoresQP (alta) o PUT /MedidoresQP/{id} (edición).
  * - Cada medidor pertenece a un controlador RF, que se elige de la lista de
  *   controladores existentes; el estado se elige del catálogo del backend.
@@ -39,9 +40,19 @@ const VALIDADORES = {
 // Props:
 // - medidor: null para alta, u objeto medidor (de medidoresService) para editar.
 // - controladores: lista [{ id, nombre }] para elegir el controlador RF.
+// - idCtrlRFInicial: (opcional) controlador preseleccionado en el alta, p. ej. al
+//   dar de alta desde el detalle de un controlador.
 // - onGuardado: callback con el mensaje de éxito tras guardar.
 // - onCancelar: callback para cerrar el formulario sin guardar.
-export default function FormularioMedidor({ medidor, controladores, onGuardado, onCancelar }) {
+// - claseFondo: (opcional) clases de fondo y borde, para distinguir de qué sección es el formulario.
+export default function FormularioMedidor({
+  medidor,
+  controladores,
+  idCtrlRFInicial,
+  onGuardado,
+  onCancelar,
+  claseFondo = 'border-slate-200 bg-slate-50',
+}) {
   const esEdicion = medidor !== null
   const [form, setForm] = useState(() =>
     esEdicion
@@ -54,8 +65,14 @@ export default function FormularioMedidor({ medidor, controladores, onGuardado, 
           edo: String(medidor.edo),
         }
       : {
-          // Con un solo controlador se preselecciona; con varios, el usuario elige.
-          idCtrlRF: controladores.length === 1 ? String(controladores[0].id) : '',
+          // Se preselecciona el controlador indicado o, si solo hay uno, ese;
+          // si no, el usuario elige.
+          idCtrlRF:
+            idCtrlRFInicial !== undefined
+              ? String(idCtrlRFInicial)
+              : controladores.length === 1
+                ? String(controladores[0].id)
+                : '',
           descripcion: '',
           dirRed: '',
           dirRF: '',
@@ -104,7 +121,7 @@ export default function FormularioMedidor({ medidor, controladores, onGuardado, 
 
   return (
     // noValidate desactiva los globos del navegador: se valida con VALIDADORES.
-    <form noValidate onSubmit={guardar} className="border-b border-slate-200 bg-slate-50 px-6 py-5">
+    <form noValidate onSubmit={guardar} className={`border-b px-6 py-5 ${claseFondo}`}>
       <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-800">
         {esEdicion ? `Editar medidor: ${medidor.descripcion}` : 'Nuevo medidor'}
       </h3>

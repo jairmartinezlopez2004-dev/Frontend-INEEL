@@ -9,8 +9,9 @@
  * ya "limpios" (DTOs del lado del frontend).
  *
  * Endpoints de medidores (backend, rama pruebas):
- *   GET  /ControladorRF        -> cada controlador trae su lista `medidores`
- *                                 (no existe un GET propio de medidores)
+ *   GET  /ControladorRF[/{id}] -> cada controlador trae su lista `medidores`
+ *                                 (no existe un GET propio de medidores; ver
+ *                                 controladoresRFService.js, que usa parsearMedidor)
  *   POST /MedidoresQP          -> alta   (Administrador)
  *   PUT  /MedidoresQP/{id}     -> edición (Administrador; 404 si no existe)
  * Cada medidor pertenece a un único controlador RF (`idCtrlRF`), que debe
@@ -25,7 +26,6 @@ import { apiGet, apiPost, apiPut } from './api'
 
 // Rutas del WebService usadas en este módulo (relativas a la URL base).
 const RUTAS = {
-  controladores: '/ControladorRF',
   medidores: '/MedidoresQP',
   leerConfiguracion: '/Medidores/Configuracion', // Provisional (LeerSetpoints)
   guardarConfiguracion: '/Medidores/Configuracion', // Provisional (ProgramarsetPoints)
@@ -42,8 +42,11 @@ export const ESTADOS_MEDIDOR = [
   { valor: 0, texto: 'Fuera de operación' },
 ]
 
-/** Normaliza un medidor del backend a la forma que usa la UI. */
-function parsearMedidor(m, controlador) {
+/**
+ * Normaliza un medidor del backend a la forma que usa la UI.
+ * `controlador` (opcional) es el controlador del backend que lo contiene.
+ */
+export function parsearMedidor(m, controlador) {
   return {
     id: m.idMedidor,
     idCtrlRF: m.idCtrlRF,
@@ -66,24 +69,6 @@ function aCuerpo({ idCtrlRF, dirRed, dirRF, descripcion, edo, dirIP }) {
     edo,
     dirIP: dirIP.trim(),
   }
-}
-
-/**
- * Obtiene los medidores (de todos los controladores) y la lista de
- * controladores RF, en una sola petición a GET /ControladorRF.
- *
- * @returns {Promise<{ medidores: Array<object>, controladores: Array<{ id, nombre }> }>}
- *   Medidores ordenados por controlador y dirección de red.
- */
-export async function listarMedidores({ signal } = {}) {
-  const lista = await apiGet(RUTAS.controladores, { signal })
-
-  const controladores = lista.map((c) => ({ id: c.idCtrlRF, nombre: c.nombre }))
-  const medidores = lista
-    .flatMap((c) => (c.medidores ?? []).map((m) => parsearMedidor(m, c)))
-    .sort((a, b) => a.nombreControlador.localeCompare(b.nombreControlador) || a.dirRed - b.dirRed)
-
-  return { medidores, controladores }
 }
 
 /**
