@@ -26,7 +26,7 @@ import CampoFormulario from '../common/CampoFormulario'
 import { claseControl } from '../common/clasesFormulario'
 
 // Encabezados de la tabla. La última columna (acciones) solo aplica al Administrador.
-const COLUMNAS = ['Nombre', 'Número de serie', 'Dirección IP', 'Estado']
+const COLUMNAS = ['Nombre', 'Número de serie', 'Dirección IP', 'Estado', 'Medidores']
 
 // Valores iniciales del formulario de alta. `edo` se guarda como texto mientras
 // se escribe (para distinguir "vacío" de 0) y se convierte a número al enviar.
@@ -291,6 +291,7 @@ export default function GestionControladoresRF({ esAdmin }) {
                   <td className="px-4 py-3 font-mono text-slate-700">{controlador.numSerie}</td>
                   <td className="px-4 py-3 font-mono text-slate-700">{controlador.dirIP}</td>
                   <td className="px-4 py-3 font-mono text-slate-700">{controlador.edo}</td>
+                  <td className="px-4 py-3 font-mono text-slate-700">{controlador.totalMedidores}</td>
                   {esAdmin && (
                     <td className="px-4 py-3 text-right">
                       <button

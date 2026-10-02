@@ -27,7 +27,8 @@ function DatoMedidor({ etiqueta, valor }) {
 }
 
 // Props:
-// - medidor: objeto { dirRed, dirRF, descripcion, edo, dirIP, puerto } elegido en el catálogo.
+// - medidor: objeto { id, idCtrlRF, nombreControlador, dirRed, dirRF, descripcion, edo, dirIP }
+//   elegido en el catálogo (ver medidoresService.js).
 // - usuarioLogueado: usuario autenticado (se reenvía a las pestañas para los permisos por rol).
 // - onVolver: callback para regresar al Catálogo de Medidores.
 export default function DetalleMedidor({ medidor, usuarioLogueado, onVolver }) {
@@ -49,10 +50,10 @@ export default function DetalleMedidor({ medidor, usuarioLogueado, onVolver }) {
         </div>
 
         <dl className="mt-4 grid grid-cols-2 gap-4 border-t border-slate-200 pt-4 sm:grid-cols-4">
+          <DatoMedidor etiqueta="Controlador RF" valor={medidor.nombreControlador} />
           <DatoMedidor etiqueta="Dir. Red" valor={medidor.dirRed} />
           <DatoMedidor etiqueta="Dir. RF" valor={medidor.dirRF} />
           <DatoMedidor etiqueta="Dirección IP" valor={medidor.dirIP} />
-          <DatoMedidor etiqueta="Puerto" valor={medidor.puerto} />
         </dl>
       </div>
 

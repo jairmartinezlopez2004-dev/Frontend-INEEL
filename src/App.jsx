@@ -136,7 +136,7 @@ function App() {
           {activeItem === 'medidores' &&
             (medidorSeleccionado ? (
               <DetalleMedidor
-                key={medidorSeleccionado.dirRed}
+                key={medidorSeleccionado.id}
                 medidor={medidorSeleccionado}
                 usuarioLogueado={currentUser}
                 onVolver={() => setMedidorSeleccionado(null)}

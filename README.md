@@ -10,7 +10,7 @@ Construido con **React 19**, **Vite** y **Tailwind CSS**.
 | Módulo | Descripción |
 |---|---|
 | Login | Inicio de sesión con JWT; la sesión se conserva al recargar la página. |
-| Medidores | Lista de medidores y detalle por medidor con las pestañas Coms, Instantáneos, Valores 5M, Calidad y Consumos. |
+| Medidores | Lista de medidores QP agrupados por controlador RF; alta y edición solo para el rol Administrador. Detalle por medidor con las pestañas Coms, Instantáneos, Valores 5M, Calidad y Consumos. |
 | Controladores RF | Lista de controladores de radiofrecuencia; alta y edición solo para el rol Administrador. |
 | Usuarios | Alta y edición de usuarios (solo rol Administrador). |
 
@@ -67,7 +67,8 @@ src/
     ├── api.js           # Cliente HTTP: URL base, token JWT y manejo de errores
     ├── authService.js   # Login, restaurar y cerrar sesión
     ├── usuariosService.js
-    └── medidoresService.js
+    ├── medidoresService.js
+    └── controladoresRFService.js
 ```
 
 Los componentes no llaman a `fetch` directamente: todo pasa por `src/services/`, que adjunta el

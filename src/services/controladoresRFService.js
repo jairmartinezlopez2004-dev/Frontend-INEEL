@@ -12,7 +12,8 @@
  *   POST /ControladorRF       -> alta { numSerie, dirIP, nombre, edo }   (Administrador)
  *   PUT  /ControladorRF/{id}  -> edición, mismos campos                  (Administrador)
  *
- * El backend no tiene endpoint para eliminar controladores. `edo` es un
+ * Los GET incluyen `medidores` (los medidores QP asociados); aquí solo se
+ * guarda cuántos son. El backend no tiene endpoint para eliminar controladores. `edo` es un
  * entero cuyo catálogo (activo, mantenimiento, inactivo) aún no está
  * definido, por lo que se maneja tal cual llega.
  */
@@ -32,6 +33,7 @@ function parsearControlador(c) {
     dirIP: c.dirIP,
     nombre: c.nombre,
     edo: c.edo,
+    totalMedidores: c.medidores?.length ?? 0,
   }
 }
 
@@ -42,7 +44,7 @@ function aCuerpo({ numSerie, dirIP, nombre, edo }) {
 
 /**
  * Lista todos los controladores RF.
- * @returns {Promise<Array<{ id, numSerie, dirIP, nombre, edo }>>}
+ * @returns {Promise<Array<{ id, numSerie, dirIP, nombre, edo, totalMedidores }>>}
  */
 export async function listarControladoresRF({ signal } = {}) {
   const controladores = await apiGet(RUTA, { signal })

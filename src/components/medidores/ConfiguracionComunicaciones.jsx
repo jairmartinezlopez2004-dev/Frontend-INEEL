@@ -16,7 +16,7 @@
  *     · Usuario Normal (rolId 3): experiencia de solo lectura; todos los
  *       campos quedan deshabilitados y no se muestran botones de acción.
  *
- * NOTA: App.jsx monta DetalleMedidor con `key={medidor.dirRed}`, de modo
+ * NOTA: App.jsx monta DetalleMedidor con `key={medidor.id}`, de modo
  * que al cambiar de medidor el estado interno se reinicia por completo.
  */
 import { useEffect, useState } from 'react'
@@ -121,7 +121,8 @@ function Seccion({ titulo, children }) {
 // ---------------------------------------------------------------------------
 
 // Props:
-// - medidor: objeto { dirRed, dirRF, descripcion, edo, dirIP, puerto } seleccionado en el catálogo.
+// - medidor: objeto { id, dirRed, dirRF, descripcion, edo, dirIP } seleccionado en el catálogo
+//   (el backend aún no guarda el puerto; se usa el de CONFIG_COMS_DEFAULT).
 // - usuarioLogueado: objeto del usuario autenticado (se usa rolId para permisos).
 export default function ConfiguracionComunicaciones({ medidor, usuarioLogueado }) {
   const esAdmin = usuarioLogueado?.rolId === ROL_ADMINISTRADOR
@@ -152,7 +153,7 @@ export default function ConfiguracionComunicaciones({ medidor, usuarioLogueado }
     leerConfiguracionComs(medidor.dirRed, { signal: controlador.signal })
       .then((datos) => {
         // Se combinan con los valores iniciales por si el DTO omite algún campo.
-        const leida = { ...CONFIG_COMS_DEFAULT, dirIP: medidor.dirIP, puerto: medidor.puerto, ...datos }
+        const leida = { ...CONFIG_COMS_DEFAULT, dirIP: medidor.dirIP, puerto: medidor.puerto ?? CONFIG_COMS_DEFAULT.puerto, ...datos }
         setConfig(leida)
         setConfigGuardada(leida)
       })
