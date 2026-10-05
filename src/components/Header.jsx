@@ -83,11 +83,13 @@ function Header({ currentUser, isSidebarOpen, onToggleSidebar, onLogout }) {
           <HamburgerIcon />
         </button>
 
-        {/* Logotipo institucional del INEEL. */}
+        {/* Logotipo institucional del INEEL. El PNG trae margen blanco alrededor,
+            por eso se usa h-14 (56 px) en un header de 64 px: el logo visible
+            queda en ~48 px, el tamaño habitual en una barra superior. */}
         <img
           src="/logo-ineel-texto.png"
           alt="INEEL"
-          className="h-10 w-auto shrink-0 object-contain"
+          className="h-14 w-auto shrink-0 object-contain"
         />
 
         {/* Título del sistema, oculto en pantallas muy pequeñas para no saturar el header. */}

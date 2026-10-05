@@ -68,7 +68,7 @@ export default function Login({ onLoginSuccess }) {
           <img
             src="/logo-ineel-texto.png"
             alt="Instituto Nacional de Electricidad y Energías Limpias"
-            className="h-16 mx-auto object-contain"
+            className="h-28 mx-auto object-contain" // 112 px: tamaño habitual de logo en pantallas de acceso
           />
         </div>
 
