@@ -30,16 +30,6 @@ import Header from './components/Header'
 import AvisoExpiracionSesion from './components/AvisoExpiracionSesion'
 import { restaurarSesion, cerrarSesion } from './services/authService'
 
-// Diccionario de títulos "amigables" para cada sección del menú (uso futuro,
-// por ejemplo para mostrarlos en un breadcrumb o en el <title> del documento).
-const PAGE_TITLES = {
-  controladoresRF: 'Controladores RF',
-  eventos: 'Eventos configurados',
-  eventosRegistrados: 'Eventos registrados',
-  unidades: 'Unidades',
-  usuarios: 'Usuarios',
-}
-
 // rolId del Administrador en la UI (ver ROL_IDS en services/authService.js).
 const ROL_ADMINISTRADOR = 2
 

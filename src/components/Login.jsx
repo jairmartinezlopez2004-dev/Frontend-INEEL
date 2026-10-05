@@ -7,7 +7,7 @@
  * Gestiona las credenciales de acceso del usuario y las valida contra el
  * WebService (POST /Auth/login) mediante services/authService.js.
  */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { iniciarSesion } from '../services/authService';
 import { useValidacion } from '../hooks/useValidacion';
 import { validarTexto } from '../utils/validaciones';

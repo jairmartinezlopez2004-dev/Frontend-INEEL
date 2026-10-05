@@ -7,7 +7,6 @@
  *
  * Endpoints:
  *   GET  /Users         -> lista de todos los usuarios
- *   GET  /Users/admins  -> solo los administradores
  *   POST /Users         -> alta { correo, contrasena, nombreUsuario, rol }
  *   PUT  /Users/{id}    -> edición { correo, nombreUsuario, rol, edo, tiempoSesion }
  *                          (no cambia la contraseña; la baja es con edo = false)
@@ -18,11 +17,8 @@
  */
 import { apiGet, apiPost, apiPut } from './api'
 
-// Rutas del WebService usadas en este módulo (relativas a la URL base).
-const RUTAS = {
-  usuarios: '/Users',
-  administradores: '/Users/admins',
-}
+// Ruta del WebService usada en este módulo (relativa a la URL base).
+const RUTA = '/Users'
 
 // Enum TipoRol del backend.
 const ROL_A_NUMERO = { Administrador: 1, Usuario: 2 }
@@ -51,16 +47,7 @@ function parsearUsuario(u) {
  * @returns {Promise<Array<{ id, correo, nombreUsuario, rol, activo, tiempoSesion }>>}
  */
 export async function listarUsuarios({ signal } = {}) {
-  const usuarios = await apiGet(RUTAS.usuarios, { signal })
-  return usuarios.map(parsearUsuario)
-}
-
-/**
- * Lista solo los usuarios con rol Administrador.
- * @returns {Promise<Array<object>>} Misma forma que listarUsuarios.
- */
-export async function listarAdministradores({ signal } = {}) {
-  const usuarios = await apiGet(RUTAS.administradores, { signal })
+  const usuarios = await apiGet(RUTA, { signal })
   return usuarios.map(parsearUsuario)
 }
 
@@ -71,7 +58,7 @@ export async function listarAdministradores({ signal } = {}) {
  * @returns {Promise<object>} Usuario creado (misma forma que listarUsuarios).
  */
 export async function crearUsuario({ correo, contrasena, nombreUsuario, rol }) {
-  const creado = await apiPost(RUTAS.usuarios, {
+  const creado = await apiPost(RUTA, {
     correo,
     contrasena,
     nombreUsuario,
@@ -87,7 +74,7 @@ export async function crearUsuario({ correo, contrasena, nombreUsuario, rol }) {
  * @returns {Promise<object>} Usuario actualizado (misma forma que listarUsuarios).
  */
 export async function actualizarUsuario(id, { correo, nombreUsuario, rol, activo, tiempoSesion }) {
-  const actualizado = await apiPut(`${RUTAS.usuarios}/${id}`, {
+  const actualizado = await apiPut(`${RUTA}/${id}`, {
     correo,
     nombreUsuario,
     rol: ROL_A_NUMERO[rol],

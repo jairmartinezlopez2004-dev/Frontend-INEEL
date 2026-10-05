@@ -10,7 +10,7 @@
  * disponibles y marca visualmente cuál está activa, pero no dispara ninguna
  * acción real al hacer clic (no recibe props ni maneja eventos todavía).
  * Está pensado como base para, en una siguiente iteración, controlar qué
- * sección de ComsForm.jsx se muestra.
+ * sección de la configuración de comunicaciones se muestra.
  */
 
 // Opciones del menú lateral de Comunicaciones.
