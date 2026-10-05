@@ -12,6 +12,8 @@
  *   entre versiones del backend (main manda nombre y rol; la rama pruebas
  *   solo { mensaje, token, idUsuario }).
  * - Al recargar la página, recupera la sesión si el token sigue vigente.
+ * - Extiende la sesión (POST /Auth/renew) y expone cuánto le queda
+ *   al token, para el aviso de expiración (AvisoExpiracionSesion.jsx).
  */
 import { apiGet, apiPost, ApiError, TOKEN_KEY } from './api'
 
@@ -88,12 +90,39 @@ function aUsuarioUI(payload) {
  */
 export async function iniciarSesion(correo, contrasena) {
   const { token } = await apiPost('/Auth/login', { correo, contrasena })
+  return guardarToken(token)
+}
 
+/**
+ * Extiende la sesión: pide un token nuevo con POST /Auth/renew.
+ * El backend lo genera con el `tiempoSesion` del usuario en la base de datos
+ * (60 minutos por defecto). Solo funciona mientras el token actual siga vigente.
+ *
+ * @returns {Promise<object>} Usuario (con los datos del token nuevo).
+ * @throws {ApiError} Si el backend no pudo renovar la sesión.
+ */
+export async function renovarSesion() {
+  const { token } = await apiPost('/Auth/renew')
+  return guardarToken(token)
+}
+
+/** Valida y guarda el token recibido; devuelve el usuario para la UI. */
+function guardarToken(token) {
   const payload = token && leerPayloadToken(token)
   if (!payload) throw new ApiError('El WebService devolvió un token inválido.')
 
   sessionStorage.setItem(TOKEN_KEY, token)
   return aUsuarioUI(payload)
+}
+
+/**
+ * Segundos que le quedan al token guardado antes de expirar (claim `exp`).
+ * @returns {number} 0 si no hay token o ya expiró.
+ */
+export function segundosRestantesSesion() {
+  const payload = leerPayloadToken(sessionStorage.getItem(TOKEN_KEY) ?? '')
+  if (!payload?.exp) return 0
+  return Math.max(0, Math.floor((payload.exp * 1000 - Date.now()) / 1000))
 }
 
 /**

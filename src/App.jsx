@@ -23,6 +23,7 @@ import Login from './components/Login'
 import GestionUsuarios from './components/usuarios/GestionUsuarios'
 import GestionControladoresRF from './components/controladoresRF/GestionControladoresRF'
 import Header from './components/Header'
+import AvisoExpiracionSesion from './components/AvisoExpiracionSesion'
 import { restaurarSesion, cerrarSesion } from './services/authService'
 
 // Diccionario de títulos "amigables" para cada sección del menú (uso futuro,
@@ -97,6 +98,10 @@ function App() {
         onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
         onLogout={handleLogout}
       />
+
+      {/* Aviso "tu sesión caduca en 1 minuto" y cierre automático al expirar
+          el token (ver AvisoExpiracionSesion.jsx). */}
+      <AvisoExpiracionSesion onRenovada={setCurrentUser} onExpirada={handleLogout} />
 
       {/* ÁREA INFERIOR: Menú Lateral + Contenido */}
       <div className="flex flex-1 overflow-hidden">
