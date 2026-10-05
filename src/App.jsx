@@ -13,8 +13,9 @@
  *   Estos estados se pasan hacia abajo como props (elevación de estado /
  *   lifting state up) a los componentes hijos que los necesitan.
  * - Actúa como enrutador simple entre los módulos principales (Controladores
- *   RF y Usuarios) según el ítem seleccionado en el Sidebar. Los medidores se
- *   consultan dentro de su controlador (ver GestionControladoresRF.jsx).
+ *   RF, Eventos configurados, Eventos registrados, Unidades y Usuarios)
+ *   según el ítem seleccionado en el Sidebar. Los medidores se consultan
+ *   dentro de su controlador (ver GestionControladoresRF.jsx).
  */
 import { useEffect, useState } from 'react'
 import Sidebar from './components/Sidebar'
@@ -22,6 +23,9 @@ import StatusBar from './components/StatusBar'
 import Login from './components/Login'
 import GestionUsuarios from './components/usuarios/GestionUsuarios'
 import GestionControladoresRF from './components/controladoresRF/GestionControladoresRF'
+import GestionEventos from './components/eventos/GestionEventos'
+import GestionEventosRegistrados from './components/eventosReg/GestionEventosRegistrados'
+import GestionUnidades from './components/unidades/GestionUnidades'
 import Header from './components/Header'
 import AvisoExpiracionSesion from './components/AvisoExpiracionSesion'
 import { restaurarSesion, cerrarSesion } from './services/authService'
@@ -30,6 +34,9 @@ import { restaurarSesion, cerrarSesion } from './services/authService'
 // por ejemplo para mostrarlos en un breadcrumb o en el <title> del documento).
 const PAGE_TITLES = {
   controladoresRF: 'Controladores RF',
+  eventos: 'Eventos configurados',
+  eventosRegistrados: 'Eventos registrados',
+  unidades: 'Unidades',
   usuarios: 'Usuarios',
 }
 
@@ -116,13 +123,22 @@ function App() {
 
         {/* CONTENIDO PRINCIPAL DINÁMICO */}
         {/* Renderizado condicional de vistas: según el ítem activo del Sidebar
-            se monta el módulo correspondiente (Controladores RF o Usuarios). */}
+            se monta el módulo correspondiente (Controladores RF, Eventos, Unidades o Usuarios). */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50 relative">
           {/* Módulo Controladores RF: lista -> controlador con sus medidores -> medidor.
               Todos consultan; solo el Administrador da de alta y edita. */}
           {activeItem === 'controladoresRF' && (
             <GestionControladoresRF esAdmin={esAdmin} usuarioLogueado={currentUser} />
           )}
+          {/* Módulo Eventos configurados: todos consultan; solo el Administrador
+              da de alta y edita (la baja es marcarlo inactivo). */}
+          {activeItem === 'eventos' && <GestionEventos esAdmin={esAdmin} />}
+          {/* Módulo Eventos registrados: historial de solo consulta de los eventos
+              configurados que han ocurrido en los medidores. */}
+          {activeItem === 'eventosRegistrados' && <GestionEventosRegistrados />}
+          {/* Módulo Unidades: catálogo de unidades de medida; todos consultan, solo el
+              Administrador da de alta y edita. */}
+          {activeItem === 'unidades' && <GestionUnidades esAdmin={esAdmin} />}
           {/* Módulo Usuarios: solo Administrador (el Sidebar ya oculta la opción). */}
           {activeItem === 'usuarios' && esAdmin && <GestionUsuarios />}
         </main>

@@ -5,7 +5,8 @@
  *
  * Rol en el sistema:
  * Permite al usuario cambiar entre los módulos principales del sistema
- * (Controladores RF, que incluye los medidores, y, solo para el Administrador, Usuarios). No maneja su propio estado de
+ * (Controladores RF, que incluye los medidores, Eventos configurados, Eventos
+ * registrados, Unidades y, solo para el Administrador, Usuarios). No maneja su propio estado de
  * navegación: recibe cuál es el ítem activo y una función para notificar
  * cambios, siguiendo el patrón de elevación de estado (el estado real vive
  * en App.jsx).
@@ -16,6 +17,9 @@
 // Catálogo estático de opciones del menú lateral (id interno + etiqueta visible).
 const NAV_ITEMS = [
   { id: 'controladoresRF', label: 'Controladores RF' },
+  { id: 'eventos', label: 'Eventos configurados' },
+  { id: 'eventosRegistrados', label: 'Eventos registrados' },
+  { id: 'unidades', label: 'Unidades' },
   // Solo visible para el Administrador (ver prop esAdmin).
   { id: 'usuarios', label: 'Usuarios', soloAdmin: true },
 ];
