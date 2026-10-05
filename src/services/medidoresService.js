@@ -34,12 +34,13 @@ const RUTAS = {
 // Límites de longitud de la tabla MedidorQP (varchar en la base de datos).
 export const LIMITES = { dirRF: 20, descripcion: 80, dirIP: 20 }
 
-// Catálogo de estados que acepta el backend (cualquier otro valor da 400).
-export const ESTADOS_MEDIDOR = [
-  { valor: 10, texto: 'En operación' },
+// Catálogo de estados (`edo`) de medidores y controladores RF que acepta el
+// backend; cualquier otro valor da 400. No hay eliminación física: para dar
+// de baja un equipo se edita con estado 20 y para reactivarlo, con 10.
+export const ESTADOS_EQUIPO = [
+  { valor: 10, texto: 'Activo' },
   { valor: 11, texto: 'En uso' },
-  { valor: 20, texto: 'Mantenimiento' },
-  { valor: 0, texto: 'Fuera de operación' },
+  { valor: 20, texto: 'Inactivo' },
 ]
 
 /**

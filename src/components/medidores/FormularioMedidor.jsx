@@ -15,7 +15,7 @@
 import { useState } from 'react'
 import {
   LIMITES,
-  ESTADOS_MEDIDOR,
+  ESTADOS_EQUIPO,
   crearMedidor,
   actualizarMedidor,
 } from '../../services/medidoresService'
@@ -200,7 +200,7 @@ export default function FormularioMedidor({
 
         <CampoFormulario id="medidor-edo" etiqueta="Estado" error={errorDe('edo')}>
           <select {...propsDe('edo')}>
-            {ESTADOS_MEDIDOR.map((e) => (
+            {ESTADOS_EQUIPO.map((e) => (
               <option key={e.valor} value={e.valor}>
                 {e.texto}
               </option>

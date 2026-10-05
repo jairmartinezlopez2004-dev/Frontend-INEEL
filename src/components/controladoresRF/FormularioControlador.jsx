@@ -5,9 +5,9 @@
  * Se usa desde la lista de Controladores RF (alta y edición) y desde el
  * detalle de un controlador (edición). Envía POST / PUT /ControladorRF.
  *
- * El estado (`edo`) es un número: el catálogo de significados (activo,
- * mantenimiento, inactivo) aún no lo define el backend, así que se captura
- * tal cual.
+ * El estado (`edo`) se elige del catálogo compartido con los medidores
+ * (ESTADOS_EQUIPO: 10 activo, 11 en uso, 20 inactivo). No hay eliminación:
+ * para dar de baja un controlador se guarda con estado Inactivo.
  */
 import { useState } from 'react'
 import {
@@ -15,21 +15,22 @@ import {
   crearControladorRF,
   actualizarControladorRF,
 } from '../../services/controladoresRFService'
+import { ESTADOS_EQUIPO } from '../../services/medidoresService'
 import { useValidacion } from '../../hooks/useValidacion'
-import { validarTexto, validarIP, validarEntero } from '../../utils/validaciones'
+import { validarTexto, validarIP } from '../../utils/validaciones'
 import CampoFormulario from '../common/CampoFormulario'
 import { claseControl } from '../common/clasesFormulario'
 
-// Valores iniciales del formulario de alta. `edo` se guarda como texto mientras
-// se escribe (para distinguir "vacío" de 0) y se convierte a número al enviar.
-const FORM_NUEVO = { numSerie: '', dirIP: '', nombre: '', edo: '1' }
+// Valores iniciales del formulario de alta. `edo` se guarda como texto (valor
+// del <select>) y se convierte a número al enviar; por defecto, Activo.
+const FORM_NUEVO = { numSerie: '', dirIP: '', nombre: '', edo: '10' }
 
 // Reglas de cada campo, en el orden en que aparecen en pantalla.
 const VALIDADORES = {
   nombre: (v) => validarTexto(v, { nombre: 'El nombre', maximo: LIMITES.nombre }),
   numSerie: (v) => validarTexto(v, { nombre: 'El número de serie', maximo: LIMITES.numSerie }),
   dirIP: validarIP,
-  edo: (v) => validarEntero(v, { nombre: 'El estado' }),
+  edo: (v) => (v === '' ? 'Elige el estado del controlador.' : null),
 }
 
 // Props:
@@ -134,15 +135,19 @@ export default function FormularioControlador({
           />
         </CampoFormulario>
 
-        {/* El catálogo de estados aún no está definido en el backend: se captura el número.
-            Es type="text" para que, si se escribe una letra, se vea el mensaje propio. */}
         <CampoFormulario
           id="ctrlrf-edo"
-          etiqueta="Estado (número)"
+          etiqueta="Estado"
           error={errorDe('edo')}
-          ayuda="Número entero (0, 1, 2…)."
+          ayuda="Para dar de baja el controlador, elige Inactivo."
         >
-          <input type="text" inputMode="numeric" {...propsDe('edo')} />
+          <select {...propsDe('edo')}>
+            {ESTADOS_EQUIPO.map((e) => (
+              <option key={e.valor} value={e.valor}>
+                {e.texto}
+              </option>
+            ))}
+          </select>
         </CampoFormulario>
       </fieldset>
 

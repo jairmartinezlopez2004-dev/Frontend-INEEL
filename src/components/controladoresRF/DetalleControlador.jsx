@@ -146,7 +146,7 @@ export default function DetalleControlador({
               <dl className="mt-4 grid grid-cols-2 gap-4 border-t border-blue-200 pt-4 sm:grid-cols-4">
                 <DatoControlador etiqueta="Número de serie" valor={controlador.numSerie} />
                 <DatoControlador etiqueta="Dirección IP" valor={controlador.dirIP} />
-                <DatoControlador etiqueta="Estado" valor={controlador.edo} />
+                <DatoControlador etiqueta="Estado" valor={<EstadoBadge edo={controlador.edo} />} />
                 <DatoControlador etiqueta="Medidores" valor={controlador.medidores.length} />
               </dl>
             </>

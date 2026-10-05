@@ -15,15 +15,16 @@
  *   detalle de cada controlador.
  * - Solo el Administrador ve "+ Nuevo controlador" y "Editar"
  *   (POST / PUT /ControladorRF); el backend además rechaza con 403 a quien no lo sea.
- * - El backend no permite eliminar controladores.
- * - El estado (`edo`) es un número: el catálogo de significados (activo,
- *   mantenimiento, inactivo) aún no lo define el backend, así que se muestra tal cual.
+ * - El backend no permite eliminar controladores: la baja se hace editando
+ *   el estado a Inactivo (edo 20).
+ * - El estado (`edo`) se muestra con EstadoBadge (10 activo, 11 en uso, 20 inactivo).
  */
 import { useEffect, useState } from 'react'
 import { listarControladoresRF } from '../../services/controladoresRFService'
 import FormularioControlador from './FormularioControlador'
 import DetalleControlador from './DetalleControlador'
 import DetalleMedidor from '../medidores/DetalleMedidor'
+import EstadoBadge from '../medidores/EstadoBadge'
 
 // Encabezados de la tabla. La última columna (acciones) no tiene título.
 const COLUMNAS = ['Nombre', 'Número de serie', 'Dirección IP', 'Estado', 'Medidores', '']
@@ -185,7 +186,9 @@ export default function GestionControladoresRF({ esAdmin, usuarioLogueado }) {
                   <td className="px-4 py-3 text-slate-900">{controlador.nombre}</td>
                   <td className="px-4 py-3 font-mono text-slate-700">{controlador.numSerie}</td>
                   <td className="px-4 py-3 font-mono text-slate-700">{controlador.dirIP}</td>
-                  <td className="px-4 py-3 font-mono text-slate-700">{controlador.edo}</td>
+                  <td className="px-4 py-3">
+                    <EstadoBadge edo={controlador.edo} />
+                  </td>
                   <td className="px-4 py-3 font-mono text-slate-700">{controlador.medidores.length}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-right">
                     {esAdmin && (
