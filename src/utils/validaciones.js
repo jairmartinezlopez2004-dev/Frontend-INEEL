@@ -2,7 +2,7 @@
  * validaciones.js
  * ---------------------------------------------------------------------------
  * Reglas de validación de formularios, compartidas por Login y los módulos
- * de gestión (Usuarios, Controladores RF, Eventos, Unidades).
+ * de gestión (Usuarios, Controladores RF, Eventos, Unidades, Puntos IO).
  *
  * Los formularios usan `noValidate` para no mostrar los globos genéricos del
  * navegador; en su lugar validan con estas funciones y muestran el mensaje
@@ -70,5 +70,19 @@ export function validarEntero(valor, { nombre, minimo, maximo }) {
   }
   if (minimo !== undefined && numero < minimo) return `${nombre} debe ser como mínimo ${minimo}.`
   if (maximo !== undefined && numero > maximo) return `${nombre} debe ser como máximo ${maximo}.`
+  return null
+}
+
+// Rango de un `int` de SQL Server / C#.
+const INT_MIN = -2147483648
+const INT_MAX = 2147483647
+
+/** Número entero obligatorio que puede ser negativo (p. ej. límites de un punto IO). */
+export function validarEnteroConSigno(valor, { nombre }) {
+  const texto = String(valor).trim()
+  if (!texto) return `${nombre} es obligatorio.`
+  if (!/^-?\d+$/.test(texto)) return `${nombre} debe ser un número entero, sin letras ni decimales.`
+  const numero = Number(texto)
+  if (numero < INT_MIN || numero > INT_MAX) return `${nombre} debe estar entre ${INT_MIN} y ${INT_MAX}.`
   return null
 }

@@ -13,7 +13,7 @@
  *   Estos estados se pasan hacia abajo como props (elevación de estado /
  *   lifting state up) a los componentes hijos que los necesitan.
  * - Actúa como enrutador simple entre los módulos principales (Controladores
- *   RF, Eventos configurados, Eventos registrados, Unidades y Usuarios)
+ *   RF, Eventos configurados, Eventos registrados, Unidades, Puntos IO y Usuarios)
  *   según el ítem seleccionado en el Sidebar. Los medidores se consultan
  *   dentro de su controlador (ver GestionControladoresRF.jsx).
  */
@@ -26,6 +26,7 @@ import GestionControladoresRF from './components/controladoresRF/GestionControla
 import GestionEventos from './components/eventos/GestionEventos'
 import GestionEventosRegistrados from './components/eventosReg/GestionEventosRegistrados'
 import GestionUnidades from './components/unidades/GestionUnidades'
+import GestionPuntosIO from './components/puntosIO/GestionPuntosIO'
 import Header from './components/Header'
 import AvisoExpiracionSesion from './components/AvisoExpiracionSesion'
 import { restaurarSesion, cerrarSesion } from './services/authService'
@@ -113,7 +114,7 @@ function App() {
 
         {/* CONTENIDO PRINCIPAL DINÁMICO */}
         {/* Renderizado condicional de vistas: según el ítem activo del Sidebar
-            se monta el módulo correspondiente (Controladores RF, Eventos, Unidades o Usuarios). */}
+            se monta el módulo correspondiente (Controladores RF, Eventos, Unidades, Puntos IO o Usuarios). */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50 relative">
           {/* Módulo Controladores RF: lista -> controlador con sus medidores -> medidor.
               Todos consultan; solo el Administrador da de alta y edita. */}
@@ -129,6 +130,9 @@ function App() {
           {/* Módulo Unidades: catálogo de unidades de medida; todos consultan, solo el
               Administrador da de alta y edita. */}
           {activeItem === 'unidades' && <GestionUnidades esAdmin={esAdmin} />}
+          {/* Módulo Puntos IO: todos consultan; solo el Administrador edita, y cada
+              edición se confirma con su contraseña. */}
+          {activeItem === 'puntosIO' && <GestionPuntosIO esAdmin={esAdmin} />}
           {/* Módulo Usuarios: solo Administrador (el Sidebar ya oculta la opción). */}
           {activeItem === 'usuarios' && esAdmin && <GestionUsuarios />}
         </main>

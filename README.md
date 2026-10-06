@@ -14,6 +14,7 @@ Construido con **React 19**, **Vite** y **Tailwind CSS**.
 | Eventos configurados | Catálogo de eventos que reconoce el sistema, con su unidad y estado. Alta y edición solo para el rol Administrador. |
 | Eventos registrados | Historial de solo consulta de los eventos configurados que han ocurrido en los medidores. |
 | Unidades | Catálogo de unidades de medida (V, A, kWh…). Alta y edición solo para el rol Administrador. |
+| Puntos IO | Puntos de entrada/salida con su grupo funcional, grupo eléctrico, unidad, direcciones y límites. Edición solo para el rol Administrador, confirmando cada cambio con su contraseña. |
 | Usuarios | Alta y edición de usuarios (solo rol Administrador). |
 
 Además, un minuto antes de que expire la sesión aparece un aviso para renovarla.
@@ -72,6 +73,7 @@ src/
 │   ├── eventos/               # Eventos configurados
 │   ├── eventosReg/            # Eventos registrados (historial)
 │   ├── unidades/              # Unidades de medida
+│   ├── puntosIO/              # Puntos de entrada/salida
 │   └── usuarios/              # Gestión de usuarios
 ├── hooks/useValidacion.js     # Validación de formularios
 ├── utils/validaciones.js      # Reglas de validación
@@ -83,7 +85,8 @@ src/
     ├── medidoresService.js
     ├── eventosConfigService.js
     ├── eventosRegService.js
-    └── unidadesService.js
+    ├── unidadesService.js
+    └── puntosIOService.js     # Puntos IO y catálogos de grupos IO
 ```
 
 Los componentes no llaman a `fetch` directamente: todo pasa por `src/services/`, que adjunta el
