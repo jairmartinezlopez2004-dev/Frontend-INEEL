@@ -32,7 +32,10 @@ const NAV_ITEMS = [
 // - onSelectItem: callback que App.jsx usa para cambiar el módulo activo.
 // - isOpen: booleano que indica si el menú está expandido (ancho completo) o colapsado (ancho 0).
 // - esAdmin: booleano; si es false se ocultan las opciones marcadas como soloAdmin.
-export default function Sidebar({ activeItem, onSelectItem, isOpen, esAdmin }) {
+// - onVolverInicio: callback para regresar a la vista principal (elegir tipo de consulta).
+// - idsVisibles: (opcional) ids de NAV_ITEMS a mostrar; sin él se muestran todos.
+//   "Datos en línea" lo usa para dejar solo Controladores RF.
+export default function Sidebar({ activeItem, onSelectItem, isOpen, esAdmin, onVolverInicio, idsVisibles }) {
   return (
     // Menú colapsable: la clase de ancho ("w-64" o "w-0") se anima con transition-[width]
     // para lograr el efecto de expandir/contraer el Sidebar.
@@ -46,7 +49,17 @@ export default function Sidebar({ activeItem, onSelectItem, isOpen, esAdmin }) {
 
         {/* Menú de Navegación */}
         <nav className="flex-1 space-y-1 px-3 py-4">
-          {NAV_ITEMS.filter((item) => !item.soloAdmin || esAdmin).map((item) => {
+          {/* Regresa a la vista principal "¿Consultar datos por medio de?:". */}
+          <button
+            type="button"
+            onClick={onVolverInicio}
+            className="mb-3 w-full cursor-pointer rounded-md border border-slate-700 px-3 py-2 text-left text-sm font-medium text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+          >
+            ← Tipo de consulta
+          </button>
+          {NAV_ITEMS.filter(
+            (item) => (!item.soloAdmin || esAdmin) && (!idsVisibles || idsVisibles.includes(item.id))
+          ).map((item) => {
             // Determina si este botón corresponde a la sección actualmente activa,
             // para resaltarlo visualmente.
             const isActive = item.id === activeItem;

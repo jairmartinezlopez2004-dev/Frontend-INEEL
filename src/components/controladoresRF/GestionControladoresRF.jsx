@@ -32,7 +32,10 @@ const COLUMNAS = ['Nombre', 'Número de serie', 'Dirección IP', 'Estado', 'Medi
 // Props:
 // - esAdmin: si es true se muestran el alta y la edición.
 // - usuarioLogueado: usuario autenticado (lo necesitan las pestañas del medidor).
-export default function GestionControladoresRF({ esAdmin, usuarioLogueado }) {
+// - soloLectura: si es true nadie edita, ni el Administrador ("Datos en línea").
+export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLogueado, soloLectura = false }) {
+  // En modo solo lectura se ocultan el alta y la edición aunque el rol lo permita.
+  const esAdmin = esAdminRol && !soloLectura
   const [controladores, setControladores] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(null)
@@ -94,6 +97,7 @@ export default function GestionControladoresRF({ esAdmin, usuarioLogueado }) {
         key={medidorAbierto.id}
         medidor={medidorAbierto}
         usuarioLogueado={usuarioLogueado}
+        soloLectura={soloLectura}
         textoVolver={`Volver a ${controladorAbierto.nombre}`}
         onVolver={() => setMedidorAbierto(null)}
       />

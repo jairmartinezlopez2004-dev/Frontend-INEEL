@@ -6,8 +6,11 @@
  * Rol en el sistema:
  * - Controla el flujo de autenticación: mientras no haya un usuario logueado
  *   (currentUser === null) muestra únicamente <Login />; en cuanto el login
- *   es exitoso, renderiza el layout completo de la aplicación (header,
- *   sidebar, contenido y barras de estado/footer).
+ *   es exitoso, muestra la vista principal <SeleccionConsulta /> para elegir
+ *   el tipo de consulta. La opción "Base de Datos (configuración)" renderiza
+ *   el layout completo de la aplicación (header, sidebar, contenido y barras
+ *   de estado/footer); "Datos en línea" usa el mismo layout, pero con solo el
+ *   flujo de Controladores RF en el menú.
  * - Es el "dueño" del estado global de la UI a nivel de aplicación:
  *   usuario autenticado, sección activa del menú y visibilidad del sidebar.
  *   Estos estados se pasan hacia abajo como props (elevación de estado /
@@ -30,6 +33,7 @@ import GestionUnidades from './components/unidades/GestionUnidades'
 import GestionPuntosIO from './components/puntosIO/GestionPuntosIO'
 import GestionGruposIO from './components/gruposIO/GestionGruposIO'
 import Header from './components/Header'
+import SeleccionConsulta from './components/inicio/SeleccionConsulta'
 import AvisoExpiracionSesion from './components/AvisoExpiracionSesion'
 import { restaurarSesion, cerrarSesion } from './services/authService'
 
@@ -46,6 +50,10 @@ function App() {
   // Controla si el menú lateral (Sidebar) está expandido o colapsado.
   // Empieza colapsado al cargar la página y vuelve a colapsarse al cerrar sesión.
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  // Tipo de consulta elegido en la vista principal. null = aún no se elige
+  // (se muestra SeleccionConsulta); 'baseDatos' = módulos de configuración;
+  // 'enLinea' = solo el flujo de Controladores RF.
+  const [modoConsulta, setModoConsulta] = useState(null)
   // true mientras se valida el token guardado (evita que parpadee el Login al recargar).
   const [verificandoSesion, setVerificandoSesion] = useState(true)
 
@@ -63,6 +71,7 @@ function App() {
   const handleLogout = () => {
     cerrarSesion()
     setCurrentUser(null)
+    setModoConsulta(null)
     setActiveItem('controladoresRF')
     setIsSidebarOpen(false)
   }
@@ -84,6 +93,30 @@ function App() {
   }
 
   const esAdmin = currentUser.rolId === ROL_ADMINISTRADOR
+
+  // Al elegir una opción se entra siempre por Controladores RF, el único
+  // módulo que comparten "Base de Datos" y "Datos en línea".
+  const seleccionarConsulta = (modo) => {
+    setActiveItem('controladoresRF')
+    setModoConsulta(modo)
+  }
+
+  // Vista principal: pregunta por qué medio consultar los datos. Por ahora
+  // "Perfiles 5 Minutales" no tiene vista; se agregará en pasos siguientes.
+  if (modoConsulta === null) {
+    return (
+      <>
+        <SeleccionConsulta currentUser={currentUser} onSeleccionar={seleccionarConsulta} onLogout={handleLogout} />
+        <AvisoExpiracionSesion onRenovada={setCurrentUser} onExpirada={handleLogout} />
+      </>
+    )
+  }
+
+  // Opción "Base de Datos (configuración)": todo lo construido hasta ahora.
+  // (Espacio reservado: aquí se ajustará esta vista en los siguientes pasos.)
+  // Opción "Datos en línea": el mismo layout, con el menú limitado al flujo
+  // de Controladores RF (controlador -> medidores -> detalle del medidor).
+  const idsVisibles = modoConsulta === 'enLinea' ? ['controladoresRF'] : undefined
 
   return (
     // Contenedor raíz de la aplicación autenticada: ocupa toda la pantalla
@@ -112,6 +145,8 @@ function App() {
           onSelectItem={setActiveItem}
           isOpen={isSidebarOpen}
           esAdmin={esAdmin}
+          onVolverInicio={() => setModoConsulta(null)}
+          idsVisibles={idsVisibles}
         />
 
         {/* CONTENIDO PRINCIPAL DINÁMICO */}
@@ -121,7 +156,12 @@ function App() {
           {/* Módulo Controladores RF: lista -> controlador con sus medidores -> medidor.
               Todos consultan; solo el Administrador da de alta y edita. */}
           {activeItem === 'controladoresRF' && (
-            <GestionControladoresRF esAdmin={esAdmin} usuarioLogueado={currentUser} />
+            <GestionControladoresRF
+              esAdmin={esAdmin}
+              usuarioLogueado={currentUser}
+              // "Datos en línea" es solo de consulta: nadie da de alta ni edita.
+              soloLectura={modoConsulta === 'enLinea'}
+            />
           )}
           {/* Módulo Eventos configurados: todos consultan; solo el Administrador
               da de alta y edita (la baja es marcarlo inactivo). */}

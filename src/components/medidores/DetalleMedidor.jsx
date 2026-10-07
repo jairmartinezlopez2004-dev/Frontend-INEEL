@@ -30,11 +30,13 @@ function DatoMedidor({ etiqueta, valor }) {
 // - medidor: objeto { id, idCtrlRF, nombreControlador, dirRed, dirRF, descripcion, edo, dirIP }
 //   elegido en el catálogo (ver medidoresService.js).
 // - usuarioLogueado: usuario autenticado (se reenvía a las pestañas para los permisos por rol).
+// - soloLectura: si es true las pestañas no permiten editar, ni al Administrador.
 // - onVolver: callback para regresar a la vista anterior.
 // - textoVolver: texto del enlace de regreso (p. ej. "Volver a RF PRUEBA").
 export default function DetalleMedidor({
   medidor,
   usuarioLogueado,
+  soloLectura = false,
   onVolver,
   textoVolver = 'Volver',
 }) {
@@ -65,7 +67,7 @@ export default function DetalleMedidor({
 
       {/* ── Pestañas del medidor (Instantáneos, Valores 5M, Calidad, Consumos, Coms) ── */}
       {/* Sin tarjeta envolvente: cada pestaña ya dibuja sus propias tarjetas. */}
-      <MainForm medidor={medidor} usuarioLogueado={usuarioLogueado} />
+      <MainForm medidor={medidor} usuarioLogueado={usuarioLogueado} soloLectura={soloLectura} />
     </div>
   )
 }

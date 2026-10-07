@@ -16,7 +16,8 @@ import ConfiguracionComunicaciones from '../medidores/ConfiguracionComunicacione
 // Props:
 // - medidor: medidor seleccionado en el catálogo.
 // - usuarioLogueado: usuario autenticado (para permisos por rol).
-function TabComunicaciones({ medidor, usuarioLogueado }) {
+// - soloLectura: si es true la configuración no se puede editar, ni el Administrador.
+function TabComunicaciones({ medidor, usuarioLogueado, soloLectura = false }) {
   return (
     // Contenedor con scroll propio, para pantallas donde el formulario sea más alto que el viewport.
     <div className="flex-1 overflow-auto p-6">
@@ -27,7 +28,7 @@ function TabComunicaciones({ medidor, usuarioLogueado }) {
 
         {/* Formulario (ya incluye su propia tarjeta blanca y título). */}
         <div className="w-full lg:w-3/4 xl:w-4/5">
-          <ConfiguracionComunicaciones medidor={medidor} usuarioLogueado={usuarioLogueado} />
+          <ConfiguracionComunicaciones medidor={medidor} usuarioLogueado={usuarioLogueado} soloLectura={soloLectura} />
         </div>
       </div>
     </div>

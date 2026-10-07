@@ -32,7 +32,8 @@ const TABS_MAQUETADAS = ['Coms', 'Instantáneos', 'Valores 5M', 'Calidad', 'Cons
 // Props:
 // - medidor: medidor seleccionado en el catálogo (se reenvía a las pestañas).
 // - usuarioLogueado: usuario autenticado (para permisos por rol).
-function MainForm({ medidor, usuarioLogueado }) {
+// - soloLectura: si es true las pestañas no permiten editar, ni al Administrador.
+function MainForm({ medidor, usuarioLogueado, soloLectura = false }) {
   // Nombre de la pestaña actualmente seleccionada dentro del módulo Medidores.
   const [activeTab, setActiveTab] = useState('Coms')
 
@@ -44,7 +45,7 @@ function MainForm({ medidor, usuarioLogueado }) {
       {/* Renderizado condicional de vistas: solo se monta el Tab que coincide
           con la pestaña activa, para no mantener en memoria/DOM los demás. */}
       {activeTab === 'Coms' && (
-        <TabComunicaciones medidor={medidor} usuarioLogueado={usuarioLogueado} />
+        <TabComunicaciones medidor={medidor} usuarioLogueado={usuarioLogueado} soloLectura={soloLectura} />
       )}
       {activeTab === 'Instantáneos' && <TabInstantaneos />}
       {activeTab === 'Valores 5M' && <TabValores5M />}

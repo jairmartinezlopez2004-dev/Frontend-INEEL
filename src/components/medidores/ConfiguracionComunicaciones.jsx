@@ -15,6 +15,8 @@
  *       y "Guardar" (guardarConfiguracionComs) o "Cancelar".
  *     · Usuario Normal (rolId 3): experiencia de solo lectura; todos los
  *       campos quedan deshabilitados y no se muestran botones de acción.
+ *     · Con `soloLectura` ("Datos en línea") la vista es de solo lectura
+ *       para todos, incluido el Administrador.
  *
  * NOTA: App.jsx monta DetalleMedidor con `key={medidor.id}`, de modo
  * que al cambiar de medidor el estado interno se reinicia por completo.
@@ -124,8 +126,9 @@ function Seccion({ titulo, children }) {
 // - medidor: objeto { id, dirRed, dirRF, descripcion, edo, dirIP } seleccionado en el catálogo
 //   (el backend aún no guarda el puerto; se usa el de CONFIG_COMS_DEFAULT).
 // - usuarioLogueado: objeto del usuario autenticado (se usa rolId para permisos).
-export default function ConfiguracionComunicaciones({ medidor, usuarioLogueado }) {
-  const esAdmin = usuarioLogueado?.rolId === ROL_ADMINISTRADOR
+// - soloLectura: si es true nadie edita, ni el Administrador ("Datos en línea").
+export default function ConfiguracionComunicaciones({ medidor, usuarioLogueado, soloLectura: vistaSoloLectura = false }) {
+  const esAdmin = usuarioLogueado?.rolId === ROL_ADMINISTRADOR && !vistaSoloLectura
 
   // Valores iniciales: defaults + IP/puerto que ya conocemos por el catálogo.
   const configInicial = {
