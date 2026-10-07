@@ -20,7 +20,7 @@
 import { useState } from 'react'
 import ConfirmDialog from './common/ConfirmDialog'
 
-const SYSTEM_TITLE = 'VISOR MEDICIÓN CALIDAD DE LA POTENCIA INEEL V1.0.1'
+const SYSTEM_TITLE = ' MEDICIÓN CALIDAD DE LA POTENCIA INEEL V1.0.1'
 
 // Ícono de menú hamburguesa (SVG) usado en el botón de colapsar/expandir el Sidebar.
 function HamburgerIcon() {
