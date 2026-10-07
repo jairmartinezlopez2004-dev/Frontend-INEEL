@@ -2,7 +2,7 @@
  * validaciones.js
  * ---------------------------------------------------------------------------
  * Reglas de validación de formularios, compartidas por Login y los módulos
- * de gestión (Usuarios, Controladores RF, Eventos, Unidades, Puntos IO).
+ * de gestión (Usuarios, Controladores RF, Eventos, Unidades, Puntos IO, Grupos IO).
  *
  * Los formularios usan `noValidate` para no mostrar los globos genéricos del
  * navegador; en su lugar validan con estas funciones y muestran el mensaje

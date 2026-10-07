@@ -14,11 +14,8 @@
  *   editando el punto como inactivo (edo = false).
  */
 import { useEffect, useState } from 'react'
-import {
-  listarPuntosIO,
-  listarGruposFuncionales,
-  listarGruposElectricos,
-} from '../../services/puntosIOService'
+import { listarPuntosIO } from '../../services/puntosIOService'
+import { listarGrupos } from '../../services/gruposIOService'
 import { listarUnidades, textoUnidad } from '../../services/unidadesService'
 import FormularioPuntoIO from './FormularioPuntoIO'
 import EstadoActivo from '../common/EstadoActivo'
@@ -68,8 +65,8 @@ export default function GestionPuntosIO({ esAdmin }) {
 
     Promise.all([
       listarPuntosIO({ signal }),
-      listarGruposFuncionales({ signal }),
-      listarGruposElectricos({ signal }),
+      listarGrupos('funcional', { signal }),
+      listarGrupos('electrico', { signal }),
       listarUnidades({ signal }),
     ])
       .then(([listaPuntos, funcionales, electricos, unidades]) => {

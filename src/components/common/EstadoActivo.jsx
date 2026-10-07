@@ -2,7 +2,7 @@
  * EstadoActivo.jsx
  * ---------------------------------------------------------------------------
  * Badge de estado activo / inactivo para los catálogos cuyo `edo` es
- * booleano (Eventos configurados, Unidades).
+ * booleano (Eventos configurados, Unidades, Grupos IO).
  */
 
 // Props:

@@ -2,8 +2,8 @@
  * puntosIOService.js
  * ---------------------------------------------------------------------------
  * Funciones de acceso al WebService para los puntos de entrada/salida
- * (controlador PuntosIOController del backend) y para los catálogos de
- * grupos IO con los que se clasifican (IO_GrupoFuncional e IO_GrupoElectrico).
+ * (controlador PuntosIOController del backend). Los catálogos de grupos IO
+ * con los que se clasifican están en gruposIOService.js.
  *
  * Endpoints:
  *   GET /PuntosIO             -> lista de puntos IO (cualquier usuario con sesión)
@@ -12,8 +12,6 @@
  *                                la contraseña del administrador y responde 401
  *                                si no coincide, 400 si un grupo o la unidad no
  *                                existe y 404 si el punto no existe.
- *   GET /IO_GrupoFuncional    -> grupos funcionales { idGF, nombre, edo }
- *   GET /IO_GrupoElectrico    -> grupos eléctricos  { idGE, nombre, edo }
  *
  * El backend no expone alta ni baja de puntos IO: solo consulta y edición.
  * `edo` es booleano (true activo, false inactivo).
@@ -43,11 +41,6 @@ function parsearPunto(p) {
     limMin: p.limMin,
     limMax: p.limMax,
   }
-}
-
-/** Normaliza un grupo IO (funcional o eléctrico) a { id, nombre, activo }. */
-function parsearGrupo(id, g) {
-  return { id, nombre: g.nombre ?? '', activo: g.edo }
 }
 
 /**
@@ -84,16 +77,4 @@ export async function actualizarPuntoIO(id, datos, contrasenaActual) {
     contrasenaActual,
   }
   return parsearPunto(await apiPut(`${RUTA}/${id}`, cuerpo))
-}
-
-/** Lista los grupos funcionales, ordenados por ID. */
-export async function listarGruposFuncionales({ signal } = {}) {
-  const grupos = await apiGet('/IO_GrupoFuncional', { signal })
-  return grupos.map((g) => parsearGrupo(g.idGF, g)).sort((a, b) => a.id - b.id)
-}
-
-/** Lista los grupos eléctricos, ordenados por ID. */
-export async function listarGruposElectricos({ signal } = {}) {
-  const grupos = await apiGet('/IO_GrupoElectrico', { signal })
-  return grupos.map((g) => parsearGrupo(g.idGE, g)).sort((a, b) => a.id - b.id)
 }

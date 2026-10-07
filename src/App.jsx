@@ -13,7 +13,8 @@
  *   Estos estados se pasan hacia abajo como props (elevación de estado /
  *   lifting state up) a los componentes hijos que los necesitan.
  * - Actúa como enrutador simple entre los módulos principales (Controladores
- *   RF, Eventos configurados, Eventos registrados, Unidades, Puntos IO y Usuarios)
+ *   RF, Eventos configurados, Eventos registrados, Unidades, Puntos IO, Grupos
+ *   funcionales IO, Grupos eléctricos IO y Usuarios)
  *   según el ítem seleccionado en el Sidebar. Los medidores se consultan
  *   dentro de su controlador (ver GestionControladoresRF.jsx).
  */
@@ -27,6 +28,7 @@ import GestionEventos from './components/eventos/GestionEventos'
 import GestionEventosRegistrados from './components/eventosReg/GestionEventosRegistrados'
 import GestionUnidades from './components/unidades/GestionUnidades'
 import GestionPuntosIO from './components/puntosIO/GestionPuntosIO'
+import GestionGruposIO from './components/gruposIO/GestionGruposIO'
 import Header from './components/Header'
 import AvisoExpiracionSesion from './components/AvisoExpiracionSesion'
 import { restaurarSesion, cerrarSesion } from './services/authService'
@@ -114,7 +116,7 @@ function App() {
 
         {/* CONTENIDO PRINCIPAL DINÁMICO */}
         {/* Renderizado condicional de vistas: según el ítem activo del Sidebar
-            se monta el módulo correspondiente (Controladores RF, Eventos, Unidades, Puntos IO o Usuarios). */}
+            se monta el módulo correspondiente (Controladores RF, Eventos, Unidades, Puntos IO, Grupos IO o Usuarios). */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50 relative">
           {/* Módulo Controladores RF: lista -> controlador con sus medidores -> medidor.
               Todos consultan; solo el Administrador da de alta y edita. */}
@@ -133,6 +135,11 @@ function App() {
           {/* Módulo Puntos IO: todos consultan; solo el Administrador edita, y cada
               edición se confirma con su contraseña. */}
           {activeItem === 'puntosIO' && <GestionPuntosIO esAdmin={esAdmin} />}
+          {/* Módulos Grupos funcionales / eléctricos IO: catálogos con los que se
+              clasifican los puntos IO; todos consultan, solo el Administrador da de
+              alta y edita. */}
+          {activeItem === 'gruposFuncionalesIO' && <GestionGruposIO tipo="funcional" esAdmin={esAdmin} />}
+          {activeItem === 'gruposElectricosIO' && <GestionGruposIO tipo="electrico" esAdmin={esAdmin} />}
           {/* Módulo Usuarios: solo Administrador (el Sidebar ya oculta la opción). */}
           {activeItem === 'usuarios' && esAdmin && <GestionUsuarios />}
         </main>
