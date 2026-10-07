@@ -6,36 +6,36 @@
  * Rol en el sistema:
  * Permite al usuario cambiar entre los módulos principales del sistema
  * (Controladores RF, que incluye los medidores, Eventos configurados, Eventos
- * registrados, Unidades, Puntos IO, Grupos funcionales y eléctricos IO y, solo para el Administrador, Usuarios). No maneja su propio estado de
- * navegación: recibe cuál es el ítem activo y una función para notificar
- * cambios, siguiendo el patrón de elevación de estado (el estado real vive
- * en App.jsx).
+ * registrados, Unidades, Puntos IO, Grupos funcionales y eléctricos IO y, solo
+ * para el Administrador, Usuarios). Cada opción es un enlace (NavLink de React
+ * Router) a la ruta del módulo, así que la opción resaltada sale de la URL y
+ * los botones Atrás / Adelante del navegador funcionan entre módulos.
  *
  * No tiene relación directa con el WebService; es puramente de navegación/UI.
  */
+import { Link, NavLink } from 'react-router'
 
-// Catálogo estático de opciones del menú lateral (id interno + etiqueta visible).
+// Catálogo estático de opciones del menú lateral (segmento de ruta + etiqueta visible).
+// La ruta completa es `${rutaBase}/${ruta}` (p. ej. /configuracion/unidades).
 const NAV_ITEMS = [
-  { id: 'controladoresRF', label: 'Controladores RF' },
-  { id: 'eventos', label: 'Eventos configurados' },
-  { id: 'eventosRegistrados', label: 'Eventos registrados' },
-  { id: 'unidades', label: 'Unidades' },
-  { id: 'puntosIO', label: 'Puntos IO' },
-  { id: 'gruposFuncionalesIO', label: 'Grupos funcionales IO' },
-  { id: 'gruposElectricosIO', label: 'Grupos eléctricos IO' },
+  { ruta: 'controladores-rf', label: 'Controladores RF' },
+  { ruta: 'eventos', label: 'Eventos configurados' },
+  { ruta: 'eventos-registrados', label: 'Eventos registrados' },
+  { ruta: 'unidades', label: 'Unidades' },
+  { ruta: 'puntos-io', label: 'Puntos IO' },
+  { ruta: 'grupos-funcionales-io', label: 'Grupos funcionales IO' },
+  { ruta: 'grupos-electricos-io', label: 'Grupos eléctricos IO' },
   // Solo visible para el Administrador (ver prop esAdmin).
-  { id: 'usuarios', label: 'Usuarios', soloAdmin: true },
+  { ruta: 'usuarios', label: 'Usuarios', soloAdmin: true },
 ];
 
 // Props:
-// - activeItem: id del módulo actualmente seleccionado (controlado por App.jsx).
-// - onSelectItem: callback que App.jsx usa para cambiar el módulo activo.
+// - rutaBase: prefijo del tipo de consulta ('/configuracion' o '/en-linea').
 // - isOpen: booleano que indica si el menú está expandido (ancho completo) o colapsado (ancho 0).
 // - esAdmin: booleano; si es false se ocultan las opciones marcadas como soloAdmin.
-// - onVolverInicio: callback para regresar a la vista principal (elegir tipo de consulta).
-// - idsVisibles: (opcional) ids de NAV_ITEMS a mostrar; sin él se muestran todos.
+// - rutasVisibles: (opcional) segmentos de NAV_ITEMS a mostrar; sin él se muestran todos.
 //   "Datos en línea" lo usa para dejar solo Controladores RF.
-export default function Sidebar({ activeItem, onSelectItem, isOpen, esAdmin, onVolverInicio, idsVisibles }) {
+export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
   return (
     // Menú colapsable: la clase de ancho ("w-64" o "w-0") se anima con transition-[width]
     // para lograr el efecto de expandir/contraer el Sidebar.
@@ -50,34 +50,32 @@ export default function Sidebar({ activeItem, onSelectItem, isOpen, esAdmin, onV
         {/* Menú de Navegación */}
         <nav className="flex-1 space-y-1 px-3 py-4">
           {/* Regresa a la vista principal "¿Consultar datos por medio de?:". */}
-          <button
-            type="button"
-            onClick={onVolverInicio}
-            className="mb-3 w-full cursor-pointer rounded-md border border-slate-700 px-3 py-2 text-left text-sm font-medium text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+          <Link
+            to="/"
+            className="mb-3 block w-full rounded-md border border-slate-700 px-3 py-2 text-left text-sm font-medium text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
           >
             ← Tipo de consulta
-          </button>
+          </Link>
           {NAV_ITEMS.filter(
-            (item) => (!item.soloAdmin || esAdmin) && (!idsVisibles || idsVisibles.includes(item.id))
-          ).map((item) => {
-            // Determina si este botón corresponde a la sección actualmente activa,
-            // para resaltarlo visualmente.
-            const isActive = item.id === activeItem;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => onSelectItem(item.id)}
-                className={`w-full cursor-pointer rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
+            (item) => (!item.soloAdmin || esAdmin) && (!rutasVisibles || rutasVisibles.includes(item.ruta))
+          ).map((item) => (
+            // NavLink marca la opción como activa cuando la URL está en esa ruta
+            // o debajo de ella (p. ej. un controlador o un medidor dentro de
+            // Controladores RF), para resaltarla visualmente.
+            <NavLink
+              key={item.ruta}
+              to={`${rutaBase}/${item.ruta}`}
+              className={({ isActive }) =>
+                `block w-full rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
                   isActive
                     ? 'bg-slate-800 text-white'
                     : 'text-slate-400 hover:bg-slate-800/60 hover:text-white'
-                }`}
-              >
-                {item.label}
-              </button>
-            );
-          })}
+                }`
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
         </nav>
 
         {/* Pie del Menú (Versión) */}

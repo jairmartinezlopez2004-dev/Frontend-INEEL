@@ -3,7 +3,8 @@
  *
  * Este archivo es el primero que ejecuta el navegador: monta el árbol de
  * componentes de React (empezando por <App />) dentro del elemento
- * <div id="root"> que se encuentra en index.html.
+ * <div id="root"> que se encuentra en index.html. <BrowserRouter> conecta
+ * la app con la URL del navegador (rutas definidas en App.jsx).
  *
  * No contiene lógica de negocio ni de UI; su única responsabilidad es
  * inicializar React y activar el modo estricto para detectar problemas
@@ -11,6 +12,7 @@
  */
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router'
 import './index.css'
 import App from './App.jsx'
 
@@ -18,6 +20,8 @@ import App from './App.jsx'
 // para ayudar a detectar efectos secundarios impuros; no afecta el comportamiento final.
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </StrictMode>,
 )

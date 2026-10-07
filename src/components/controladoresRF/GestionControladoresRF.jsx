@@ -4,11 +4,13 @@
  * Módulo "Controladores RF": catálogo de controladores de radiofrecuencia y,
  * dentro de cada uno, los medidores que tiene agrupados.
  *
- * Navegación en tres niveles (el estado vive aquí, no en App.jsx):
- *   Lista de controladores -> Detalle del controlador (sus medidores)
- *                          -> Detalle del medidor (pestañas Coms, Instantáneos…)
- * Al cambiar de módulo en el Sidebar este componente se desmonta, así que al
- * volver siempre se entra por la lista.
+ * Navegación en tres niveles, cada uno con su propia URL (ver App.jsx), de
+ * modo que Atrás / Adelante del navegador y recargar la página funcionan:
+ *   <rutaBase>                          Lista de controladores
+ *   <rutaBase>/:idControlador           Detalle del controlador (sus medidores)
+ *   <rutaBase>/:idControlador/medidores/:idMedidor
+ *                                       Detalle del medidor (pestañas Coms, Instantáneos…)
+ * El nivel se decide con los parámetros de la URL (useParams).
  *
  * Rol en el sistema:
  * - Cualquier usuario con sesión ve la lista (GET /ControladorRF) y el
@@ -20,10 +22,11 @@
  * - El estado (`edo`) se muestra con EstadoBadge (10 activo, 11 en uso, 20 inactivo).
  */
 import { useEffect, useState } from 'react'
+import { Navigate, useNavigate, useParams } from 'react-router'
 import { listarControladoresRF } from '../../services/controladoresRFService'
 import FormularioControlador from './FormularioControlador'
 import DetalleControlador from './DetalleControlador'
-import DetalleMedidor from '../medidores/DetalleMedidor'
+import MedidorDeControlador from './MedidorDeControlador'
 import EstadoBadge from '../medidores/EstadoBadge'
 
 // Encabezados de la tabla. La última columna (acciones) no tiene título.
@@ -33,23 +36,29 @@ const COLUMNAS = ['Nombre', 'Número de serie', 'Dirección IP', 'Estado', 'Medi
 // - esAdmin: si es true se muestran el alta y la edición.
 // - usuarioLogueado: usuario autenticado (lo necesitan las pestañas del medidor).
 // - soloLectura: si es true nadie edita, ni el Administrador ("Datos en línea").
-export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLogueado, soloLectura = false }) {
+// - rutaBase: URL de la lista (p. ej. '/configuracion/controladores-rf').
+export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLogueado, soloLectura = false, rutaBase }) {
   // En modo solo lectura se ocultan el alta y la edición aunque el rol lo permita.
   const esAdmin = esAdminRol && !soloLectura
+  const navigate = useNavigate()
+  // Nivel de navegación según la URL: sin IDs = lista; con idControlador =
+  // detalle del controlador; con ambos = detalle del medidor.
+  const { idControlador: paramControlador, idMedidor: paramMedidor } = useParams()
+  const idControlador = paramControlador === undefined ? null : Number(paramControlador)
+  const idMedidor = paramMedidor === undefined ? null : Number(paramMedidor)
   const [controladores, setControladores] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(null)
   const [aviso, setAviso] = useState(null) // Mensaje de éxito tras guardar.
   // Formulario abierto: undefined = cerrado, null = alta, objeto = edición.
   const [enEdicion, setEnEdicion] = useState(undefined)
-  // Se incrementa para volver a pedir la lista después de guardar o al regresar del detalle.
+  // Se incrementa para volver a pedir la lista después de guardar.
   const [recarga, setRecarga] = useState(0)
-  // Navegación: controlador abierto (null = lista) y medidor abierto dentro de él.
-  const [controladorAbierto, setControladorAbierto] = useState(null)
-  const [medidorAbierto, setMedidorAbierto] = useState(null)
 
-  // Carga (y recarga) de la lista. El AbortController cancela la petición si
-  // el usuario sale de la vista antes de que responda el WebService.
+  // Carga (y recarga) de la lista. También se vuelve a pedir al cambiar de
+  // controlador o al regresar a la lista, para que el conteo de medidores
+  // esté al día. El AbortController cancela la petición si el usuario sale
+  // de la vista antes de que responda el WebService.
   useEffect(() => {
     const controlador = new AbortController()
 
@@ -63,10 +72,9 @@ export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLog
       })
 
     return () => controlador.abort()
-  }, [recarga])
+  }, [recarga, idControlador])
 
-  // Vuelve a pedir la lista (después de guardar o al regresar del detalle,
-  // para que el conteo de medidores esté al día).
+  // Vuelve a pedir la lista después de guardar.
   const recargar = () => {
     setCargando(true)
     setError(null)
@@ -84,38 +92,42 @@ export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLog
     recargar()
   }
 
-  const volverALista = () => {
-    setControladorAbierto(null)
+  // Abre un controlador: cambia la URL y React Router muestra el nivel 2.
+  const abrirControlador = (id) => {
     setAviso(null)
-    recargar()
+    setEnEdicion(undefined)
+    navigate(`${rutaBase}/${id}`)
+  }
+
+  // Un ID que no es número (URL escrita a mano) regresa a la lista.
+  if (Number.isNaN(idControlador) || Number.isNaN(idMedidor)) {
+    return <Navigate to={rutaBase} replace />
   }
 
   // ── Nivel 3: detalle de un medidor del controlador abierto ──
-  if (controladorAbierto && medidorAbierto) {
+  if (idControlador !== null && idMedidor !== null) {
     return (
-      <DetalleMedidor
-        key={medidorAbierto.id}
-        medidor={medidorAbierto}
+      <MedidorDeControlador
+        key={`${idControlador}-${idMedidor}`}
+        idControlador={idControlador}
+        idMedidor={idMedidor}
         usuarioLogueado={usuarioLogueado}
         soloLectura={soloLectura}
-        textoVolver={`Volver a ${controladorAbierto.nombre}`}
-        onVolver={() => setMedidorAbierto(null)}
+        onVolver={() => navigate(`${rutaBase}/${idControlador}`)}
       />
     )
   }
 
   // ── Nivel 2: detalle del controlador con sus medidores ──
-  if (controladorAbierto) {
+  if (idControlador !== null) {
     return (
       <DetalleControlador
-        key={controladorAbierto.id}
-        idControlador={controladorAbierto.id}
+        key={idControlador}
+        idControlador={idControlador}
         controladores={controladores}
         esAdmin={esAdmin}
-        onVolver={volverALista}
-        onVerMedidor={setMedidorAbierto}
-        // Mantiene el nombre al día para el botón "Volver a …" si se edita el controlador.
-        onCargado={setControladorAbierto}
+        onVolver={() => navigate(rutaBase)}
+        onVerMedidor={(medidor) => navigate(`${rutaBase}/${idControlador}/medidores/${medidor.id}`)}
       />
     )
   }
@@ -206,7 +218,7 @@ export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLog
                     )}
                     <button
                       type="button"
-                      onClick={() => setControladorAbierto(controlador)}
+                      onClick={() => abrirControlador(controlador.id)}
                       className="cursor-pointer rounded-md border border-blue-600 px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-600 hover:text-white"
                     >
                       Ver medidores

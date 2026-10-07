@@ -47,16 +47,17 @@ function IconoEnLinea() {
   )
 }
 
-// Opciones de consulta. `disponible: false` = aún sin vista (tarjeta deshabilitada).
+// Opciones de consulta. `ruta` = dirección a la que lleva la tarjeta (ver App.jsx);
+// `disponible: false` = aún sin vista (tarjeta deshabilitada).
 const OPCIONES = [
-  { id: 'baseDatos', titulo: 'Base de Datos', detalle: '(configuración)', Icono: IconoBaseDatos, disponible: true },
+  { id: 'baseDatos', ruta: '/configuracion', titulo: 'Base de Datos', detalle: '(configuración)', Icono: IconoBaseDatos, disponible: true },
   { id: 'perfiles5M', titulo: 'Perfiles 5 Minutales', Icono: IconoPerfiles, disponible: false },
-  { id: 'enLinea', titulo: 'Datos en línea', Icono: IconoEnLinea, disponible: true },
+  { id: 'enLinea', ruta: '/en-linea', titulo: 'Datos en línea', Icono: IconoEnLinea, disponible: true },
 ]
 
 // Props:
 // - currentUser: usuario autenticado (nombre, apellido, rol, iniciales).
-// - onSeleccionar: callback con el id de la opción elegida ('baseDatos' o 'enLinea').
+// - onSeleccionar: callback con la ruta de la opción elegida ('/configuracion' o '/en-linea').
 // - onLogout: callback para cerrar la sesión y volver al Login.
 export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout }) {
   // true mientras se muestra la confirmación de "¿Cerrar sesión?".
@@ -97,12 +98,12 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
         </h1>
 
         <div className="grid w-full max-w-5xl grid-cols-1 gap-6 md:grid-cols-3">
-          {OPCIONES.map(({ id, titulo, detalle, Icono, disponible }) => (
+          {OPCIONES.map(({ id, ruta, titulo, detalle, Icono, disponible }) => (
             <button
               key={id}
               type="button"
               disabled={!disponible}
-              onClick={() => onSeleccionar(id)}
+              onClick={() => onSeleccionar(ruta)}
               className="group relative flex min-h-56 cursor-pointer flex-col items-center justify-center gap-5 rounded-2xl border border-slate-700 bg-slate-800 p-8 text-center shadow-lg transition-all hover:-translate-y-1 hover:border-blue-500 hover:bg-slate-800/80 hover:shadow-blue-900/40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:border-slate-700"
             >
               {/* Espacio del ícono (provisional). */}

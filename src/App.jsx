@@ -5,26 +5,31 @@
  *
  * Rol en el sistema:
  * - Controla el flujo de autenticación: mientras no haya un usuario logueado
- *   (currentUser === null) muestra únicamente <Login />; en cuanto el login
- *   es exitoso, muestra la vista principal <SeleccionConsulta /> para elegir
- *   el tipo de consulta. La opción "Base de Datos (configuración)" renderiza
- *   el layout completo de la aplicación (header, sidebar, contenido y barras
- *   de estado/footer); "Datos en línea" usa el mismo layout, pero con solo el
- *   flujo de Controladores RF en el menú.
- * - Es el "dueño" del estado global de la UI a nivel de aplicación:
- *   usuario autenticado, sección activa del menú y visibilidad del sidebar.
- *   Estos estados se pasan hacia abajo como props (elevación de estado /
- *   lifting state up) a los componentes hijos que los necesitan.
- * - Actúa como enrutador simple entre los módulos principales (Controladores
- *   RF, Eventos configurados, Eventos registrados, Unidades, Puntos IO, Grupos
- *   funcionales IO, Grupos eléctricos IO y Usuarios)
- *   según el ítem seleccionado en el Sidebar. Los medidores se consultan
- *   dentro de su controlador (ver GestionControladoresRF.jsx).
+ *   (currentUser === null) muestra únicamente <Login />, sin importar la URL;
+ *   al iniciar sesión se muestra la vista que pide esa URL.
+ * - Define las rutas de la aplicación (React Router). La URL es la que decide
+ *   qué vista se ve, de modo que los botones Atrás / Adelante del navegador,
+ *   recargar la página o abrir un enlace guardado muestran siempre la vista
+ *   que corresponde a la dirección:
+ *
+ *     /                                      Vista principal (tipo de consulta)
+ *     /configuracion/<módulo>                Base de Datos (configuración)
+ *     /configuracion/controladores-rf/3      Controlador 3 con sus medidores
+ *     /configuracion/controladores-rf/3/medidores/12   Detalle del medidor 12
+ *     /en-linea/controladores-rf[/…]         Datos en línea (solo lectura)
+ *
+ *   Los módulos de configuración son: controladores-rf, eventos,
+ *   eventos-registrados, unidades, puntos-io, grupos-funcionales-io,
+ *   grupos-electricos-io y usuarios (solo Administrador).
+ * - Guarda el estado global de la UI: usuario autenticado y visibilidad del
+ *   menú lateral, que se pasan como props a los componentes que los usan.
  */
 import { useEffect, useState } from 'react'
-import Sidebar from './components/Sidebar'
-import StatusBar from './components/StatusBar'
+import { Navigate, Route, Routes, useNavigate } from 'react-router'
 import Login from './components/Login'
+import LayoutSistema from './components/LayoutSistema'
+import SeleccionConsulta from './components/inicio/SeleccionConsulta'
+import AvisoExpiracionSesion from './components/AvisoExpiracionSesion'
 import GestionUsuarios from './components/usuarios/GestionUsuarios'
 import GestionControladoresRF from './components/controladoresRF/GestionControladoresRF'
 import GestionEventos from './components/eventos/GestionEventos'
@@ -32,28 +37,29 @@ import GestionEventosRegistrados from './components/eventosReg/GestionEventosReg
 import GestionUnidades from './components/unidades/GestionUnidades'
 import GestionPuntosIO from './components/puntosIO/GestionPuntosIO'
 import GestionGruposIO from './components/gruposIO/GestionGruposIO'
-import Header from './components/Header'
-import SeleccionConsulta from './components/inicio/SeleccionConsulta'
-import AvisoExpiracionSesion from './components/AvisoExpiracionSesion'
 import { restaurarSesion, cerrarSesion } from './services/authService'
 
 // rolId del Administrador en la UI (ver ROL_IDS en services/authService.js).
 const ROL_ADMINISTRADOR = 2
 
+// Rutas de las tres pantallas del flujo de Controladores RF (relativas al
+// tipo de consulta). Las tres montan GestionControladoresRF, que decide qué
+// nivel mostrar según los parámetros de la URL.
+const RUTAS_CONTROLADORES = [
+  'controladores-rf',
+  'controladores-rf/:idControlador',
+  'controladores-rf/:idControlador/medidores/:idMedidor',
+]
+
 function App() {
+  const navigate = useNavigate()
   // Usuario autenticado actual. null = nadie ha iniciado sesión todavía.
   // Se llena con el objeto que arma authService.js a partir de la respuesta
   // de /Auth/login o /Auth/perfil (nombre, apellido, rol, iniciales, etc.).
   const [currentUser, setCurrentUser] = useState(null)
-  // Identificador del módulo/sección actualmente seleccionado en el Sidebar.
-  const [activeItem, setActiveItem] = useState('controladoresRF')
   // Controla si el menú lateral (Sidebar) está expandido o colapsado.
   // Empieza colapsado al cargar la página y vuelve a colapsarse al cerrar sesión.
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  // Tipo de consulta elegido en la vista principal. null = aún no se elige
-  // (se muestra SeleccionConsulta); 'baseDatos' = módulos de configuración;
-  // 'enLinea' = solo el flujo de Controladores RF.
-  const [modoConsulta, setModoConsulta] = useState(null)
   // true mientras se valida el token guardado (evita que parpadee el Login al recargar).
   const [verificandoSesion, setVerificandoSesion] = useState(true)
 
@@ -65,21 +71,15 @@ function App() {
       .finally(() => setVerificandoSesion(false))
   }, [])
 
-  // Cierra la sesión: borra el token y regresa a la pantalla de Login.
-  // También deja la navegación en su estado inicial (Controladores RF, menú colapsado)
-  // para que el siguiente inicio de sesión no herede cómo quedó la pantalla.
+  // Cierra la sesión: borra el token, colapsa el menú y vuelve a la vista
+  // principal, para que el siguiente inicio de sesión empiece desde ahí.
   const handleLogout = () => {
     cerrarSesion()
     setCurrentUser(null)
-    setModoConsulta(null)
-    setActiveItem('controladoresRF')
     setIsSidebarOpen(false)
+    navigate('/', { replace: true })
   }
 
-  // Renderizado condicional de vistas: si todavía no hay sesión iniciada,
-  // se muestra solamente la pantalla de Login y no se monta el resto del layout.
-  // `setCurrentUser` se pasa directo como `onLoginSuccess`, de modo que el
-  // objeto de usuario que arma Login.jsx queda guardado aquí en App.jsx.
   if (verificandoSesion) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 text-sm text-slate-500">
@@ -88,111 +88,110 @@ function App() {
     )
   }
 
+  // Sin sesión solo se muestra el Login. `setCurrentUser` se pasa directo como
+  // `onLoginSuccess`, de modo que el usuario que arma Login.jsx queda aquí.
   if (!currentUser) {
     return <Login onLoginSuccess={setCurrentUser} />
   }
 
   const esAdmin = currentUser.rolId === ROL_ADMINISTRADOR
 
-  // Al elegir una opción se entra siempre por Controladores RF, el único
-  // módulo que comparten "Base de Datos" y "Datos en línea".
-  const seleccionarConsulta = (modo) => {
-    setActiveItem('controladoresRF')
-    setModoConsulta(modo)
+  // Props comunes del marco (header + menú lateral) de ambos tipos de consulta.
+  const propsLayout = {
+    currentUser,
+    esAdmin,
+    isSidebarOpen,
+    onToggleSidebar: () => setIsSidebarOpen((prev) => !prev),
+    onLogout: handleLogout,
   }
 
-  // Vista principal: pregunta por qué medio consultar los datos. Por ahora
-  // "Perfiles 5 Minutales" no tiene vista; se agregará en pasos siguientes.
-  if (modoConsulta === null) {
-    return (
-      <>
-        <SeleccionConsulta currentUser={currentUser} onSeleccionar={seleccionarConsulta} onLogout={handleLogout} />
-        <AvisoExpiracionSesion onRenovada={setCurrentUser} onExpirada={handleLogout} />
-      </>
-    )
-  }
-
-  // Opción "Base de Datos (configuración)": todo lo construido hasta ahora.
-  // (Espacio reservado: aquí se ajustará esta vista en los siguientes pasos.)
-  // Opción "Datos en línea": el mismo layout, con el menú limitado al flujo
-  // de Controladores RF (controlador -> medidores -> detalle del medidor).
-  const idsVisibles = modoConsulta === 'enLinea' ? ['controladoresRF'] : undefined
+  // Rutas del flujo de Controladores RF (lista -> controlador -> medidor).
+  // `soloLectura` = true en "Datos en línea": nadie da de alta ni edita.
+  const rutasControladores = (rutaBase, soloLectura) =>
+    RUTAS_CONTROLADORES.map((ruta) => (
+      <Route
+        key={ruta}
+        path={ruta}
+        element={
+          <GestionControladoresRF
+            esAdmin={esAdmin}
+            usuarioLogueado={currentUser}
+            soloLectura={soloLectura}
+            rutaBase={`${rutaBase}/controladores-rf`}
+          />
+        }
+      />
+    ))
 
   return (
-    // Contenedor raíz de la aplicación autenticada: ocupa toda la pantalla
-    // y organiza el layout en columna (header arriba, contenido al centro,
-    // barras de estado/footer abajo).
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-slate-50">
-      {/* Encabezado corporativo: logo, título del sistema, botón de menú
-          hamburguesa y el perfil del usuario autenticado (ver Header.jsx). */}
-      <Header
-        currentUser={currentUser}
-        isSidebarOpen={isSidebarOpen}
-        onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
-        onLogout={handleLogout}
-      />
-
+    <>
       {/* Aviso "tu sesión caduca en 1 minuto" y cierre automático al expirar
           el token (ver AvisoExpiracionSesion.jsx). */}
       <AvisoExpiracionSesion onRenovada={setCurrentUser} onExpirada={handleLogout} />
 
-      {/* ÁREA INFERIOR: Menú Lateral + Contenido */}
-      <div className="flex flex-1 overflow-hidden">
-
-        {/* SIDEBAR COLAPSABLE */}
-        <Sidebar
-          activeItem={activeItem}
-          onSelectItem={setActiveItem}
-          isOpen={isSidebarOpen}
-          esAdmin={esAdmin}
-          onVolverInicio={() => setModoConsulta(null)}
-          idsVisibles={idsVisibles}
+      <Routes>
+        {/* Vista principal: "¿Consultar datos por medio de?:". Cada tarjeta
+            navega a la ruta de su tipo de consulta. */}
+        <Route
+          path="/"
+          element={
+            <SeleccionConsulta
+              currentUser={currentUser}
+              onSeleccionar={(ruta) => navigate(ruta)}
+              onLogout={handleLogout}
+            />
+          }
         />
 
-        {/* CONTENIDO PRINCIPAL DINÁMICO */}
-        {/* Renderizado condicional de vistas: según el ítem activo del Sidebar
-            se monta el módulo correspondiente (Controladores RF, Eventos, Unidades, Puntos IO, Grupos IO o Usuarios). */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50 relative">
-          {/* Módulo Controladores RF: lista -> controlador con sus medidores -> medidor.
+        {/* Opción "Base de Datos (configuración)": todos los módulos.
+            (Espacio reservado: aquí se ajustará esta vista en los siguientes pasos.) */}
+        <Route path="/configuracion" element={<LayoutSistema rutaBase="/configuracion" {...propsLayout} />}>
+          <Route index element={<Navigate to="controladores-rf" replace />} />
+          {/* Controladores RF: lista -> controlador con sus medidores -> medidor.
               Todos consultan; solo el Administrador da de alta y edita. */}
-          {activeItem === 'controladoresRF' && (
-            <GestionControladoresRF
-              esAdmin={esAdmin}
-              usuarioLogueado={currentUser}
-              // "Datos en línea" es solo de consulta: nadie da de alta ni edita.
-              soloLectura={modoConsulta === 'enLinea'}
-            />
-          )}
-          {/* Módulo Eventos configurados: todos consultan; solo el Administrador
-              da de alta y edita (la baja es marcarlo inactivo). */}
-          {activeItem === 'eventos' && <GestionEventos esAdmin={esAdmin} />}
-          {/* Módulo Eventos registrados: historial de solo consulta de los eventos
-              configurados que han ocurrido en los medidores. */}
-          {activeItem === 'eventosRegistrados' && <GestionEventosRegistrados />}
-          {/* Módulo Unidades: catálogo de unidades de medida; todos consultan, solo el
-              Administrador da de alta y edita. */}
-          {activeItem === 'unidades' && <GestionUnidades esAdmin={esAdmin} />}
-          {/* Módulo Puntos IO: todos consultan; solo el Administrador edita, y cada
+          {rutasControladores('/configuracion', false)}
+          {/* Eventos configurados: todos consultan; solo el Administrador da de
+              alta y edita (la baja es marcarlo inactivo). */}
+          <Route path="eventos" element={<GestionEventos esAdmin={esAdmin} />} />
+          {/* Eventos registrados: historial de solo consulta. */}
+          <Route path="eventos-registrados" element={<GestionEventosRegistrados />} />
+          {/* Unidades: todos consultan; solo el Administrador da de alta y edita. */}
+          <Route path="unidades" element={<GestionUnidades esAdmin={esAdmin} />} />
+          {/* Puntos IO: todos consultan; solo el Administrador edita, y cada
               edición se confirma con su contraseña. */}
-          {activeItem === 'puntosIO' && <GestionPuntosIO esAdmin={esAdmin} />}
-          {/* Módulos Grupos funcionales / eléctricos IO: catálogos con los que se
-              clasifican los puntos IO; todos consultan, solo el Administrador da de
-              alta y edita. */}
-          {activeItem === 'gruposFuncionalesIO' && <GestionGruposIO tipo="funcional" esAdmin={esAdmin} />}
-          {activeItem === 'gruposElectricosIO' && <GestionGruposIO tipo="electrico" esAdmin={esAdmin} />}
-          {/* Módulo Usuarios: solo Administrador (el Sidebar ya oculta la opción). */}
-          {activeItem === 'usuarios' && esAdmin && <GestionUsuarios />}
-        </main>
-      </div>
+          <Route path="puntos-io" element={<GestionPuntosIO esAdmin={esAdmin} />} />
+          {/* Grupos funcionales / eléctricos IO: catálogos con los que se
+              clasifican los puntos IO. `key` separa el estado de cada catálogo. */}
+          <Route
+            path="grupos-funcionales-io"
+            element={<GestionGruposIO key="funcional" tipo="funcional" esAdmin={esAdmin} />}
+          />
+          <Route
+            path="grupos-electricos-io"
+            element={<GestionGruposIO key="electrico" tipo="electrico" esAdmin={esAdmin} />}
+          />
+          {/* Usuarios: solo Administrador; para otro rol la ruta no existe y
+              cae en la redirección de abajo. */}
+          {esAdmin && <Route path="usuarios" element={<GestionUsuarios />} />}
+          {/* Módulo desconocido (o sin permiso): se regresa a Controladores RF. */}
+          <Route path="*" element={<Navigate to="controladores-rf" replace />} />
+        </Route>
 
-      {/* STATUS BAR (Conservado de tu código) */}
-      <StatusBar />
+        {/* Opción "Datos en línea": el mismo marco, con el menú limitado al
+            flujo de Controladores RF y en modo solo lectura. */}
+        <Route
+          path="/en-linea"
+          element={<LayoutSistema rutaBase="/en-linea" rutasVisibles={['controladores-rf']} {...propsLayout} />}
+        >
+          <Route index element={<Navigate to="controladores-rf" replace />} />
+          {rutasControladores('/en-linea', true)}
+          <Route path="*" element={<Navigate to="controladores-rf" replace />} />
+        </Route>
 
-      {/* FOOTER INSTITUCIONAL (Conservado de tu código) */}
-      <footer className="w-full py-2 text-center text-[11px] font-medium tracking-wide text-slate-400 border-t border-slate-800 bg-slate-900 shrink-0">
-        © 2026 Instituto Nacional de Electricidad y Energías Limpias (INEEL). Visor de Calidad de la Potencia v1.0.1.
-      </footer>
-    </div>
+        {/* Cualquier otra dirección vuelve a la vista principal. */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   )
 }
 
