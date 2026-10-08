@@ -17,6 +17,7 @@
  *     /configuracion/controladores-rf/3      Controlador 3 con sus medidores
  *     /configuracion/controladores-rf/3/medidores/12   Detalle del medidor 12
  *     /en-linea/controladores-rf[/…]         Datos en línea (solo lectura)
+ *     /perfiles-5m/mediciones                Perfiles 5 Minutales
  *
  *   Los módulos de configuración son: controladores-rf, eventos,
  *   eventos-registrados, unidades, puntos-io, grupos-funcionales-io,
@@ -37,6 +38,7 @@ import GestionEventosRegistrados from './components/eventosReg/GestionEventosReg
 import GestionUnidades from './components/unidades/GestionUnidades'
 import GestionPuntosIO from './components/puntosIO/GestionPuntosIO'
 import GestionGruposIO from './components/gruposIO/GestionGruposIO'
+import ConsultaPerfiles5M from './components/perfiles5m/ConsultaPerfiles5M'
 import { restaurarSesion, cerrarSesion } from './services/authService'
 
 // rolId del Administrador en la UI (ver ROL_IDS en services/authService.js).
@@ -186,6 +188,17 @@ function App() {
           <Route index element={<Navigate to="controladores-rf" replace />} />
           {rutasControladores('/en-linea', true)}
           <Route path="*" element={<Navigate to="controladores-rf" replace />} />
+        </Route>
+
+        {/* Opción "Perfiles 5 Minutales": consulta de solo lectura de las
+            mediciones de cinco minutos de cualquier medidor. */}
+        <Route
+          path="/perfiles-5m"
+          element={<LayoutSistema rutaBase="/perfiles-5m" rutasVisibles={['mediciones']} {...propsLayout} />}
+        >
+          <Route index element={<Navigate to="mediciones" replace />} />
+          <Route path="mediciones" element={<ConsultaPerfiles5M />} />
+          <Route path="*" element={<Navigate to="mediciones" replace />} />
         </Route>
 
         {/* Cualquier otra dirección vuelve a la vista principal. */}

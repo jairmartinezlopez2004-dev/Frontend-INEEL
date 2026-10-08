@@ -10,8 +10,8 @@
  *   App.jsx decide qué renderizar a partir de la opción elegida.
  * - "Datos en línea" abre solo el flujo de Controladores RF (controlador ->
  *   sus medidores -> detalle del medidor).
- * - "Perfiles 5 Minutales" aún no tiene vista: se muestra deshabilitada con
- *   la etiqueta "Próximamente".
+ * - "Perfiles 5 Minutales" abre la consulta de mediciones de cinco minutos
+ *   de cualquier medidor (ConsultaPerfiles5M).
  * - Incluye una barra superior con el usuario y el botón de cerrar sesión,
  *   porque en esta vista todavía no se monta el Header del sistema.
  */
@@ -51,13 +51,13 @@ function IconoEnLinea() {
 // `disponible: false` = aún sin vista (tarjeta deshabilitada).
 const OPCIONES = [
   { id: 'baseDatos', ruta: '/configuracion', titulo: 'Base de Datos', detalle: '(configuración)', Icono: IconoBaseDatos, disponible: true },
-  { id: 'perfiles5M', titulo: 'Perfiles 5 Minutales', Icono: IconoPerfiles, disponible: false },
+  { id: 'perfiles5M', ruta: '/perfiles-5m', titulo: 'Perfiles 5 Minutales', Icono: IconoPerfiles, disponible: true },
   { id: 'enLinea', ruta: '/en-linea', titulo: 'Datos en línea', Icono: IconoEnLinea, disponible: true },
 ]
 
 // Props:
 // - currentUser: usuario autenticado (nombre, apellido, rol, iniciales).
-// - onSeleccionar: callback con la ruta de la opción elegida ('/configuracion' o '/en-linea').
+// - onSeleccionar: callback con la ruta de la opción elegida ('/configuracion', '/perfiles-5m' o '/en-linea').
 // - onLogout: callback para cerrar la sesión y volver al Login.
 export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout }) {
   // true mientras se muestra la confirmación de "¿Cerrar sesión?".

@@ -1,8 +1,9 @@
 /**
  * LayoutSistema.jsx
  * ---------------------------------------------------------------------------
- * Marco común de las vistas "Base de Datos (configuración)" y "Datos en
- * línea": header, menú lateral, área de contenido, barra de estado y footer.
+ * Marco común de las vistas "Base de Datos (configuración)", "Perfiles 5
+ * Minutales" y "Datos en línea": header, menú lateral, área de contenido,
+ * barra de estado y footer.
  *
  * El módulo que se muestra en el área de contenido lo decide la URL: React
  * Router lo dibuja en el <Outlet /> según la ruta hija que coincida (ver
@@ -15,7 +16,7 @@ import Sidebar from './Sidebar'
 import StatusBar from './StatusBar'
 
 // Props:
-// - rutaBase: prefijo del tipo de consulta ('/configuracion' o '/en-linea').
+// - rutaBase: prefijo del tipo de consulta ('/configuracion', '/en-linea' o '/perfiles-5m').
 // - rutasVisibles: (opcional) módulos que se muestran en el menú lateral.
 // - currentUser: usuario autenticado (para el Header).
 // - esAdmin: si es true el menú muestra las opciones solo para Administrador.

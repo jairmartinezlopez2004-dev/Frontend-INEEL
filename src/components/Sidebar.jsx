@@ -27,10 +27,12 @@ const NAV_ITEMS = [
   { ruta: 'grupos-electricos-io', label: 'Grupos eléctricos IO' },
   // Solo visible para el Administrador (ver prop esAdmin).
   { ruta: 'usuarios', label: 'Usuarios', soloAdmin: true },
+  // Solo aparece donde `rutasVisibles` la incluye (opción Perfiles 5 Minutales).
+  { ruta: 'mediciones', label: 'Mediciones 5 minutales', soloSiVisible: true },
 ];
 
 // Props:
-// - rutaBase: prefijo del tipo de consulta ('/configuracion' o '/en-linea').
+// - rutaBase: prefijo del tipo de consulta ('/configuracion', '/en-linea' o '/perfiles-5m').
 // - isOpen: booleano que indica si el menú está expandido (ancho completo) o colapsado (ancho 0).
 // - esAdmin: booleano; si es false se ocultan las opciones marcadas como soloAdmin.
 // - rutasVisibles: (opcional) segmentos de NAV_ITEMS a mostrar; sin él se muestran todos.
@@ -57,7 +59,9 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
             ← Tipo de consulta
           </Link>
           {NAV_ITEMS.filter(
-            (item) => (!item.soloAdmin || esAdmin) && (!rutasVisibles || rutasVisibles.includes(item.ruta))
+            (item) =>
+              (!item.soloAdmin || esAdmin) &&
+              (rutasVisibles ? rutasVisibles.includes(item.ruta) : !item.soloSiVisible)
           ).map((item) => (
             // NavLink marca la opción como activa cuando la URL está en esa ruta
             // o debajo de ella (p. ej. un controlador o un medidor dentro de
