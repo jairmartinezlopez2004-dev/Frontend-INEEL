@@ -48,14 +48,16 @@ export const VARIABLES_5M = [
   { id: 13, nombre: 'THD corriente', unidad: '%' },
 ]
 
-// Fases que acepta el backend.
+// Fases que acepta el backend. `color` es el de su serie en la gráfica
+// (primeros tres colores de la paleta categórica, validados para daltonismo).
 export const FASES = [
-  { id: 1, nombre: 'A' },
-  { id: 2, nombre: 'B' },
-  { id: 3, nombre: 'C' },
+  { id: 1, nombre: 'A', color: '#2a78d6' },
+  { id: 2, nombre: 'B', color: '#eb6834' },
+  { id: 3, nombre: 'C', color: '#1baf7a' },
 ]
 
 const dosDigitos = (n) => String(n).padStart(2, '0')
+const tresDigitos = (n) => String(n).padStart(3, '0')
 
 /** "HH:MM" de un intervalo de 5 minutos (0 = 00:00, 287 = 23:55). */
 export function horaDeIntervalo(intervalo) {
@@ -86,7 +88,9 @@ function agruparPromedio(filas, claveDe, etiquetaDe) {
 }
 
 // Agrupaciones disponibles: ruta del endpoint y cómo normalizar sus filas a
-// { clave, etiqueta, valor }.
+// { clave, etiqueta, valor }. La `clave` identifica el periodo y se ordena
+// como texto (dígitos con ceros a la izquierda), para empatar y ordenar los
+// periodos de varias fases.
 export const AGRUPACIONES = [
   {
     id: 'crudo',
@@ -94,7 +98,7 @@ export const AGRUPACIONES = [
     ruta: 'crudo',
     normalizar: (filas) =>
       filas.map((f) => ({
-        clave: `${f.fecha}-${f.intervalo}`,
+        clave: `${f.fecha} ${tresDigitos(f.intervalo)}`,
         etiqueta: `${f.fecha} ${horaDeIntervalo(f.intervalo)}`,
         valor: f.valor,
       })),
@@ -105,7 +109,7 @@ export const AGRUPACIONES = [
     ruta: 'promedio-hora',
     normalizar: (filas) =>
       filas.map((f) => ({
-        clave: `${f.fecha}-${f.hora}`,
+        clave: `${f.fecha} ${dosDigitos(f.hora)}`,
         etiqueta: `${f.fecha} ${dosDigitos(f.hora)}:00`,
         valor: f.valorPromedio,
       })),
@@ -124,7 +128,7 @@ export const AGRUPACIONES = [
     normalizar: (filas) =>
       agruparPromedio(
         filas,
-        (f) => `${f.anio}-${f.semana}`,
+        (f) => `${f.anio}-${dosDigitos(f.semana)}`,
         (f) => `${f.anio} · semana ${f.semana}`,
       ),
   },
@@ -135,7 +139,7 @@ export const AGRUPACIONES = [
     normalizar: (filas) =>
       agruparPromedio(
         filas,
-        (f) => `${f.anio}-${f.mes}`,
+        (f) => `${f.anio}-${dosDigitos(f.mes)}`,
         (f) => `${f.anio}-${dosDigitos(f.mes)}`,
       ),
   },
@@ -145,7 +149,7 @@ export const AGRUPACIONES = [
     ruta: 'promedio-anio',
     normalizar: (filas) =>
       filas.map((f) => ({
-        clave: `${f.anio}-${f.mes}`,
+        clave: `${f.anio}-${dosDigitos(f.mes)}`,
         etiqueta: `${f.anio}-${dosDigitos(f.mes)}`,
         valor: f.valorPromedio,
       })),
@@ -181,3 +185,35 @@ export async function consultarMedicion5M(
   }
 }
 
+/**
+ * Consulta varias fases a la vez. El backend recibe una sola fase por
+ * petición, así que se hace una por fase, en paralelo.
+ * @param {object} filtros - Mismos campos que consultarMedicion5M, pero con
+ *   `fases` (arreglo de 1, 2 o 3) en lugar de `fase`.
+ * @returns {Promise<{ series: Array<{ fase: number, puntos: Array<object> }>,
+ *   periodos: Array<{ clave: string, etiqueta: string }>, mensaje: string|null }>}
+ *   `periodos` es la unión ordenada de los periodos de todas las fases;
+ *   `mensaje` trae el aviso del backend cuando ninguna fase tiene datos.
+ */
+export async function consultarFases({ fases, ...filtros }, { signal } = {}) {
+  const resultados = await Promise.all(
+    fases.map((fase) => consultarMedicion5M({ ...filtros, fase }, { signal })),
+  )
+  const series = fases.map((fase, i) => ({ fase, puntos: resultados[i].puntos }))
+
+  const periodos = new Map()
+  for (const { puntos } of series) {
+    for (const p of puntos) {
+      if (!periodos.has(p.clave)) periodos.set(p.clave, p.etiqueta)
+    }
+  }
+  const ordenados = [...periodos.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([clave, etiqueta]) => ({ clave, etiqueta }))
+
+  return {
+    series,
+    periodos: ordenados,
+    mensaje: ordenados.length === 0 ? resultados[0].mensaje : null,
+  }
+}
