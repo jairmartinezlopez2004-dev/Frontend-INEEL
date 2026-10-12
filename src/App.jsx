@@ -104,6 +104,7 @@ function App() {
     esAdmin,
     isSidebarOpen,
     onToggleSidebar: () => setIsSidebarOpen((prev) => !prev),
+    onCloseSidebar: () => setIsSidebarOpen(false),
     onLogout: handleLogout,
   }
 

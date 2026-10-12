@@ -9,7 +9,11 @@
  * Router lo dibuja en el <Outlet /> según la ruta hija que coincida (ver
  * App.jsx). Así la vista siempre corresponde a la dirección del navegador,
  * también al usar Atrás / Adelante o al recargar la página.
+ *
+ * El menú lateral se guarda solo: con él abierto, un clic en cualquier parte
+ * de la pantalla (el contenido o una opción del propio menú) lo cierra.
  */
+import { useEffect } from 'react'
 import { Outlet } from 'react-router'
 import Header from './Header'
 import Sidebar from './Sidebar'
@@ -20,7 +24,7 @@ import StatusBar from './StatusBar'
 // - rutasVisibles: (opcional) módulos que se muestran en el menú lateral.
 // - currentUser: usuario autenticado (para el Header).
 // - esAdmin: si es true el menú muestra las opciones solo para Administrador.
-// - isSidebarOpen / onToggleSidebar: estado del menú lateral (vive en App.jsx).
+// - isSidebarOpen / onToggleSidebar / onCloseSidebar: estado del menú lateral (vive en App.jsx).
 // - onLogout: callback para cerrar la sesión.
 export default function LayoutSistema({
   rutaBase,
@@ -29,8 +33,25 @@ export default function LayoutSistema({
   esAdmin,
   isSidebarOpen,
   onToggleSidebar,
+  onCloseSidebar,
   onLogout,
 }) {
+  // Con el menú abierto, cualquier clic lo cierra. Se excluye el botón
+  // hamburguesa, que ya lo alterna por su cuenta.
+  useEffect(() => {
+    if (!isSidebarOpen) return undefined
+
+    const alHacerClic = (evento) => {
+      if (evento.target.closest?.('[data-boton-menu]')) return
+      onCloseSidebar()
+    }
+
+    document.addEventListener('click', alHacerClic)
+    return () => document.removeEventListener('click', alHacerClic)
+    // onCloseSidebar se omite a propósito: App.jsx la crea de nuevo en cada render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSidebarOpen])
+
   return (
     // Contenedor raíz: ocupa toda la pantalla y organiza el layout en columna
     // (header arriba, contenido al centro, barras de estado/footer abajo).

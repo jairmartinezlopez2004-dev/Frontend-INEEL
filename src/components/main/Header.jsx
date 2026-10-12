@@ -76,6 +76,7 @@ function Header({ currentUser, isSidebarOpen, onToggleSidebar, onLogout }) {
         <button
           type="button"
           onClick={onToggleSidebar}
+          data-boton-menu
           aria-label={isSidebarOpen ? 'Ocultar menú lateral' : 'Mostrar menú lateral'}
           aria-pressed={isSidebarOpen}
           className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-md text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
