@@ -8,10 +8,10 @@
  * WebService (POST /Auth/login) mediante services/authService.js.
  */
 import { useState } from 'react';
-import { iniciarSesion } from '../services/authService';
-import { useValidacion } from '../hooks/useValidacion';
-import { validarTexto } from '../utils/validaciones';
-import { MensajeCampo } from './common/CampoFormulario';
+import { iniciarSesion } from '../../services/authService';
+import { useValidacion } from '../../hooks/useValidacion';
+import { validarTexto } from '../../utils/validaciones';
+import { MensajeCampo } from '../common/CampoFormulario';
 
 // Reglas de cada campo. En el login solo se pide que no estén vacíos: las
 // credenciales las valida el WebService.

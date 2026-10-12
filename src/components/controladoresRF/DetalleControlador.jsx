@@ -7,10 +7,11 @@
  * - Se monta desde GestionControladoresRF al pulsar "Ver medidores".
  * - Lee el controlador con GET /ControladorRF/{id}, que ya trae sus medidores.
  * - Encabezado con los datos del controlador; el Administrador puede editarlo.
- * - Tabla de sus medidores: "Detalles" abre el medidor (sus pestañas) y el
- *   Administrador puede dar de alta un medidor en este controlador (queda
- *   preseleccionado en el formulario) o editar uno existente, incluso para
- *   moverlo a otro controlador.
+ * - Tabla de sus medidores: el Administrador puede dar de alta un medidor en
+ *   este controlador (queda preseleccionado en el formulario) o editar uno
+ *   existente, incluso para moverlo a otro controlador. "Detalles" abre el
+ *   medidor (sus pestañas) solo en "Datos en línea"; en "Base de Datos
+ *   (configuración)" no se muestra.
  * - Colores: la sección del controlador va en azul y la de sus medidores en
  *   verde (incluidos sus formularios), para que al editar se distinga a qué
  *   parte pertenece cada formulario.
@@ -39,7 +40,8 @@ function DatoControlador({ etiqueta, valor }) {
 // - controladores: lista de controladores (para el selector del formulario de medidor).
 // - esAdmin: si es true se muestran el alta y la edición.
 // - onVolver: callback para regresar a la lista de controladores.
-// - onVerMedidor: callback con el medidor elegido con "Detalles".
+// - onVerMedidor: callback con el medidor elegido con "Detalles"; si no se
+//   pasa, el botón no se muestra.
 // - onCargado: callback con el controlador cada vez que se lee del WebService.
 export default function DetalleControlador({
   idControlador,
@@ -237,18 +239,20 @@ export default function DetalleControlador({
                           <button
                             type="button"
                             onClick={() => abrirFormularioMedidor(medidor)}
-                            className="mr-2 cursor-pointer rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-100"
+                            className="cursor-pointer rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-100"
                           >
                             Editar
                           </button>
                         )}
-                        <button
-                          type="button"
-                          onClick={() => onVerMedidor(medidor)}
-                          className="cursor-pointer rounded-md border border-blue-600 px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-600 hover:text-white"
-                        >
-                          Detalles
-                        </button>
+                        {onVerMedidor && (
+                          <button
+                            type="button"
+                            onClick={() => onVerMedidor(medidor)}
+                            className="cursor-pointer rounded-md border border-blue-600 px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-600 hover:text-white"
+                          >
+                            Detalles
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}

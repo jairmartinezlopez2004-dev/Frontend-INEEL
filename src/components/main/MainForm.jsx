@@ -17,12 +17,12 @@
  * a cada Tab hijo (por ejemplo, TabInstantaneos, TabValores5M, etc.).
  */
 import { useState } from 'react'
-import CommunicationsTabs from './coms/CommunicationsTabs'
-import TabComunicaciones from './coms/TabComunicaciones'
-import TabInstantaneos from './instantaneos/TabInstantaneos'
-import TabValores5M from './valores5m/TabValores5M'
-import TabCalidad from './calidad/TabCalidad'
-import TabConsumos from './consumos/TabConsumos'
+import CommunicationsTabs from '../coms/CommunicationsTabs'
+import TabComunicaciones from '../coms/TabComunicaciones'
+import TabInstantaneos from '../instantaneos/TabInstantaneos'
+import TabValores5M from '../valores5m/TabValores5M'
+import TabCalidad from '../calidad/TabCalidad'
+import TabConsumos from '../consumos/TabConsumos'
 
 // Lista de pestañas que ya cuentan con una vista maquetada/funcional.
 // Se usa para mostrar el mensaje de "en construcción" en cualquier pestaña

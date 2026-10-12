@@ -20,8 +20,8 @@
  * autenticado (App.jsx).
  */
 import { useEffect, useState } from 'react'
-import ConfirmDialog from './common/ConfirmDialog'
-import { renovarSesion, segundosRestantesSesion } from '../services/authService'
+import ConfirmDialog from '../common/ConfirmDialog'
+import { renovarSesion, segundosRestantesSesion } from '../../services/authService'
 
 // Con cuántos segundos de anticipación se avisa.
 const SEGUNDOS_AVISO = 60

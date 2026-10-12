@@ -27,10 +27,10 @@
  */
 import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router'
-import Login from './components/Login'
-import LayoutSistema from './components/LayoutSistema'
+import Login from './components/auth/Login'
+import LayoutSistema from './components/main/LayoutSistema'
 import SeleccionConsulta from './components/inicio/SeleccionConsulta'
-import AvisoExpiracionSesion from './components/AvisoExpiracionSesion'
+import AvisoExpiracionSesion from './components/auth/AvisoExpiracionSesion'
 import GestionUsuarios from './components/usuarios/GestionUsuarios'
 import GestionControladoresRF from './components/controladoresRF/GestionControladoresRF'
 import GestionEventos from './components/eventos/GestionEventos'

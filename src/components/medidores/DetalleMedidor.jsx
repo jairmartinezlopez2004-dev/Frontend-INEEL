@@ -14,7 +14,7 @@
  *   importar la pestaña activa.
  */
 import EstadoBadge from './EstadoBadge'
-import MainForm from '../MainForm'
+import MainForm from '../main/MainForm'
 
 // Dato de solo lectura para el encabezado del medidor (etiqueta + valor).
 function DatoMedidor({ etiqueta, valor }) {

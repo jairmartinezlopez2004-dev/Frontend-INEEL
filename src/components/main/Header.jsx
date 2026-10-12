@@ -18,7 +18,7 @@
  * presentación en lo que a datos de usuario se refiere.
  */
 import { useState } from 'react'
-import ConfirmDialog from './common/ConfirmDialog'
+import ConfirmDialog from '../common/ConfirmDialog'
 
 const SYSTEM_TITLE = ' MEDICIÓN CALIDAD DE LA POTENCIA INEEL V1.0.1'
 

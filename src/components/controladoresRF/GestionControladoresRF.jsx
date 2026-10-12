@@ -127,7 +127,12 @@ export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLog
         controladores={controladores}
         esAdmin={esAdmin}
         onVolver={() => navigate(rutaBase)}
-        onVerMedidor={(medidor) => navigate(`${rutaBase}/${idControlador}/medidores/${medidor.id}`)}
+        // "Detalles" solo existe en "Datos en línea"; en configuración solo se edita.
+        onVerMedidor={
+          soloLectura
+            ? (medidor) => navigate(`${rutaBase}/${idControlador}/medidores/${medidor.id}`)
+            : undefined
+        }
       />
     )
   }
