@@ -15,6 +15,8 @@ import { useEffect, useState } from 'react'
 import { listarUnidades } from '../../services/unidadesService'
 import FormularioUnidad from './FormularioUnidad'
 import EstadoActivo from '../common/EstadoActivo'
+import { useFiltroTabla } from '../../hooks/useFiltroTabla'
+import BuscadorTabla from '../common/BuscadorTabla'
 
 // Encabezados de la tabla. La última columna (acciones) no tiene título.
 const COLUMNAS = ['ID', 'Símbolo', 'Nombre', 'Estado', '']
@@ -30,6 +32,14 @@ export default function GestionUnidades({ esAdmin }) {
   const [enEdicion, setEnEdicion] = useState(undefined)
   // Se incrementa para volver a pedir la lista después de guardar.
   const [recarga, setRecarga] = useState(0)
+
+  // Buscador de la tabla: filtra por las columnas visibles (el estado por su texto).
+  const filtro = useFiltroTabla(unidades, (u) => [
+    u.id,
+    u.simbolo,
+    u.nombre,
+    u.activa ? 'Activa' : 'Inactiva',
+  ])
 
   // Carga (y recarga) de la lista. El AbortController cancela la petición si
   // el usuario sale de la vista antes de que responda el WebService.
@@ -107,6 +117,17 @@ export default function GestionUnidades({ esAdmin }) {
         <p className="px-6 py-4 text-sm text-slate-500">No hay unidades registradas.</p>
       )}
 
+      {/* Buscador sobre la tabla (solo si hay registros que filtrar). */}
+      {!error && unidades.length > 0 && (
+        <BuscadorTabla
+          valor={filtro.texto}
+          onCambio={filtro.setTexto}
+          total={unidades.length}
+          visibles={filtro.filtradas.length}
+          placeholder="Buscar por símbolo, nombre o estado…"
+        />
+      )}
+
       {/* Contenedor con scroll horizontal para que la tabla no rompa el layout en pantallas angostas. */}
       {!error && unidades.length > 0 && (
         <div className="overflow-x-auto">
@@ -125,7 +146,7 @@ export default function GestionUnidades({ esAdmin }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {unidades.map((unidad) => (
+              {filtro.filtradas.map((unidad) => (
                 <tr key={unidad.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-mono text-slate-700">{unidad.id}</td>
                   <td className="px-4 py-3 font-mono text-slate-900">
@@ -150,6 +171,11 @@ export default function GestionUnidades({ esAdmin }) {
               ))}
             </tbody>
           </table>
+          {filtro.texto.trim() && filtro.filtradas.length === 0 && (
+            <p className="px-6 py-4 text-sm text-slate-500">
+              Ninguna unidad coincide con “{filtro.texto.trim()}”.
+            </p>
+          )}
         </div>
       )}
     </div>

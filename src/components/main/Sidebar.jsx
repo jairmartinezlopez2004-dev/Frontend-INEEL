@@ -18,7 +18,7 @@ import { Link, NavLink } from 'react-router'
 // Catálogo estático de opciones del menú lateral (segmento de ruta + etiqueta visible).
 // La ruta completa es `${rutaBase}/${ruta}` (p. ej. /configuracion/unidades).
 const NAV_ITEMS = [
-  { ruta: 'controladores-rf', label: 'Controladores RF' },
+  { ruta: 'controladores-rf', label: 'Controladores' },
   { ruta: 'eventos', label: 'Eventos configurados' },
   { ruta: 'eventos-registrados', label: 'Eventos registrados' },
   { ruta: 'unidades', label: 'Unidades' },

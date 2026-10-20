@@ -16,6 +16,8 @@ import { useEffect, useState } from 'react'
 import { TIPOS_GRUPO, listarGrupos } from '../../services/gruposIOService'
 import FormularioGrupoIO from './FormularioGrupoIO'
 import EstadoActivo from '../common/EstadoActivo'
+import { useFiltroTabla } from '../../hooks/useFiltroTabla'
+import BuscadorTabla from '../common/BuscadorTabla'
 
 // Encabezados de la tabla. La última columna (acciones) no tiene título.
 const COLUMNAS = ['ID', 'Nombre', 'Estado', '']
@@ -33,6 +35,13 @@ export default function GestionGruposIO({ tipo, esAdmin }) {
   const [enEdicion, setEnEdicion] = useState(undefined)
   // Se incrementa para volver a pedir la lista después de guardar.
   const [recarga, setRecarga] = useState(0)
+
+  // Buscador de la tabla: filtra por las columnas visibles (el estado por su texto).
+  const filtro = useFiltroTabla(grupos, (g) => [
+    g.id,
+    g.nombre,
+    g.activo ? 'Activo' : 'Inactivo',
+  ])
 
   // Carga (y recarga) de la lista. El AbortController cancela la petición si
   // el usuario sale de la vista antes de que responda el WebService.
@@ -111,6 +120,17 @@ export default function GestionGruposIO({ tipo, esAdmin }) {
         <p className="px-6 py-4 text-sm text-slate-500">No hay grupos registrados.</p>
       )}
 
+      {/* Buscador sobre la tabla (solo si hay registros que filtrar). */}
+      {!error && grupos.length > 0 && (
+        <BuscadorTabla
+          valor={filtro.texto}
+          onCambio={filtro.setTexto}
+          total={grupos.length}
+          visibles={filtro.filtradas.length}
+          placeholder="Buscar por ID, nombre o estado…"
+        />
+      )}
+
       {/* Contenedor con scroll horizontal para que la tabla no rompa el layout en pantallas angostas. */}
       {!error && grupos.length > 0 && (
         <div className="overflow-x-auto">
@@ -129,7 +149,7 @@ export default function GestionGruposIO({ tipo, esAdmin }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {grupos.map((grupo) => (
+              {filtro.filtradas.map((grupo) => (
                 <tr key={grupo.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-mono text-slate-700">{grupo.id}</td>
                   {/* Hay registros con nombre vacío en la base de datos; se marcan con un guion. */}
@@ -154,6 +174,11 @@ export default function GestionGruposIO({ tipo, esAdmin }) {
               ))}
             </tbody>
           </table>
+          {filtro.texto.trim() && filtro.filtradas.length === 0 && (
+            <p className="px-6 py-4 text-sm text-slate-500">
+              Ningún grupo coincide con “{filtro.texto.trim()}”.
+            </p>
+          )}
         </div>
       )}
     </div>

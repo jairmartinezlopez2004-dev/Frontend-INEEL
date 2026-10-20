@@ -23,6 +23,8 @@ import { useValidacion } from '../../hooks/useValidacion'
 import { validarTexto, validarCorreo, validarEntero } from '../../utils/validaciones'
 import CampoFormulario from '../common/CampoFormulario'
 import { claseControl } from '../common/clasesFormulario'
+import { useFiltroTabla } from '../../hooks/useFiltroTabla'
+import BuscadorTabla from '../common/BuscadorTabla'
 
 // Encabezados de la tabla (se mantienen en un arreglo para no repetir markup).
 const COLUMNAS = ['Nombre', 'Correo', 'Rol', 'Estado', 'Sesión (min)', '']
@@ -273,6 +275,14 @@ export default function GestionUsuarios() {
   // Se incrementa para volver a pedir la lista después de guardar.
   const [recarga, setRecarga] = useState(0)
 
+  // Buscador de la tabla: filtra por las columnas visibles (el estado por su texto).
+  const filtro = useFiltroTabla(usuarios, (u) => [
+    u.nombreUsuario,
+    u.correo,
+    u.rol,
+    u.activo ? 'Activo' : 'Inactivo',
+  ])
+
   // Carga (y recarga) de la lista. El AbortController cancela la petición si
   // el usuario sale de la vista antes de que responda el WebService.
   useEffect(() => {
@@ -342,6 +352,17 @@ export default function GestionUsuarios() {
         </div>
       )}
 
+      {/* Buscador sobre la tabla (solo si hay registros que filtrar). */}
+      {!error && usuarios.length > 0 && (
+        <BuscadorTabla
+          valor={filtro.texto}
+          onCambio={filtro.setTexto}
+          total={usuarios.length}
+          visibles={filtro.filtradas.length}
+          placeholder="Buscar por nombre, correo, rol o estado…"
+        />
+      )}
+
       {/* Contenedor con scroll horizontal para que la tabla no rompa el layout en pantallas angostas. */}
       {!error && (
         <div className="overflow-x-auto">
@@ -360,7 +381,7 @@ export default function GestionUsuarios() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {usuarios.map((usuario) => (
+              {filtro.filtradas.map((usuario) => (
                 <tr key={usuario.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 text-slate-900">{usuario.nombreUsuario}</td>
                   <td className="px-4 py-3 text-slate-700">{usuario.correo}</td>
@@ -382,6 +403,11 @@ export default function GestionUsuarios() {
               ))}
             </tbody>
           </table>
+          {filtro.texto.trim() && filtro.filtradas.length === 0 && (
+            <p className="px-6 py-4 text-sm text-slate-500">
+              Ningún usuario coincide con “{filtro.texto.trim()}”.
+            </p>
+          )}
         </div>
       )}
     </div>

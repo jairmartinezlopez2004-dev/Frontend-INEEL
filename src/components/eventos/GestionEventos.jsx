@@ -17,6 +17,8 @@ import { listarEventos } from '../../services/eventosConfigService'
 import { listarUnidades, textoUnidad } from '../../services/unidadesService'
 import FormularioEvento from './FormularioEvento'
 import EstadoActivo from '../common/EstadoActivo'
+import { useFiltroTabla } from '../../hooks/useFiltroTabla'
+import BuscadorTabla from '../common/BuscadorTabla'
 
 // Encabezados de la tabla. La última columna (acciones) no tiene título.
 const COLUMNAS = ['Núm. evento', 'Descripción', 'Unidad', 'Estado', '']
@@ -79,6 +81,14 @@ export default function GestionEventos({ esAdmin }) {
     return unidad ? textoUnidad(unidad) : `ID ${idUnidad}`
   }
 
+  // Buscador de la tabla: filtra por las columnas visibles (el estado por su texto).
+  const filtro = useFiltroTabla(eventos, (e) => [
+    e.numEvento,
+    e.descripcion,
+    unidadDe(e.idUnidad),
+    e.activo ? 'Activo' : 'Inactivo',
+  ])
+
   return (
     <div className="rounded-xl bg-white shadow-md">
       {/* Encabezado de la tarjeta: título + alta de evento. */}
@@ -124,6 +134,17 @@ export default function GestionEventos({ esAdmin }) {
         <p className="px-6 py-4 text-sm text-slate-500">No hay eventos configurados.</p>
       )}
 
+      {/* Buscador sobre la tabla (solo si hay registros que filtrar). */}
+      {!error && eventos.length > 0 && (
+        <BuscadorTabla
+          valor={filtro.texto}
+          onCambio={filtro.setTexto}
+          total={eventos.length}
+          visibles={filtro.filtradas.length}
+          placeholder="Buscar por número, descripción, unidad o estado…"
+        />
+      )}
+
       {/* Contenedor con scroll horizontal para que la tabla no rompa el layout en pantallas angostas. */}
       {!error && eventos.length > 0 && (
         <div className="overflow-x-auto">
@@ -142,7 +163,7 @@ export default function GestionEventos({ esAdmin }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {eventos.map((evento) => (
+              {filtro.filtradas.map((evento) => (
                 <tr key={evento.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-mono text-slate-700">{evento.numEvento}</td>
                   <td className="px-4 py-3 text-slate-900">{evento.descripcion}</td>
@@ -165,6 +186,11 @@ export default function GestionEventos({ esAdmin }) {
               ))}
             </tbody>
           </table>
+          {filtro.texto.trim() && filtro.filtradas.length === 0 && (
+            <p className="px-6 py-4 text-sm text-slate-500">
+              Ningún evento coincide con “{filtro.texto.trim()}”.
+            </p>
+          )}
         </div>
       )}
     </div>

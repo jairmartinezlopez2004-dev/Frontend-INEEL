@@ -24,6 +24,9 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router'
 import { listarControladoresRF } from '../../services/controladoresRFService'
+import { textoEstadoEquipo } from '../../services/medidoresService'
+import { useFiltroTabla } from '../../hooks/useFiltroTabla'
+import BuscadorTabla from '../common/BuscadorTabla'
 import FormularioControlador from './FormularioControlador'
 import DetalleControlador from './DetalleControlador'
 import MedidorDeControlador from './MedidorDeControlador'
@@ -54,6 +57,13 @@ export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLog
   const [enEdicion, setEnEdicion] = useState(undefined)
   // Se incrementa para volver a pedir la lista después de guardar.
   const [recarga, setRecarga] = useState(0)
+  // Buscador de la tabla: filtra por las columnas visibles (el estado por su texto).
+  const filtro = useFiltroTabla(controladores, (c) => [
+    c.nombre,
+    c.numSerie,
+    c.dirIP,
+    textoEstadoEquipo(c.edo),
+  ])
 
   // Carga (y recarga) de la lista. También se vuelve a pedir al cambiar de
   // controlador o al regresar a la lista, para que el conteo de medidores
@@ -143,7 +153,7 @@ export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLog
       {/* Encabezado de la tarjeta: título + alta de controlador. */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-6 py-4">
         <h2 className="text-lg font-bold uppercase tracking-wide text-slate-900">
-          Controladores RF
+          Controladores
         </h2>
         {esAdmin && enEdicion === undefined && (
           <button
@@ -184,6 +194,17 @@ export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLog
         </p>
       )}
 
+      {/* Buscador sobre la tabla (solo si hay controladores que filtrar). */}
+      {!error && controladores.length > 0 && (
+        <BuscadorTabla
+          valor={filtro.texto}
+          onCambio={filtro.setTexto}
+          total={controladores.length}
+          visibles={filtro.filtradas.length}
+          placeholder="Buscar por nombre, serie, IP o estado…"
+        />
+      )}
+
       {/* Contenedor con scroll horizontal para que la tabla no rompa el layout en pantallas angostas. */}
       {!error && controladores.length > 0 && (
         <div className="overflow-x-auto">
@@ -202,7 +223,7 @@ export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLog
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {controladores.map((controlador) => (
+              {filtro.filtradas.map((controlador) => (
                 <tr key={controlador.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 text-slate-900">{controlador.nombre}</td>
                   <td className="px-4 py-3 font-mono text-slate-700">{controlador.numSerie}</td>
@@ -233,6 +254,11 @@ export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLog
               ))}
             </tbody>
           </table>
+          {filtro.filtradas.length === 0 && (
+            <p className="px-6 py-4 text-sm text-slate-500">
+              Ningún controlador coincide con “{filtro.texto.trim()}”.
+            </p>
+          )}
         </div>
       )}
     </div>

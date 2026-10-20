@@ -21,6 +21,9 @@ import { obtenerControladorRF } from '../../services/controladoresRFService'
 import FormularioControlador from './FormularioControlador'
 import FormularioMedidor from '../medidores/FormularioMedidor'
 import EstadoBadge from '../medidores/EstadoBadge'
+import { textoEstadoEquipo } from '../../services/medidoresService'
+import { useFiltroTabla } from '../../hooks/useFiltroTabla'
+import BuscadorTabla from '../common/BuscadorTabla'
 
 // Encabezados de la tabla de medidores. La última columna (acciones) no tiene título.
 const COLUMNAS = ['Dir. Red', 'Dir. RF', 'Descripción', 'Estado', 'Dirección IP', '']
@@ -61,6 +64,15 @@ export default function DetalleControlador({
   const [medidorEnEdicion, setMedidorEnEdicion] = useState(undefined)
   // Se incrementa para volver a pedir el controlador después de guardar.
   const [recarga, setRecarga] = useState(0)
+  // Buscador de la tabla de medidores: filtra por las columnas visibles.
+  const medidores = controlador?.medidores ?? []
+  const filtro = useFiltroTabla(medidores, (m) => [
+    m.dirRed,
+    m.dirRF,
+    m.descripcion,
+    textoEstadoEquipo(m.edo),
+    m.dirIP,
+  ])
 
   // Carga (y recarga) del controlador con sus medidores. El AbortController
   // cancela la petición si el usuario sale de la vista antes de que responda.
@@ -111,7 +123,7 @@ export default function DetalleControlador({
             onClick={onVolver}
             className="mb-3 cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
           >
-            ← Volver a Controladores RF
+            ← Volver a Controladores
           </button>
 
           {error && (
@@ -128,7 +140,7 @@ export default function DetalleControlador({
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">
-                    Controlador RF
+                    Controlador
                   </p>
                   <h2 className="text-lg font-bold text-blue-950">{controlador.nombre}</h2>
                 </div>
@@ -208,57 +220,72 @@ export default function DetalleControlador({
               Este controlador todavía no tiene medidores.
             </p>
           ) : (
-            // Contenedor con scroll horizontal para que la tabla no rompa el layout en pantallas angostas.
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-200 text-sm">
-                <thead className="bg-emerald-50/60">
-                  <tr>
-                    {COLUMNAS.map((col) => (
-                      <th
-                        key={col}
-                        scope="col"
-                        className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-emerald-800"
-                      >
-                        {col}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-emerald-100">
-                  {controlador.medidores.map((medidor) => (
-                    <tr key={medidor.id} className="hover:bg-emerald-50/40">
-                      <td className="px-4 py-3 font-mono text-slate-700">{medidor.dirRed}</td>
-                      <td className="px-4 py-3 font-mono text-slate-700">{medidor.dirRF}</td>
-                      <td className="px-4 py-3 text-slate-900">{medidor.descripcion}</td>
-                      <td className="px-4 py-3">
-                        <EstadoBadge edo={medidor.edo} />
-                      </td>
-                      <td className="px-4 py-3 font-mono text-slate-700">{medidor.dirIP}</td>
-                      <td className="whitespace-nowrap px-4 py-3 text-right">
-                        {esAdmin && (
-                          <button
-                            type="button"
-                            onClick={() => abrirFormularioMedidor(medidor)}
-                            className="cursor-pointer rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-100"
-                          >
-                            Editar
-                          </button>
-                        )}
-                        {onVerMedidor && (
-                          <button
-                            type="button"
-                            onClick={() => onVerMedidor(medidor)}
-                            className="cursor-pointer rounded-md border border-blue-600 px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-600 hover:text-white"
-                          >
-                            Detalles
-                          </button>
-                        )}
-                      </td>
+            <>
+              <BuscadorTabla
+                valor={filtro.texto}
+                onCambio={filtro.setTexto}
+                total={medidores.length}
+                visibles={filtro.filtradas.length}
+                placeholder="Buscar por dirección, descripción, estado o IP…"
+                claseFoco="focus:ring-emerald-500"
+              />
+              {/* Contenedor con scroll horizontal para que la tabla no rompa el layout en pantallas angostas. */}
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-slate-200 text-sm">
+                  <thead className="bg-emerald-50/60">
+                    <tr>
+                      {COLUMNAS.map((col) => (
+                        <th
+                          key={col}
+                          scope="col"
+                          className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-emerald-800"
+                        >
+                          {col}
+                        </th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-emerald-100">
+                    {filtro.filtradas.map((medidor) => (
+                      <tr key={medidor.id} className="hover:bg-emerald-50/40">
+                        <td className="px-4 py-3 font-mono text-slate-700">{medidor.dirRed}</td>
+                        <td className="px-4 py-3 font-mono text-slate-700">{medidor.dirRF}</td>
+                        <td className="px-4 py-3 text-slate-900">{medidor.descripcion}</td>
+                        <td className="px-4 py-3">
+                          <EstadoBadge edo={medidor.edo} />
+                        </td>
+                        <td className="px-4 py-3 font-mono text-slate-700">{medidor.dirIP}</td>
+                        <td className="whitespace-nowrap px-4 py-3 text-right">
+                          {esAdmin && (
+                            <button
+                              type="button"
+                              onClick={() => abrirFormularioMedidor(medidor)}
+                              className="cursor-pointer rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-100"
+                            >
+                              Editar
+                            </button>
+                          )}
+                          {onVerMedidor && (
+                            <button
+                              type="button"
+                              onClick={() => onVerMedidor(medidor)}
+                              className="cursor-pointer rounded-md border border-blue-600 px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-600 hover:text-white"
+                            >
+                              Detalles
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {filtro.filtradas.length === 0 && (
+                  <p className="px-6 py-4 text-sm text-slate-500">
+                    Ningún medidor coincide con “{filtro.texto.trim()}”.
+                  </p>
+                )}
+              </div>
+            </>
           )}
         </div>
       )}

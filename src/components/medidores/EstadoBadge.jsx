@@ -11,7 +11,7 @@
  *   11 = EN USO   (azul)
  *   20 = INACTIVO (rojo)
  */
-import { ESTADOS_EQUIPO } from '../../services/medidoresService'
+import { textoEstadoEquipo } from '../../services/medidoresService'
 
 // Clases de Tailwind por estado.
 const CLASES_ESTADO = {
@@ -23,7 +23,7 @@ const CLASES_ESTADO = {
 // Props:
 // - edo: número de estado (10, 11 o 20). Cualquier otro valor se muestra como "DESCONOCIDO".
 export default function EstadoBadge({ edo }) {
-  const texto = ESTADOS_EQUIPO.find((e) => e.valor === edo)?.texto ?? 'Desconocido'
+  const texto = textoEstadoEquipo(edo)
   const clases = CLASES_ESTADO[edo] ?? 'bg-slate-100 text-slate-700 ring-slate-500/20'
 
   return (

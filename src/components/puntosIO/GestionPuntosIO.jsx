@@ -19,6 +19,8 @@ import { listarGrupos } from '../../services/gruposIOService'
 import { listarUnidades, textoUnidad } from '../../services/unidadesService'
 import FormularioPuntoIO from './FormularioPuntoIO'
 import EstadoActivo from '../common/EstadoActivo'
+import { useFiltroTabla } from '../../hooks/useFiltroTabla'
+import BuscadorTabla from '../common/BuscadorTabla'
 
 // Encabezados de la tabla. La última columna (acciones) no tiene título.
 const COLUMNAS = [
@@ -55,6 +57,21 @@ export default function GestionPuntosIO({ esAdmin }) {
   const [enEdicion, setEnEdicion] = useState(null)
   // Se incrementa para volver a pedir la lista después de guardar.
   const [recarga, setRecarga] = useState(0)
+
+  // Buscador de la tabla: filtra por las columnas visibles (el estado por su texto).
+  const filtro = useFiltroTabla(puntos, (p) => [
+    p.id,
+    p.tag,
+    p.descripcion,
+    nombreEn(catalogos.funcionales, p.idGF),
+    nombreEn(catalogos.electricos, p.idGE),
+    nombreEn(catalogos.unidades, p.idUnidad, textoUnidad),
+    p.tipoDato,
+    p.tipoReg,
+    p.dirCCEC,
+    p.dirMB,
+    p.activo ? 'Activo' : 'Inactivo',
+  ])
 
   // Carga (y recarga) de los puntos y sus catálogos en paralelo. El
   // AbortController cancela las peticiones si el usuario sale de la vista
@@ -136,6 +153,17 @@ export default function GestionPuntosIO({ esAdmin }) {
         <p className="px-6 py-4 text-sm text-slate-500">No hay puntos IO registrados.</p>
       )}
 
+      {/* Buscador sobre la tabla (solo si hay registros que filtrar). */}
+      {!error && puntos.length > 0 && (
+        <BuscadorTabla
+          valor={filtro.texto}
+          onCambio={filtro.setTexto}
+          total={puntos.length}
+          visibles={filtro.filtradas.length}
+          placeholder="Buscar por tag, descripción, grupo, unidad o dirección…"
+        />
+      )}
+
       {/* Contenedor con scroll horizontal para que la tabla no rompa el layout en pantallas angostas. */}
       {!error && puntos.length > 0 && (
         <div className="overflow-x-auto">
@@ -154,7 +182,7 @@ export default function GestionPuntosIO({ esAdmin }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {puntos.map((punto) => (
+              {filtro.filtradas.map((punto) => (
                 <tr key={punto.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-mono text-slate-700">{punto.id}</td>
                   <td className="px-4 py-3 font-mono text-slate-900">{punto.tag}</td>
@@ -191,6 +219,11 @@ export default function GestionPuntosIO({ esAdmin }) {
               ))}
             </tbody>
           </table>
+          {filtro.texto.trim() && filtro.filtradas.length === 0 && (
+            <p className="px-6 py-4 text-sm text-slate-500">
+              Ningún punto IO coincide con “{filtro.texto.trim()}”.
+            </p>
+          )}
         </div>
       )}
     </div>

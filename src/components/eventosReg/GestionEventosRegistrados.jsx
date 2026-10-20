@@ -17,6 +17,8 @@ import { useEffect, useState } from 'react'
 import { listarRegistros, claveRegistro } from '../../services/eventosRegService'
 import { listarControladoresRF } from '../../services/controladoresRFService'
 import { listarEventos } from '../../services/eventosConfigService'
+import { useFiltroTabla } from '../../hooks/useFiltroTabla'
+import BuscadorTabla from '../common/BuscadorTabla'
 
 // Encabezados de la tabla.
 const COLUMNAS = ['Fecha', 'Controlador RF', 'Medidor', 'Evento', 'Consumo']
@@ -71,6 +73,15 @@ export default function GestionEventosRegistrados() {
     return evento ? `${evento.numEvento} – ${evento.descripcion}` : `ID ${idEvento}`
   }
 
+  // Buscador de la tabla: filtra por las columnas visibles (el estado por su texto).
+  const filtro = useFiltroTabla(registros, (r) => [
+    formatearFecha(r.fecha),
+    textoControlador(r.idCtrlRF),
+    textoMedidor(r.idCtrlRF, r.idMedidor),
+    textoEvento(r.idEvento),
+    r.consumo,
+  ])
+
   return (
     <div className="rounded-xl bg-white shadow-md">
       {/* Encabezado de la tarjeta. */}
@@ -94,6 +105,17 @@ export default function GestionEventosRegistrados() {
         <p className="px-6 py-4 text-sm text-slate-500">No hay eventos registrados.</p>
       )}
 
+      {/* Buscador sobre la tabla (solo si hay registros que filtrar). */}
+      {!error && registros.length > 0 && (
+        <BuscadorTabla
+          valor={filtro.texto}
+          onCambio={filtro.setTexto}
+          total={registros.length}
+          visibles={filtro.filtradas.length}
+          placeholder="Buscar por fecha, controlador, medidor o evento…"
+        />
+      )}
+
       {/* Contenedor con scroll horizontal para que la tabla no rompa el layout en pantallas angostas. */}
       {!error && registros.length > 0 && (
         <div className="overflow-x-auto">
@@ -112,7 +134,7 @@ export default function GestionEventosRegistrados() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {registros.map((registro) => (
+              {filtro.filtradas.map((registro) => (
                 <tr key={claveRegistro(registro)} className="hover:bg-slate-50">
                   <td className="whitespace-nowrap px-4 py-3 font-mono text-slate-700">
                     {formatearFecha(registro.fecha)}
@@ -127,6 +149,11 @@ export default function GestionEventosRegistrados() {
               ))}
             </tbody>
           </table>
+          {filtro.texto.trim() && filtro.filtradas.length === 0 && (
+            <p className="px-6 py-4 text-sm text-slate-500">
+              Ningún registro coincide con “{filtro.texto.trim()}”.
+            </p>
+          )}
         </div>
       )}
     </div>

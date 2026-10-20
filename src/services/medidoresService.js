@@ -43,6 +43,11 @@ export const ESTADOS_EQUIPO = [
   { valor: 20, texto: 'Inactivo' },
 ]
 
+/** Texto de un estado de equipo (`edo`); "Desconocido" si no está en el catálogo. */
+export function textoEstadoEquipo(edo) {
+  return ESTADOS_EQUIPO.find((e) => e.valor === edo)?.texto ?? 'Desconocido'
+}
+
 /**
  * Normaliza un medidor del backend a la forma que usa la UI.
  * `controlador` (opcional) es el controlador del backend que lo contiene.
