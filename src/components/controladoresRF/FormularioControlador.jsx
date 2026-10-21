@@ -86,7 +86,7 @@ export default function FormularioControlador({
     // noValidate desactiva los globos del navegador: se valida con VALIDADORES.
     <form noValidate onSubmit={guardar} className={`border-b px-6 py-5 ${claseFondo}`}>
       <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-800">
-        {esEdicion ? `Editar controlador: ${controlador.nombre}` : 'Nuevo controlador RF'}
+        {esEdicion ? `Editar controlador: ${controlador.nombre}` : 'Nuevo controlador'}
       </h3>
 
       {error && (

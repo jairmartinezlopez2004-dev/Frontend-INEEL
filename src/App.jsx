@@ -18,9 +18,10 @@
  *     /configuracion/controladores-rf/3/medidores/12   Detalle del medidor 12
  *     /en-linea/controladores-rf[/…]         Datos en línea (solo lectura)
  *     /perfiles-5m/mediciones                Perfiles 5 Minutales
+ *     /eventos/eventos-registrados           Eventos registrados
  *
  *   Los módulos de configuración son: controladores-rf, eventos,
- *   eventos-registrados, unidades, puntos-io, grupos-funcionales-io,
+ *   unidades, puntos-io, grupos-funcionales-io,
  *   grupos-electricos-io y usuarios (solo Administrador).
  * - Guarda el estado global de la UI: usuario autenticado y visibilidad del
  *   menú lateral, que se pasan como props a los componentes que los usan.
@@ -156,8 +157,6 @@ function App() {
           {/* Eventos configurados: todos consultan; solo el Administrador da de
               alta y edita (la baja es marcarlo inactivo). */}
           <Route path="eventos" element={<GestionEventos esAdmin={esAdmin} />} />
-          {/* Eventos registrados: historial de solo consulta. */}
-          <Route path="eventos-registrados" element={<GestionEventosRegistrados />} />
           {/* Unidades: todos consultan; solo el Administrador da de alta y edita. */}
           <Route path="unidades" element={<GestionUnidades esAdmin={esAdmin} />} />
           {/* Puntos IO: todos consultan; solo el Administrador edita, y cada
@@ -200,6 +199,17 @@ function App() {
           <Route index element={<Navigate to="mediciones" replace />} />
           <Route path="mediciones" element={<ConsultaPerfiles5M />} />
           <Route path="*" element={<Navigate to="mediciones" replace />} />
+        </Route>
+
+        {/* Opción "Eventos registrados": historial de solo consulta de los
+            eventos ocurridos en los medidores. */}
+        <Route
+          path="/eventos"
+          element={<LayoutSistema rutaBase="/eventos" rutasVisibles={['eventos-registrados']} {...propsLayout} />}
+        >
+          <Route index element={<Navigate to="eventos-registrados" replace />} />
+          <Route path="eventos-registrados" element={<GestionEventosRegistrados />} />
+          <Route path="*" element={<Navigate to="eventos-registrados" replace />} />
         </Route>
 
         {/* Cualquier otra dirección vuelve a la vista principal. */}

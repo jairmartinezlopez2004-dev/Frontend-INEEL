@@ -5,8 +5,8 @@
  *
  * Rol en el sistema:
  * Permite al usuario cambiar entre los módulos principales del sistema
- * (Controladores RF, que incluye los medidores, Eventos configurados, Eventos
- * registrados, Unidades, Puntos IO, Grupos funcionales y eléctricos IO y, solo
+ * (Controladores RF, que incluye los medidores, Eventos configurados,
+ * Unidades, Puntos IO, Grupos funcionales y eléctricos IO y, solo
  * para el Administrador, Usuarios). Cada opción es un enlace (NavLink de React
  * Router) a la ruta del módulo, así que la opción resaltada sale de la URL y
  * los botones Atrás / Adelante del navegador funcionan entre módulos.
@@ -20,7 +20,6 @@ import { Link, NavLink } from 'react-router'
 const NAV_ITEMS = [
   { ruta: 'controladores-rf', label: 'Controladores' },
   { ruta: 'eventos', label: 'Eventos configurados' },
-  { ruta: 'eventos-registrados', label: 'Eventos registrados' },
   { ruta: 'unidades', label: 'Unidades' },
   { ruta: 'puntos-io', label: 'Puntos IO' },
   { ruta: 'grupos-funcionales-io', label: 'Grupos funcionales IO' },
@@ -29,10 +28,12 @@ const NAV_ITEMS = [
   { ruta: 'usuarios', label: 'Usuarios', soloAdmin: true },
   // Solo aparece donde `rutasVisibles` la incluye (opción Perfiles 5 Minutales).
   { ruta: 'mediciones', label: 'Mediciones 5 minutales', soloSiVisible: true },
+  // Solo aparece en la opción Eventos registrados.
+  { ruta: 'eventos-registrados', label: 'Eventos registrados', soloSiVisible: true },
 ];
 
 // Props:
-// - rutaBase: prefijo del tipo de consulta ('/configuracion', '/en-linea' o '/perfiles-5m').
+// - rutaBase: prefijo del tipo de consulta ('/configuracion', '/en-linea', '/perfiles-5m' o '/eventos').
 // - isOpen: booleano que indica si el menú está expandido (ancho completo) o colapsado (ancho 0).
 // - esAdmin: booleano; si es false se ocultan las opciones marcadas como soloAdmin.
 // - rutasVisibles: (opcional) segmentos de NAV_ITEMS a mostrar; sin él se muestran todos.

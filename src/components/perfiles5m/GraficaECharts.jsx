@@ -9,7 +9,8 @@
  * - Zoom con la rueda del mouse o con dos dedos en el celular, y un
  *   minimapa (barra deslizante) con la serie completa debajo de la gráfica.
  * - Leyenda que oculta o muestra cada fase (y la capa de eventos).
- * - Bandas rojas de los eventos registrados (`markArea`).
+ * - Bandas rojas de los eventos registrados (`markArea`): una por tramo, con
+ *   un distintivo que cuenta sus eventos; el detalle va en el tooltip.
  * - Barra de herramientas: acercar con recuadro, restaurar y guardar imagen.
  * - Reducción de puntos (`sampling: 'lttb'`) para dibujar miles de lecturas
  *   sin perder los picos.
@@ -50,6 +51,29 @@ echarts.use([
 const TINTA = '#334155'
 const TINTA_SUAVE = '#64748b'
 const REJILLA = '#e2e8f0'
+
+// Colores de la capa de eventos (tonos red de Tailwind).
+const ROJO = '#dc2626'
+const ROJO_OSCURO = '#b91c1c'
+
+/**
+ * Agrupa los marcadores que cubren el mismo tramo (p. ej. varios eventos del
+ * mismo día): [{ inicio, fin, textos }]. Así cada banda se dibuja una sola vez.
+ */
+function agruparMarcadores(marcadores) {
+  const grupos = new Map()
+  for (const { inicio, fin, texto } of marcadores) {
+    const clave = `${inicio}-${fin}`
+    if (!grupos.has(clave)) grupos.set(clave, { inicio, fin, textos: [] })
+    grupos.get(clave).textos.push(texto)
+  }
+  return [...grupos.values()]
+}
+
+/** Escapa texto para meterlo en el HTML del tooltip. */
+function escaparHtml(texto) {
+  return String(texto).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+}
 
 /**
  * Tramo { desde, hasta } (índices de periodo) del zoom actual de la gráfica.
@@ -144,19 +168,45 @@ export default function GraficaECharts({
     })
 
     // Capa de eventos: una serie sin datos que solo lleva las bandas, para
-    // que la leyenda también pueda ocultarlas.
-    if (marcadores.length > 0) {
+    // que la leyenda también pueda ocultarlas. En la banda va solo un
+    // distintivo con el número de eventos (los nombres completos se enciman);
+    // el detalle aparece en el tooltip y en la tabla de eventos.
+    const grupos = agruparMarcadores(marcadores)
+    // Textos de eventos por índice de periodo, para el tooltip.
+    const eventosPorPeriodo = new Map()
+    for (const { inicio, fin, textos } of grupos) {
+      for (let i = inicio; i <= fin; i++) {
+        eventosPorPeriodo.set(i, [...(eventosPorPeriodo.get(i) ?? []), ...textos])
+      }
+    }
+    if (grupos.length > 0) {
       series.push({
         name: 'Eventos',
         type: 'line',
         data: [],
-        itemStyle: { color: '#dc2626' },
+        itemStyle: { color: ROJO },
         markArea: {
-          itemStyle: { color: 'rgba(220, 38, 38, 0.10)', borderColor: '#f87171', borderWidth: 1, borderType: 'dashed' },
-          label: { color: '#b91c1c', fontSize: 11, position: 'insideTop' },
-          data: marcadores.map((m) => [
-            { name: m.texto, xAxis: etiquetas[m.inicio] },
-            { xAxis: etiquetas[m.fin] },
+          silent: true,
+          itemStyle: { color: 'rgba(220, 38, 38, 0.08)', borderColor: '#f87171', borderWidth: 1, borderType: 'dashed' },
+          label: {
+            position: 'insideTop',
+            distance: 4,
+            formatter: ({ name }) => `{badge|${name}}`,
+            rich: {
+              badge: {
+                color: '#ffffff',
+                backgroundColor: ROJO,
+                borderRadius: 9,
+                padding: [3, 6],
+                fontSize: 11,
+                fontWeight: 'bold',
+                lineHeight: 12,
+              },
+            },
+          },
+          data: grupos.map((g) => [
+            { name: g.textos.length === 1 ? '1 evento' : `${g.textos.length} eventos`, xAxis: etiquetas[g.inicio] },
+            { xAxis: etiquetas[g.fin] },
           ]),
         },
       })
@@ -167,9 +217,29 @@ export default function GraficaECharts({
       // `top` deja lugar a la barra de herramientas (íconos de 20 px + relleno).
       grid: { left: 64, right: 24, top: 64, bottom: 72 },
       legend: { top: 0, left: 0, textStyle: { color: TINTA }, icon: 'roundRect' },
+      // Tooltip del eje: valores de cada fase y, si el periodo cae en una
+      // banda, la lista de sus eventos.
       tooltip: {
         trigger: 'axis',
-        valueFormatter: (v) => `${formatoValor(v)} ${unidad}`,
+        formatter: (params) => {
+          const lineas = params
+            .filter((p) => p.seriesName !== 'Eventos')
+            .map(
+              (p) =>
+                `<div style="display:flex;justify-content:space-between;gap:16px">` +
+                `<span>${p.marker}${escaparHtml(p.seriesName)}</span>` +
+                `<b>${p.value == null ? '—' : `${formatoValor(p.value)} ${escaparHtml(unidad)}`}</b></div>`,
+            )
+          const eventos = eventosPorPeriodo.get(params[0]?.dataIndex) ?? []
+          const bloqueEventos =
+            eventos.length > 0
+              ? `<div style="margin-top:6px;padding-top:6px;border-top:1px solid ${REJILLA};color:${ROJO_OSCURO}">` +
+                `<b>Eventos registrados</b>` +
+                eventos.map((t) => `<div style="max-width:320px;white-space:normal">• ${escaparHtml(t)}</div>`).join('') +
+                `</div>`
+              : ''
+          return `<div style="margin-bottom:4px;color:${TINTA}">${escaparHtml(params[0]?.axisValueLabel ?? '')}</div>${lineas.join('')}${bloqueEventos}`
+        },
       },
       // Barra de herramientas: íconos grandes en azul dentro de un recuadro, para
       // que se distingan de la gráfica; al pasar el mouse se oscurecen y

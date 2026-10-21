@@ -2,16 +2,19 @@
  * SeleccionConsulta.jsx
  * ---------------------------------------------------------------------------
  * Vista principal que aparece después del inicio de sesión: fondo oscuro, la pregunta "¿Consultar datos por medio
- * de?:" y tres tarjetas grandes para elegir el tipo de consulta.
+ * de?:" y cuatro tarjetas grandes para elegir el tipo de consulta.
  *
  * Rol en el sistema:
  * - "Base de Datos (configuración)" abre todo lo construido hasta ahora
- *   (Controladores RF, Eventos, Unidades, Puntos IO, Grupos IO, Usuarios);
+ *   (Controladores RF, Eventos configurados, Unidades, Puntos IO, Grupos IO,
+ *   Usuarios);
  *   App.jsx decide qué renderizar a partir de la opción elegida.
  * - "Datos en línea" abre solo el flujo de Controladores RF (controlador ->
  *   sus medidores -> detalle del medidor).
  * - "Perfiles 5 Minutales" abre la consulta de mediciones de cinco minutos
  *   de cualquier medidor (ConsultaPerfiles5M).
+ * - "Eventos registrados" abre el historial de eventos ocurridos en los
+ *   medidores (GestionEventosRegistrados).
  * - Incluye una barra superior con el usuario y el botón de cerrar sesión,
  *   porque en esta vista todavía no se monta el Header del sistema.
  */
@@ -47,17 +50,27 @@ function IconoEnLinea() {
   )
 }
 
+function IconoEventos() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-12 w-12" aria-hidden="true">
+      <path d="M6 9.5a6 6 0 0 1 12 0c0 4.5 2 6 2 6H4s2-1.5 2-6Z" strokeLinejoin="round" />
+      <path d="M10 19a2 2 0 0 0 4 0" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 // Opciones de consulta. `ruta` = dirección a la que lleva la tarjeta (ver App.jsx);
 // `disponible: false` = aún sin vista (tarjeta deshabilitada).
 const OPCIONES = [
   { id: 'baseDatos', ruta: '/configuracion', titulo: 'Base de Datos', detalle: '(configuración)', Icono: IconoBaseDatos, disponible: true },
   { id: 'perfiles5M', ruta: '/perfiles-5m', titulo: 'Perfiles 5 Minutales', Icono: IconoPerfiles, disponible: true },
   { id: 'enLinea', ruta: '/en-linea', titulo: 'Datos en línea', Icono: IconoEnLinea, disponible: true },
+  { id: 'eventos', ruta: '/eventos', titulo: 'Eventos registrados', Icono: IconoEventos, disponible: true },
 ]
 
 // Props:
 // - currentUser: usuario autenticado (nombre, apellido, rol, iniciales).
-// - onSeleccionar: callback con la ruta de la opción elegida ('/configuracion', '/perfiles-5m' o '/en-linea').
+// - onSeleccionar: callback con la ruta de la opción elegida ('/configuracion', '/perfiles-5m', '/en-linea' o '/eventos').
 // - onLogout: callback para cerrar la sesión y volver al Login.
 export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout }) {
   // true mientras se muestra la confirmación de "¿Cerrar sesión?".
@@ -94,10 +107,10 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
       {/* Pregunta y tarjetas de opciones. */}
       <main className="flex flex-1 flex-col items-center justify-center px-4 py-10 sm:px-8">
         <h1 className="mb-10 text-center text-2xl font-bold tracking-wide text-white sm:text-3xl">
-          ¿Consultar datos por medio de?:
+          Datos a Consultar:
         </h1>
 
-        <div className="grid w-full max-w-5xl grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="grid w-full max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {OPCIONES.map(({ id, ruta, titulo, detalle, Icono, disponible }) => (
             <button
               key={id}

@@ -29,7 +29,7 @@
  * (mediciones), services/controladoresRFService.js (lista de medidores),
  * services/eventosRegService.js y services/eventosConfigService.js (eventos).
  */
-import { Suspense, lazy, useEffect, useState } from 'react'
+import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import {
   AGRUPACIONES,
   FASES,
@@ -46,9 +46,10 @@ import SelectorRangoFechas from '../common/SelectorRangoFechas'
 // abrir esta vista, no al entrar al sistema.
 const GraficaECharts = lazy(() => import('./GraficaECharts'))
 
-// Rango máximo (en días) para la agrupación cada 5 minutos: 288 lecturas por
-// día y fase, así que una semana con tres fases ya son más de 6,000 valores.
-const MAX_DIAS_CRUDO = 7
+// Rango máximo (en días) para la agrupación cada 5 minutos: un mes (31 días
+// para cubrir cualquier mes). Son 288 lecturas por día y fase, así que un mes
+// con tres fases llega a unos 26,800 valores.
+const MAX_DIAS_CRUDO = 31
 
 // Periodos mínimos que se muestran al acercarse a la gráfica.
 const MIN_PERIODOS_VENTANA = 4
@@ -340,8 +341,12 @@ export default function ConsultaPerfiles5M() {
     const d = Math.min(Math.max(Math.round(inicio), 0), total - tamano)
     setVentana({ desde: d, hasta: d + tamano - 1 })
   }
-  // Acerca la gráfica al día de un evento, con un margen a cada lado para ver el contexto.
+  // Contenedor de la gráfica, para desplazar la vista hasta ella desde la tabla de eventos.
+  const graficaRef = useRef(null)
+  // Acerca la gráfica al día de un evento, con un margen a cada lado para ver
+  // el contexto, y sube la vista hasta la gráfica (la tabla queda debajo).
   const verEvento = (e) => {
+    graficaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     const inicio = e.indices[0]
     const tam = e.indices[e.indices.length - 1] - inicio + 1
     const margen = Math.max(2, Math.round(tam / 2))
@@ -557,17 +562,20 @@ export default function ConsultaPerfiles5M() {
             </p>
 
             {/* Suspense muestra el aviso mientras se descarga ECharts (solo la primera vez). */}
-            <Suspense fallback={<p className="py-10 text-center text-sm text-slate-500">Cargando gráfica…</p>}>
-              <GraficaECharts
-                periodos={periodos}
-                seriesCrudas={resultado.series}
-                unidad={unidad}
-                comoBarras={esEnergia}
-                marcadores={marcadores}
-                ventana={ventana}
-                onCambiarVentana={setVentana}
-              />
-            </Suspense>
+            {/* Destino del desplazamiento de "Ver en la gráfica". */}
+            <div ref={graficaRef}>
+              <Suspense fallback={<p className="py-10 text-center text-sm text-slate-500">Cargando gráfica…</p>}>
+                <GraficaECharts
+                  periodos={periodos}
+                  seriesCrudas={resultado.series}
+                  unidad={unidad}
+                  comoBarras={esEnergia}
+                  marcadores={marcadores}
+                  ventana={ventana}
+                  onCambiarVentana={setVentana}
+                />
+              </Suspense>
+            </div>
           </section>
 
           {/* Eventos registrados del medidor en el rango consultado. */}

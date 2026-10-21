@@ -190,7 +190,7 @@ export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLog
       )}
       {!cargando && !error && controladores.length === 0 && (
         <p className="px-6 py-4 text-sm text-slate-500">
-          No hay controladores RF registrados.
+          No hay Controladores  registrados.
         </p>
       )}
 
