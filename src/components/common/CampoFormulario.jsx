@@ -25,7 +25,8 @@ export function MensajeCampo({ id, error, ayuda }) {
 // - etiqueta: texto de la etiqueta.
 // - error: mensaje de error a mostrar (o null).
 // - ayuda: texto de ayuda opcional cuando no hay error.
-export default function CampoFormulario({ id, etiqueta, error, ayuda, children }) {
+// - debajo: contenido opcional bajo el mensaje (p. ej. RequisitosContrasena).
+export default function CampoFormulario({ id, etiqueta, error, ayuda, debajo, children }) {
   return (
     <div className="flex flex-col gap-1.5">
       <label htmlFor={id} className="text-sm font-semibold text-slate-900">
@@ -33,6 +34,7 @@ export default function CampoFormulario({ id, etiqueta, error, ayuda, children }
       </label>
       {children}
       <MensajeCampo id={id} error={error} ayuda={ayuda} />
+      {debajo}
     </div>
   )
 }

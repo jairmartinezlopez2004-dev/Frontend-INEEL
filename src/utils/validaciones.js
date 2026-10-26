@@ -30,6 +30,50 @@ export function validarTexto(valor, { nombre, minimo, maximo, recortar = true, f
   return null
 }
 
+// Largo de las contraseñas en todo el sistema (alta y restablecimiento en
+// Usuarios, registro y Login). El backend exige mínimo 8 y no fija máximo;
+// el máximo de 16 es el que acepta el campo de contraseña del Login.
+export const CONTRASENA_MIN = 8
+export const CONTRASENA_MAX = 16
+
+// Requisitos de una contraseña nueva (alta y restablecimiento en Usuarios, y
+// registro). No se aplican al Login ni a la confirmación de Puntos IO, donde
+// se escribe una contraseña que ya existe. `faltante` es el texto del error
+// ("debe tener …"); el de espacios va aparte ("no debe tener espacios").
+export const REQUISITOS_CONTRASENA = [
+  {
+    texto: `De ${CONTRASENA_MIN} a ${CONTRASENA_MAX} caracteres`,
+    faltante: `de ${CONTRASENA_MIN} a ${CONTRASENA_MAX} caracteres`,
+    cumple: (v) => v.length >= CONTRASENA_MIN && v.length <= CONTRASENA_MAX,
+  },
+  { texto: 'Una letra mayúscula', faltante: 'una mayúscula', cumple: (v) => /\p{Lu}/u.test(v) },
+  { texto: 'Una letra minúscula', faltante: 'una minúscula', cumple: (v) => /\p{Ll}/u.test(v) },
+  { texto: 'Un número', faltante: 'un número', cumple: (v) => /\d/.test(v) },
+  {
+    texto: 'Un carácter especial (por ejemplo ! @ # $ % & *)',
+    faltante: 'un carácter especial',
+    cumple: (v) => /[^\p{L}\p{N}\s]/u.test(v),
+  },
+  { texto: 'Sin espacios', faltante: null, cumple: (v) => !/\s/.test(v) },
+]
+
+/** Contraseña nueva obligatoria que cumple todos los REQUISITOS_CONTRASENA. */
+export function validarContrasena(valor) {
+  const contrasena = String(valor)
+  if (!contrasena) return 'La contraseña es obligatoria.'
+  const incumplidos = REQUISITOS_CONTRASENA.filter((r) => !r.cumple(contrasena))
+  if (incumplidos.length === 0) return null
+  const faltantes = incumplidos.filter((r) => r.faltante).map((r) => r.faltante)
+  const partes = []
+  if (faltantes.length > 0) {
+    const lista =
+      faltantes.length === 1 ? faltantes[0] : `${faltantes.slice(0, -1).join(', ')} y ${faltantes.at(-1)}`
+    partes.push(`debe tener ${lista}`)
+  }
+  if (incumplidos.some((r) => !r.faltante)) partes.push('no debe tener espacios')
+  return `La contraseña ${partes.join(', y ')}.`
+}
+
 /** Correo electrónico obligatorio con formato usuario@dominio.ext. */
 export function validarCorreo(valor) {
   const correo = String(valor).trim()

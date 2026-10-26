@@ -1,13 +1,14 @@
 /**
  * GestionUsuarios.jsx
  * ---------------------------------------------------------------------------
- * Módulo "Usuarios": catálogo de usuarios del sistema con alta y edición.
+ * Módulo "Usuarios": catálogo de usuarios del sistema con edición.
+ * No hay alta desde aquí: las cuentas nuevas se crean con el registro de la
+ * pantalla de acceso (Registro.jsx, rol Usuario) y aquí solo se editan.
  *
  * Rol en el sistema:
  * - Solo se muestra al Administrador (App.jsx y Sidebar.jsx ocultan la opción
  *   al Usuario Normal; además el backend rechaza con 401/403 a quien no lo sea).
  * - Lista los usuarios (GET /Users) y permite:
- *     · "+ Nuevo usuario": correo, nombre, contraseña y rol (POST /Users).
  *     · "Editar": correo, nombre, rol, estado activo/inactivo y tiempo de
  *       sesión (PUT /Users/{id}). La contraseña no se modifica por aquí, y
  *       la "baja" de un usuario se hace desmarcando "Activo".
@@ -15,20 +16,26 @@
  *       una contraseña nueva a un usuario que olvidó la suya
  *       (PUT /Users/{id}/contrasena). La anterior no se puede consultar porque
  *       el backend solo guarda su hash.
- * - Mientras un formulario está abierto se oculta la tabla, para que solo se
- *   vea la configuración del usuario que se captura o edita.
+ * - Mientras el formulario está abierto se oculta la tabla, para que solo se
+ *   vea la configuración del usuario que se edita.
  */
 import { useEffect, useState } from 'react'
 import {
   ROLES,
   listarUsuarios,
-  crearUsuario,
   actualizarUsuario,
   restablecerContrasena,
 } from '../../services/usuariosService'
 import { useValidacion } from '../../hooks/useValidacion'
-import { validarTexto, validarCorreo, validarEntero } from '../../utils/validaciones'
+import {
+  validarTexto,
+  validarCorreo,
+  validarEntero,
+  validarContrasena,
+  CONTRASENA_MAX,
+} from '../../utils/validaciones'
 import CampoFormulario from '../common/CampoFormulario'
+import RequisitosContrasena from '../common/RequisitosContrasena'
 import { claseControl } from '../common/clasesFormulario'
 import { useFiltroTabla } from '../../hooks/useFiltroTabla'
 import BuscadorTabla from '../common/BuscadorTabla'
@@ -36,47 +43,17 @@ import BuscadorTabla from '../common/BuscadorTabla'
 // Encabezados de la tabla (se mantienen en un arreglo para no repetir markup).
 const COLUMNAS = ['Nombre', 'Correo', 'Rol', 'Estado', 'Sesión (min)', '']
 
-// Valores iniciales del formulario de alta.
-const FORM_NUEVO = {
-  correo: '',
-  nombreUsuario: '',
-  contrasena: '',
-  rol: 'Usuario',
-  activo: true,
-  tiempoSesion: 60,
-}
-
-// Largo exacto de la contraseña (el backend exige mínimo 8; el máximo lo fija el formulario).
-const LARGO_CONTRASENA = 8
-
 // Rango de tiempo de sesión que acepta el backend (minutos).
 const SESION_MIN = 1
 const SESION_MAX = 1440
 
-// Reglas de cada campo, en el orden en que aparecen en pantalla. La contraseña
-// solo se valida en el alta y el tiempo de sesión solo en la edición.
-function validadoresPara(esEdicion) {
-  return {
-    nombreUsuario: (v) => validarTexto(v, { nombre: 'El nombre' }),
-    correo: validarCorreo,
-    ...(esEdicion
-      ? {
-          tiempoSesion: (v) =>
-            validarEntero(v, { nombre: 'El tiempo de sesión', minimo: SESION_MIN, maximo: SESION_MAX }),
-        }
-      : { contrasena: validarContrasena }),
-  }
+// Reglas de cada campo del formulario de edición, en el orden en que aparecen en pantalla.
+const VALIDADORES_USUARIO = {
+  nombreUsuario: (v) => validarTexto(v, { nombre: 'El nombre' }),
+  correo: validarCorreo,
+  tiempoSesion: (v) =>
+    validarEntero(v, { nombre: 'El tiempo de sesión', minimo: SESION_MIN, maximo: SESION_MAX }),
 }
-
-// Regla de la contraseña: la misma para el alta y para el restablecimiento.
-const validarContrasena = (v) =>
-  validarTexto(v, {
-    nombre: 'La contraseña',
-    minimo: LARGO_CONTRASENA,
-    maximo: LARGO_CONTRASENA,
-    recortar: false,
-    femenino: true,
-  })
 
 // Badge de estado activo/inactivo.
 function EstadoUsuario({ activo }) {
@@ -94,28 +71,25 @@ function EstadoUsuario({ activo }) {
 }
 
 // ---------------------------------------------------------------------------
-// Formulario de alta / edición
+// Formulario de edición
 // ---------------------------------------------------------------------------
 
 // Props:
-// - usuario: null para alta, u objeto usuario (de usuariosService) para editar.
+// - usuario: objeto usuario (de usuariosService) que se edita.
 // - onGuardado: callback con el mensaje de éxito tras guardar.
 // - onCancelar: callback para cerrar el formulario sin guardar.
-function FormularioUsuario({ usuario, onGuardado, onCancelar }) {
-  const esEdicion = usuario !== null
-  // `tiempoSesion` se guarda como texto mientras se escribe y se convierte a número al enviar.
-  const [form, setForm] = useState(
-    esEdicion
-      ? { ...usuario, contrasena: '', tiempoSesion: String(usuario.tiempoSesion) }
-      : FORM_NUEVO,
+// - esSuperAdmin: si es true se puede asignar el rol SuperAdministrador.
+function FormularioUsuario({ usuario, onGuardado, onCancelar, esSuperAdmin }) {
+  // Solo un SuperAdministrador asigna ese rol; al editar a alguien que ya lo
+  // tiene se conserva la opción para no cambiarle el rol sin querer.
+  const rolesDisponibles = ROLES.filter(
+    (rol) => rol !== 'SuperAdministrador' || esSuperAdmin || usuario.rol === rol,
   )
+  // `tiempoSesion` se guarda como texto mientras se escribe y se convierte a número al enviar.
+  const [form, setForm] = useState({ ...usuario, tiempoSesion: String(usuario.tiempoSesion) })
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState(null) // Error devuelto por el WebService.
-  const { errorDe, ariaDe, validarAlEnviar } = useValidacion(
-    form,
-    validadoresPara(esEdicion),
-    'usuario',
-  )
+  const { errorDe, ariaDe, validarAlEnviar } = useValidacion(form, VALIDADORES_USUARIO, 'usuario')
 
   // Genera un manejador onChange para el campo indicado (texto, select o checkbox).
   const actualizar = (campo) => (e) => {
@@ -145,13 +119,8 @@ function FormularioUsuario({ usuario, onGuardado, onCancelar }) {
         nombreUsuario: form.nombreUsuario.trim(),
         tiempoSesion: Number(form.tiempoSesion),
       }
-      if (esEdicion) {
-        await actualizarUsuario(usuario.id, datos)
-        onGuardado('Usuario actualizado correctamente.')
-      } else {
-        await crearUsuario(datos)
-        onGuardado('Usuario creado correctamente.')
-      }
+      await actualizarUsuario(usuario.id, datos)
+      onGuardado('Usuario actualizado correctamente.')
     } catch (err) {
       setError(err.message)
       setGuardando(false)
@@ -159,14 +128,10 @@ function FormularioUsuario({ usuario, onGuardado, onCancelar }) {
   }
 
   return (
-    // noValidate desactiva los globos del navegador: se valida con validadoresPara().
-    <form
-      noValidate
-      onSubmit={guardar}
-      className={`bg-slate-50 px-6 py-5 ${esEdicion ? '' : 'border-b border-slate-200'}`}
-    >
+    // noValidate desactiva los globos del navegador: se valida con VALIDADORES_USUARIO.
+    <form noValidate onSubmit={guardar} className="bg-slate-50 px-6 py-5">
       <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-800">
-        {esEdicion ? `Editar usuario: ${usuario.nombreUsuario}` : 'Nuevo usuario'}
+        Editar usuario: {usuario.nombreUsuario}
       </h3>
 
       {error && (
@@ -190,23 +155,6 @@ function FormularioUsuario({ usuario, onGuardado, onCancelar }) {
           />
         </CampoFormulario>
 
-        {/* La contraseña solo se captura en el alta: el PUT del backend no la modifica. */}
-        {!esEdicion && (
-          <CampoFormulario
-            id="usuario-contrasena"
-            etiqueta="Contraseña"
-            error={errorDe('contrasena')}
-            ayuda={`Exactamente ${LARGO_CONTRASENA} caracteres.`}
-          >
-            <input
-              type="password"
-              maxLength={LARGO_CONTRASENA}
-              autoComplete="new-password"
-              {...propsDe('contrasena')}
-            />
-          </CampoFormulario>
-        )}
-
         <CampoFormulario id="usuario-rol" etiqueta="Rol">
           <select
             id="usuario-rol"
@@ -214,7 +162,7 @@ function FormularioUsuario({ usuario, onGuardado, onCancelar }) {
             onChange={actualizar('rol')}
             className={claseControl()}
           >
-            {ROLES.map((rol) => (
+            {rolesDisponibles.map((rol) => (
               <option key={rol} value={rol}>
                 {rol}
               </option>
@@ -222,34 +170,28 @@ function FormularioUsuario({ usuario, onGuardado, onCancelar }) {
           </select>
         </CampoFormulario>
 
-        {/* Estado y tiempo de sesión solo se pueden cambiar al editar
-            (el alta del backend los fija en activo y 60 minutos). */}
-        {esEdicion && (
-          <>
-            {/* El backend acepta entre 1 y 1440 minutos (24 h). Es type="text" para
-                que, si se escribe una letra, se vea el mensaje propio. */}
-            <CampoFormulario
-              id="usuario-tiempoSesion"
-              etiqueta="Tiempo de sesión (minutos)"
-              error={errorDe('tiempoSesion')}
-              ayuda={`Entre ${SESION_MIN} y ${SESION_MAX} minutos (24 horas).`}
-            >
-              <input type="text" inputMode="numeric" {...propsDe('tiempoSesion')} />
-            </CampoFormulario>
+        {/* El backend acepta entre 1 y 1440 minutos (24 h). Es type="text" para
+            que, si se escribe una letra, se vea el mensaje propio. */}
+        <CampoFormulario
+          id="usuario-tiempoSesion"
+          etiqueta="Tiempo de sesión (minutos)"
+          error={errorDe('tiempoSesion')}
+          ayuda={`Entre ${SESION_MIN} y ${SESION_MAX} minutos (24 horas).`}
+        >
+          <input type="text" inputMode="numeric" {...propsDe('tiempoSesion')} />
+        </CampoFormulario>
 
-            <label className="flex items-center gap-2 pt-6">
-              <input
-                type="checkbox"
-                checked={form.activo}
-                onChange={actualizar('activo')}
-                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
-              />
-              <span className="text-sm font-semibold text-slate-900">
-                Activo (desmarcar para dar de baja)
-              </span>
-            </label>
-          </>
-        )}
+        <label className="flex items-center gap-2 pt-6">
+          <input
+            type="checkbox"
+            checked={form.activo}
+            onChange={actualizar('activo')}
+            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+          />
+          <span className="text-sm font-semibold text-slate-900">
+            Activo (desmarcar para dar de baja)
+          </span>
+        </label>
       </fieldset>
 
       <div className="mt-5 flex justify-end gap-3">
@@ -301,7 +243,7 @@ function FormularioContrasena({ usuario, onRestablecida }) {
   const propsDe = (campo) => ({
     ...ariaDe(campo),
     type: 'password',
-    maxLength: LARGO_CONTRASENA,
+    maxLength: CONTRASENA_MAX,
     autoComplete: 'new-password',
     value: form[campo],
     onChange: (e) => setForm((prev) => ({ ...prev, [campo]: e.target.value })),
@@ -344,7 +286,7 @@ function FormularioContrasena({ usuario, onRestablecida }) {
           id="contrasena-contrasena"
           etiqueta="Contraseña nueva"
           error={errorDe('contrasena')}
-          ayuda={`Exactamente ${LARGO_CONTRASENA} caracteres.`}
+          debajo={<RequisitosContrasena valor={form.contrasena} />}
         >
           <input {...propsDe('contrasena')} />
         </CampoFormulario>
@@ -400,13 +342,15 @@ function SeccionContrasena({ usuario }) {
 // Vista principal
 // ---------------------------------------------------------------------------
 
-export default function GestionUsuarios() {
+// Props:
+// - esSuperAdmin: si es true el formulario ofrece el rol SuperAdministrador.
+export default function GestionUsuarios({ esSuperAdmin }) {
   const [usuarios, setUsuarios] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(null)
   const [aviso, setAviso] = useState(null) // Mensaje de éxito tras guardar.
-  // Formulario abierto: undefined = cerrado, null = alta, objeto = edición.
-  const [enEdicion, setEnEdicion] = useState(undefined)
+  // Usuario que se edita (null = formulario cerrado).
+  const [enEdicion, setEnEdicion] = useState(null)
   // Se incrementa para volver a pedir la lista después de guardar.
   const [recarga, setRecarga] = useState(0)
 
@@ -441,10 +385,10 @@ export default function GestionUsuarios() {
   }
 
   // Con un formulario abierto la tabla se oculta y solo queda la configuración.
-  const formularioAbierto = enEdicion !== undefined
+  const formularioAbierto = enEdicion !== null
 
   const alGuardar = (mensaje) => {
-    setEnEdicion(undefined)
+    setEnEdicion(null)
     setAviso(mensaje)
     setCargando(true)
     setError(null)
@@ -453,31 +397,22 @@ export default function GestionUsuarios() {
 
   return (
     <div className="rounded-xl bg-white shadow-md">
-      {/* Encabezado de la tarjeta: título + alta de usuario. */}
+      {/* Encabezado de la tarjeta. */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-6 py-4">
         <h2 className="text-lg font-bold uppercase tracking-wide text-slate-900">Usuarios</h2>
-        {!formularioAbierto && (
-          <button
-            type="button"
-            onClick={() => abrirFormulario(null)}
-            className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 active:scale-95"
-          >
-            + Nuevo usuario
-          </button>
-        )}
       </div>
 
-      {/* `key` reinicia el formulario al cambiar entre alta y distintos usuarios. */}
+      {/* `key` reinicia el formulario al cambiar de usuario. */}
       {formularioAbierto && (
         <FormularioUsuario
-          key={enEdicion?.id ?? 'nuevo'}
+          key={enEdicion.id}
           usuario={enEdicion}
           onGuardado={alGuardar}
-          onCancelar={() => setEnEdicion(undefined)}
+          onCancelar={() => setEnEdicion(null)}
+          esSuperAdmin={esSuperAdmin}
         />
       )}
 
-      {/* Solo al editar: la contraseña de una cuenta nueva se captura en el alta. */}
       {/* Su `key` lleva prefijo para no repetir la del formulario de edición (mismo padre). */}
       {enEdicion && <SeccionContrasena key={`contrasena-${enEdicion.id}`} usuario={enEdicion} />}
 

@@ -83,13 +83,13 @@ function diasEnRango(inicio, fin) {
   return Math.round((new Date(fin) - new Date(inicio)) / 86_400_000) + 1
 }
 
-/** Filtros iniciales del medidor dado: voltaje, fase A, promedio por hora de los últimos 7 días. */
-function filtrosIniciales(idMedidor = null) {
+/** Filtros iniciales: sin medidor elegido; voltaje, fase A, promedio por hora de los últimos 7 días. */
+function filtrosIniciales() {
   const hoy = new Date()
   const haceSeisDias = new Date(hoy)
   haceSeisDias.setDate(hoy.getDate() - 6)
   return {
-    idMedidor,
+    idMedidor: null,
     idVar5M: 9,
     fases: [1],
     fechaInicio: fechaISO(haceSeisDias),
@@ -162,23 +162,17 @@ export default function ConsultaPerfiles5M() {
   const [catalogoEventos, setCatalogoEventos] = useState([])
   const [errorEventos, setErrorEventos] = useState(null)
 
-  // Carga de los medidores. Al llegar se elige el primero y se lanza la
-  // primera consulta, para que la vista no aparezca vacía.
+  // Carga de los medidores. La vista empieza vacía (sin medidor elegido ni
+  // consulta), para que al volver a iniciar sesión no aparezcan datos de una
+  // consulta anterior; no se consulta hasta que el usuario presiona Consultar.
   useEffect(() => {
     const controlador = new AbortController()
 
     listarControladoresRF({ signal: controlador.signal })
       .then((lista) => {
         setControladores(lista)
-        const primero = lista.flatMap((c) => c.medidores)[0]
-        if (!primero) {
-          setError('No hay medidores registrados.')
-          setCargando(false)
-          return
-        }
-        const iniciales = filtrosIniciales(primero.id)
-        setFiltros(iniciales)
-        setConsulta(iniciales)
+        if (!lista.some((c) => c.medidores.length > 0)) setError('No hay medidores registrados.')
+        setCargando(false)
       })
       .catch((err) => {
         if (err.name === 'AbortError') return
@@ -374,7 +368,13 @@ export default function ConsultaPerfiles5M() {
               disabled={controladores.length === 0}
               className={claseControl()}
             >
-              {controladores.length === 0 && <option value="">Cargando medidores…</option>}
+              {controladores.length === 0 ? (
+                <option value="">Cargando medidores…</option>
+              ) : (
+                <option value="" disabled>
+                  Elige un medidor
+                </option>
+              )}
               {/* Medidores agrupados por su controlador RF. */}
               {controladores
                 .filter((c) => c.medidores.length > 0)

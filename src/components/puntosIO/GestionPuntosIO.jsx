@@ -8,7 +8,7 @@
  * - Cualquier usuario con sesión ve la lista (GET /PuntosIO) junto con los
  *   catálogos para mostrar nombres en lugar de IDs (GET /IO_GrupoFuncional,
  *   /IO_GrupoElectrico y /Unidades).
- * - Solo el Administrador ve "Editar" (PUT /PuntosIO/{id}), y cada edición
+ * - Solo el SuperAdministrador ve "Editar" (PUT /PuntosIO/{id}), y cada edición
  *   pide su contraseña otra vez (ver FormularioPuntoIO.jsx).
  * - El backend no ofrece alta ni eliminación de puntos IO; la baja se hace
  *   editando el punto como inactivo (edo = false).
@@ -46,8 +46,9 @@ function nombreEn(catalogo, id, texto = (e) => e.nombre) {
 }
 
 // Props:
-// - esAdmin: si es true se muestra la edición.
-export default function GestionPuntosIO({ esAdmin }) {
+// - esSuperAdmin: si es true se muestra la edición (el backend solo la
+//   permite al SuperAdministrador).
+export default function GestionPuntosIO({ esSuperAdmin }) {
   const [puntos, setPuntos] = useState([])
   const [catalogos, setCatalogos] = useState({ funcionales: [], electricos: [], unidades: [] })
   const [cargando, setCargando] = useState(true)
@@ -125,7 +126,7 @@ export default function GestionPuntosIO({ esAdmin }) {
       </div>
 
       {/* `key` reinicia el formulario al cambiar de punto. */}
-      {esAdmin && enEdicion && (
+      {esSuperAdmin && enEdicion && (
         <FormularioPuntoIO
           key={enEdicion.id}
           punto={enEdicion}
@@ -205,7 +206,7 @@ export default function GestionPuntosIO({ esAdmin }) {
                     <EstadoActivo activo={punto.activo} />
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-right">
-                    {esAdmin && (
+                    {esSuperAdmin && (
                       <button
                         type="button"
                         onClick={() => abrirFormulario(punto)}

@@ -1,7 +1,7 @@
 /**
  * FormularioPuntoIO.jsx
  * ---------------------------------------------------------------------------
- * Formulario de edición de un punto IO (solo Administrador). Envía
+ * Formulario de edición de un punto IO (solo SuperAdministrador). Envía
  * PUT /PuntosIO/{id}.
  *
  * El backend exige que el administrador vuelva a escribir su contraseña en
@@ -16,7 +16,7 @@ import { useState } from 'react'
 import { LIMITES, actualizarPuntoIO } from '../../services/puntosIOService'
 import { textoUnidad } from '../../services/unidadesService'
 import { useValidacion } from '../../hooks/useValidacion'
-import { validarTexto, validarEntero, validarEnteroConSigno } from '../../utils/validaciones'
+import { validarTexto, validarEntero, validarEnteroConSigno, CONTRASENA_MAX } from '../../utils/validaciones'
 import CampoFormulario from '../common/CampoFormulario'
 import { claseControl } from '../common/clasesFormulario'
 
@@ -234,7 +234,7 @@ export default function FormularioPuntoIO({
           error={errorDe('contrasena')}
           ayuda="Por seguridad, cada cambio a un punto IO se confirma con tu contraseña."
         >
-          <input type="password" autoComplete="current-password" {...propsDe('contrasena')} />
+          <input type="password" maxLength={CONTRASENA_MAX} autoComplete="current-password" {...propsDe('contrasena')} />
         </CampoFormulario>
       </fieldset>
 

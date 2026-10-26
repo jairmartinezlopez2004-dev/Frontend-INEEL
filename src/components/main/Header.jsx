@@ -110,7 +110,7 @@ function Header({ currentUser, isSidebarOpen, onToggleSidebar, onLogout }) {
             <p className="text-sm font-medium text-gray-800">
               {currentUser.nombre} {currentUser.apellido}
             </p>
-            {/* Rol en texto ("Administrador" o "Usuario"), ya traducido desde el RolID numérico. */}
+            {/* Rol en texto ("SuperAdministrador", "Administrador" o "Usuario"), tal como viene en el token. */}
             <p className="text-xs text-gray-500">{currentUser.rol}</p>
           </div>
           {/* Círculo con las iniciales del usuario (ej. "OM"), calculadas en Login.jsx. */}

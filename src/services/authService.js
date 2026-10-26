@@ -19,6 +19,7 @@ import { apiGet, apiPost, ApiError, TOKEN_KEY } from './api'
 
 // Equivalencia entre el nombre de rol del backend y el rolId que usa la UI.
 const ROL_IDS = {
+  SuperAdministrador: 1,
   Administrador: 2,
   Usuario: 3,
 }
@@ -91,6 +92,18 @@ function aUsuarioUI(payload) {
 export async function iniciarSesion(correo, contrasena) {
   const { token } = await apiPost('/Auth/login', { correo, contrasena })
   return guardarToken(token)
+}
+
+/**
+ * Registra una cuenta nueva con POST /Auth/register. El backend siempre le
+ * asigna el rol Usuario y no inicia sesión: la persona entra después con el Login.
+ *
+ * @param {{ nombreUsuario: string, correo: string, contrasena: string }} datos
+ * @returns {Promise<object>} Respuesta del backend ({ mensaje, usuario }).
+ * @throws {ApiError} Si el correo ya existe (409), los datos no son válidos (400) o no hay conexión.
+ */
+export function registrarCuenta({ nombreUsuario, correo, contrasena }) {
+  return apiPost('/Auth/register', { nombreUsuario, correo, contrasena })
 }
 
 /**

@@ -42,7 +42,9 @@ import GestionGruposIO from './components/gruposIO/GestionGruposIO'
 import ConsultaPerfiles5M from './components/perfiles5m/ConsultaPerfiles5M'
 import { restaurarSesion, cerrarSesion } from './services/authService'
 
-// rolId del Administrador en la UI (ver ROL_IDS en services/authService.js).
+// rolId del SuperAdministrador y del Administrador en la UI (ver ROL_IDS en
+// services/authService.js).
+const ROL_SUPERADMINISTRADOR = 1
 const ROL_ADMINISTRADOR = 2
 
 // Rutas de las tres pantallas del flujo de Controladores RF (relativas al
@@ -97,7 +99,10 @@ function App() {
     return <Login onLoginSuccess={setCurrentUser} />
   }
 
-  const esAdmin = currentUser.rolId === ROL_ADMINISTRADOR
+  // El SuperAdministrador tiene todos los permisos del Administrador y además
+  // es el único que puede editar los puntos IO.
+  const esSuperAdmin = currentUser.rolId === ROL_SUPERADMINISTRADOR
+  const esAdmin = esSuperAdmin || currentUser.rolId === ROL_ADMINISTRADOR
 
   // Props comunes del marco (header + menú lateral) de ambos tipos de consulta.
   const propsLayout = {
@@ -161,7 +166,7 @@ function App() {
           <Route path="unidades" element={<GestionUnidades esAdmin={esAdmin} />} />
           {/* Puntos IO: todos consultan; solo el Administrador edita, y cada
               edición se confirma con su contraseña. */}
-          <Route path="puntos-io" element={<GestionPuntosIO esAdmin={esAdmin} />} />
+          <Route path="puntos-io" element={<GestionPuntosIO esSuperAdmin={esSuperAdmin} />} />
           {/* Grupos funcionales / eléctricos IO: catálogos con los que se
               clasifican los puntos IO. `key` separa el estado de cada catálogo. */}
           <Route
@@ -174,7 +179,7 @@ function App() {
           />
           {/* Usuarios: solo Administrador; para otro rol la ruta no existe y
               cae en la redirección de abajo. */}
-          {esAdmin && <Route path="usuarios" element={<GestionUsuarios />} />}
+          {esAdmin && <Route path="usuarios" element={<GestionUsuarios esSuperAdmin={esSuperAdmin} />} />}
           {/* Módulo desconocido (o sin permiso): se regresa a Controladores RF. */}
           <Route path="*" element={<Navigate to="controladores-rf" replace />} />
         </Route>

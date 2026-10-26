@@ -7,23 +7,23 @@
  *
  * Endpoints:
  *   GET  /Users         -> lista de todos los usuarios
- *   POST /Users         -> alta { correo, contrasena, nombreUsuario, rol }
  *   PUT  /Users/{id}    -> edición { correo, nombreUsuario, rol, edo, tiempoSesion }
  *                          (no cambia la contraseña; la baja es con edo = false)
  *   PUT  /Users/{id}/contrasena -> restablecimiento { nuevaContrasena }
  *
  * El backend maneja el rol como número (enum TipoRol: 1 = Administrador,
- * 2 = Usuario). Aquí se traduce a texto para la UI y de vuelta a número al
- * enviarlo, para que los componentes solo trabajen con 'Administrador' | 'Usuario'.
+ * 2 = Usuario, 5 = SuperAdministrador). Aquí se traduce a texto para la UI y
+ * de vuelta a número al enviarlo, para que los componentes solo trabajen con
+ * 'SuperAdministrador' | 'Administrador' | 'Usuario'.
  */
-import { apiGet, apiPost, apiPut } from './api'
+import { apiGet, apiPut } from './api'
 
 // Ruta del WebService usada en este módulo (relativa a la URL base).
 const RUTA = '/Users'
 
 // Enum TipoRol del backend.
-const ROL_A_NUMERO = { Administrador: 1, Usuario: 2 }
-const NUMERO_A_ROL = { 1: 'Administrador', 2: 'Usuario' }
+const ROL_A_NUMERO = { SuperAdministrador: 5, Administrador: 1, Usuario: 2 }
+const NUMERO_A_ROL = { 5: 'SuperAdministrador', 1: 'Administrador', 2: 'Usuario' }
 
 // Roles disponibles para los <select> de la UI.
 export const ROLES = Object.keys(ROL_A_NUMERO)
@@ -53,25 +53,9 @@ export async function listarUsuarios({ signal } = {}) {
 }
 
 /**
- * Da de alta un usuario. La contraseña debe tener exactamente 8 caracteres
- * (el backend valida el mínimo de 8; el máximo de 8 lo limita el formulario).
- * @param {{ correo: string, contrasena: string, nombreUsuario: string, rol: 'Administrador'|'Usuario' }} datos
- * @returns {Promise<object>} Usuario creado (misma forma que listarUsuarios).
- */
-export async function crearUsuario({ correo, contrasena, nombreUsuario, rol }) {
-  const creado = await apiPost(RUTA, {
-    correo,
-    contrasena,
-    nombreUsuario,
-    rol: ROL_A_NUMERO[rol],
-  })
-  return parsearUsuario(creado)
-}
-
-/**
  * Actualiza un usuario existente (no modifica la contraseña).
  * @param {number} id
- * @param {{ correo: string, nombreUsuario: string, rol: 'Administrador'|'Usuario', activo: boolean, tiempoSesion: number }} datos
+ * @param {{ correo: string, nombreUsuario: string, rol: 'SuperAdministrador'|'Administrador'|'Usuario', activo: boolean, tiempoSesion: number }} datos
  * @returns {Promise<object>} Usuario actualizado (misma forma que listarUsuarios).
  */
 export async function actualizarUsuario(id, { correo, nombreUsuario, rol, activo, tiempoSesion }) {
@@ -89,7 +73,7 @@ export async function actualizarUsuario(id, { correo, nombreUsuario, rol, activo
  * Asigna una contraseña nueva a un usuario (por ejemplo, si olvidó la suya).
  * El administrador no ve la contraseña anterior: el backend solo guarda su hash.
  * @param {number} id
- * @param {string} nuevaContrasena - Exactamente 8 caracteres (mismo criterio que el alta).
+ * @param {string} nuevaContrasena - Debe cumplir REQUISITOS_CONTRASENA (utils/validaciones.js).
  * @returns {Promise<{ mensaje: string }>} Mensaje de confirmación del backend.
  */
 export async function restablecerContrasena(id, nuevaContrasena) {

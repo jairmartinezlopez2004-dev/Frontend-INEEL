@@ -11,7 +11,7 @@
  *   (leerConfiguracionComs). Si el WebService no responde, muestra valores
  *   por defecto (tomando IP y puerto del propio medidor) y un aviso.
  * - Permisos por rol:
- *     · Administrador (rolId 2): puede pulsar "Editar", modificar los campos
+ *     · SuperAdministrador (rolId 1) y Administrador (rolId 2): pueden pulsar "Editar", modificar los campos
  *       y "Guardar" (guardarConfiguracionComs) o "Cancelar".
  *     · Usuario Normal (rolId 3): experiencia de solo lectura; todos los
  *       campos quedan deshabilitados y no se muestran botones de acción.
@@ -24,8 +24,8 @@
 import { useEffect, useState } from 'react'
 import { leerConfiguracionComs, guardarConfiguracionComs } from '../../services/medidoresService'
 
-// ID de rol del Administrador según el WebService.
-const ROL_ADMINISTRADOR = 2
+// rolId del SuperAdministrador y del Administrador en la UI.
+const ROLES_ADMINISTRADOR = [1, 2]
 
 // Valores por defecto del formulario. También documentan la forma esperada
 // del DTO de configuración que devuelve/recibe el WebService.
@@ -128,7 +128,7 @@ function Seccion({ titulo, children }) {
 // - usuarioLogueado: objeto del usuario autenticado (se usa rolId para permisos).
 // - soloLectura: si es true nadie edita, ni el Administrador ("Datos en línea").
 export default function ConfiguracionComunicaciones({ medidor, usuarioLogueado, soloLectura: vistaSoloLectura = false }) {
-  const esAdmin = usuarioLogueado?.rolId === ROL_ADMINISTRADOR && !vistaSoloLectura
+  const esAdmin = ROLES_ADMINISTRADOR.includes(usuarioLogueado?.rolId) && !vistaSoloLectura
 
   // Valores iniciales: defaults + IP/puerto que ya conocemos por el catálogo.
   const configInicial = {
