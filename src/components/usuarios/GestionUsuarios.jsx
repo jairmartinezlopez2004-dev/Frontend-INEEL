@@ -16,6 +16,8 @@
  *       una contraseña nueva a un usuario que olvidó la suya
  *       (PUT /Users/{id}/contrasena). La anterior no se puede consultar porque
  *       el backend solo guarda su hash.
+ * - Las cuentas de SuperAdministrador solo las edita otro SuperAdministrador
+ *   (al Administrador no le aparece "Editar" en esas filas).
  * - Mientras el formulario está abierto se oculta la tabla, para que solo se
  *   vea la configuración del usuario que se edita.
  */
@@ -80,11 +82,9 @@ function EstadoUsuario({ activo }) {
 // - onCancelar: callback para cerrar el formulario sin guardar.
 // - esSuperAdmin: si es true se puede asignar el rol SuperAdministrador.
 function FormularioUsuario({ usuario, onGuardado, onCancelar, esSuperAdmin }) {
-  // Solo un SuperAdministrador asigna ese rol; al editar a alguien que ya lo
-  // tiene se conserva la opción para no cambiarle el rol sin querer.
-  const rolesDisponibles = ROLES.filter(
-    (rol) => rol !== 'SuperAdministrador' || esSuperAdmin || usuario.rol === rol,
-  )
+  // Solo un SuperAdministrador asigna ese rol (un Administrador tampoco puede
+  // abrir la edición de un SuperAdministrador; ver puedeEditar).
+  const rolesDisponibles = ROLES.filter((rol) => rol !== 'SuperAdministrador' || esSuperAdmin)
   // `tiempoSesion` se guarda como texto mientras se escribe y se convierte a número al enviar.
   const [form, setForm] = useState({ ...usuario, tiempoSesion: String(usuario.tiempoSesion) })
   const [guardando, setGuardando] = useState(false)
@@ -379,6 +379,10 @@ export default function GestionUsuarios({ esSuperAdmin }) {
     return () => controlador.abort()
   }, [recarga])
 
+  // Un Administrador no edita cuentas de SuperAdministrador: podría quitarle
+  // el rol, desactivarlo o cambiarle el correo y dejarlo fuera del sistema.
+  const puedeEditar = (usuario) => esSuperAdmin || usuario.rol !== 'SuperAdministrador'
+
   const abrirFormulario = (usuario) => {
     setAviso(null)
     setEnEdicion(usuario)
@@ -468,13 +472,15 @@ export default function GestionUsuarios({ esSuperAdmin }) {
                   </td>
                   <td className="px-4 py-3 font-mono text-slate-700">{usuario.tiempoSesion}</td>
                   <td className="px-4 py-3 text-right">
-                    <button
-                      type="button"
-                      onClick={() => abrirFormulario(usuario)}
-                      className="cursor-pointer rounded-md border border-blue-600 px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-600 hover:text-white"
-                    >
-                      Editar
-                    </button>
+                    {puedeEditar(usuario) && (
+                      <button
+                        type="button"
+                        onClick={() => abrirFormulario(usuario)}
+                        className="cursor-pointer rounded-md border border-blue-600 px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-600 hover:text-white"
+                      >
+                        Editar
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

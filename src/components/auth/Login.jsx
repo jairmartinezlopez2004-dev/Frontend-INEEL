@@ -12,15 +12,16 @@
 import { useState } from 'react';
 import { iniciarSesion } from '../../services/authService';
 import { useValidacion } from '../../hooks/useValidacion';
-import { validarTexto, CONTRASENA_MAX } from '../../utils/validaciones';
+import { validarTexto, validarCorreo, CONTRASENA_MAX } from '../../utils/validaciones';
 import { MensajeCampo } from '../common/CampoFormulario';
 import Registro from './Registro';
 import { CLASE_INPUT, CLASE_INPUT_OK, CLASE_INPUT_ERROR } from './clasesAuth';
 
-// Reglas de cada campo. En el login solo se pide que no estén vacíos: las
+// Reglas de cada campo. La cuenta debe ser un correo (el WebService rechaza
+// con 400 lo que no lo sea); la contraseña solo no debe estar vacía: las
 // credenciales las valida el WebService.
 const VALIDADORES = {
-  cuenta: (v) => validarTexto(v, { nombre: 'La cuenta', femenino: true }),
+  cuenta: validarCorreo,
   clave: (v) => validarTexto(v, { nombre: 'La contraseña', femenino: true, recortar: false }),
 };
 
@@ -109,7 +110,7 @@ export default function Login({ onLoginSuccess }) {
           
               <div>
                 <label htmlFor="login-cuenta" className="block text-sm font-medium text-gray-700 mb-1">
-                  Cuenta de correo o usuario
+                  Correo electrónico
                 </label>
                 <input
                   {...ariaDe('cuenta')}
@@ -119,7 +120,7 @@ export default function Login({ onLoginSuccess }) {
                   value={cuenta}
                   onChange={(e) => setCuenta(e.target.value)}
                   className={claseDe('cuenta')}
-                  placeholder="usuario@dominio"
+                  placeholder="usuario@dominio.com"
                 />
                 <div className="mt-1">
                   <MensajeCampo id="login-cuenta" error={errorDe('cuenta')} />
