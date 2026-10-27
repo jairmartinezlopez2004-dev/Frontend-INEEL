@@ -6,6 +6,7 @@
  * Las usa la vista "Perfiles 5 Minutales" (perfiles5m/ConsultaPerfiles5M.jsx).
  *
  * Endpoints (cualquier usuario con sesión; todos de solo lectura):
+ *   GET /Vars5M                     -> catálogo de variables { idVar5M, idUnidad, nombre, edo, fases }
  *   GET /Medicion5M/crudo           -> lecturas cada 5 min: { fecha, intervalo (0..287), valor }
  *   GET /Medicion5M/promedio-hora   -> { fecha, hora (0..23), valorPromedio }
  *   GET /Medicion5M/promedio-dia    -> { fecha, valorPromedio }
@@ -25,28 +26,44 @@
  * por mes (promedio de los promedios diarios).
  */
 import { ApiError, apiGet } from './api'
+import { listarUnidades } from './unidadesService'
 
 // Ruta del WebService usada en este módulo (relativa a la URL base).
 const RUTA = '/Medicion5M'
 
-// Catálogo de variables de 5 minutos (tabla Vars5M). El backend aún no expone
-// una API de Vars5M, por eso se replica aquí; cuando exista, este arreglo
-// deberá sustituirse por la consulta. Las unidades son las de cada magnitud.
+// Catálogo de respaldo de las variables de 5 minutos (tabla Vars5M). Se usa
+// mientras GET /Vars5M no responde (la base de datos aún no tiene la columna
+// `fases` que lee el backend). `fases` = en cuántas fases se mide: 1 = solo
+// fase A (energías), 3 = A, B y C.
 export const VARIABLES_5M = [
-  { id: 1, nombre: 'Energía entregada', unidad: 'kWh' },
-  { id: 2, nombre: 'Energía recibida', unidad: 'kWh' },
-  { id: 3, nombre: 'Energía reactiva I', unidad: 'kVARh' },
-  { id: 4, nombre: 'Energía reactiva II', unidad: 'kVARh' },
-  { id: 5, nombre: 'Energía reactiva III', unidad: 'kVARh' },
-  { id: 6, nombre: 'Energía reactiva IV', unidad: 'kVARh' },
-  { id: 7, nombre: 'Potencia activa', unidad: 'kW' },
-  { id: 8, nombre: 'Potencia reactiva', unidad: 'kVAR' },
-  { id: 9, nombre: 'Voltaje', unidad: 'V' },
-  { id: 10, nombre: 'Corriente', unidad: 'A' },
-  { id: 11, nombre: 'Factor de potencia', unidad: '' },
-  { id: 12, nombre: 'THD voltaje', unidad: '%' },
-  { id: 13, nombre: 'THD corriente', unidad: '%' },
+  { id: 1, nombre: 'Energía entregada', unidad: 'kWh', fases: 1 },
+  { id: 2, nombre: 'Energía recibida', unidad: 'kWh', fases: 1 },
+  { id: 3, nombre: 'Energía reactiva I', unidad: 'kVARh', fases: 1 },
+  { id: 4, nombre: 'Energía reactiva II', unidad: 'kVARh', fases: 1 },
+  { id: 5, nombre: 'Energía reactiva III', unidad: 'kVARh', fases: 1 },
+  { id: 6, nombre: 'Energía reactiva IV', unidad: 'kVARh', fases: 1 },
+  { id: 7, nombre: 'Potencia activa', unidad: 'kW', fases: 3 },
+  { id: 8, nombre: 'Potencia reactiva', unidad: 'kVAR', fases: 3 },
+  { id: 9, nombre: 'Voltaje', unidad: 'V', fases: 3 },
+  { id: 10, nombre: 'Corriente', unidad: 'A', fases: 3 },
+  { id: 11, nombre: 'Factor de potencia', unidad: '', fases: 3 },
+  { id: 12, nombre: 'THD voltaje', unidad: '%', fases: 3 },
+  { id: 13, nombre: 'THD corriente', unidad: '%', fases: 3 },
 ]
+
+/**
+ * Variables de 5 minutos activas (GET /Vars5M), con el símbolo de su unidad
+ * (GET /Unidades), ordenadas por ID.
+ * @returns {Promise<Array<{ id, nombre, unidad, fases }>>}
+ */
+export async function listarVariables5M({ signal } = {}) {
+  const [variables, unidades] = await Promise.all([apiGet('/Vars5M', { signal }), listarUnidades({ signal })])
+  const simboloDe = new Map(unidades.map((u) => [u.id, u.simbolo]))
+  return variables
+    .filter((v) => v.edo)
+    .map((v) => ({ id: v.idVar5M, nombre: v.nombre, unidad: simboloDe.get(v.idUnidad) ?? '', fases: v.fases }))
+    .sort((a, b) => a.id - b.id)
+}
 
 // Fases que acepta el backend. `color` es el de su serie en la gráfica
 // (primeros tres colores de la paleta categórica, validados para daltonismo).

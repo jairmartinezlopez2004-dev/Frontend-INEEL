@@ -36,6 +36,7 @@ import {
   VARIABLES_5M,
   consultarFases,
   formatoValor,
+  listarVariables5M,
 } from '../../services/medicion5MService'
 import { listarControladoresRF } from '../../services/controladoresRFService'
 import { listarRegistros } from '../../services/eventosRegService'
@@ -145,6 +146,8 @@ const CLASE_TH =
 export default function ConsultaPerfiles5M() {
   // Controladores RF con sus medidores, para el selector de medidor.
   const [controladores, setControladores] = useState([])
+  // Catálogo de variables: el de respaldo hasta que responda GET /Vars5M.
+  const [variables, setVariables] = useState(VARIABLES_5M)
   // Filtros que se están editando en el formulario.
   const [filtros, setFiltros] = useState(() => filtrosIniciales())
   // Filtros de la consulta aplicada (null = todavía no se consulta); un
@@ -178,6 +181,22 @@ export default function ConsultaPerfiles5M() {
         if (err.name === 'AbortError') return
         setError(err.message)
         setCargando(false)
+      })
+
+    return () => controlador.abort()
+  }, [])
+
+  // Catálogo de variables desde el WebService. Si falla (p. ej. la base de
+  // datos aún no tiene la columna `fases`), se queda el de respaldo.
+  useEffect(() => {
+    const controlador = new AbortController()
+
+    listarVariables5M({ signal: controlador.signal })
+      .then((lista) => {
+        if (lista.length > 0) setVariables(lista)
+      })
+      .catch((err) => {
+        if (err.name !== 'AbortError') console.warn('Vars5M no disponible; se usa el catálogo de respaldo.', err)
       })
 
     return () => controlador.abort()
@@ -246,6 +265,16 @@ export default function ConsultaPerfiles5M() {
     setFiltros((prev) => ({ ...prev, [campo]: convertir(e.target.value) }))
   }
 
+  // Fases en que se mide la variable elegida (1 = solo A).
+  const fasesVariable = variables.find((v) => v.id === filtros.idVar5M)?.fases ?? FASES.length
+
+  // Al elegir una variable de una sola fase, solo queda marcada la A.
+  const cambiarVariable = (e) => {
+    const idVar5M = Number(e.target.value)
+    const fases = variables.find((v) => v.id === idVar5M)?.fases ?? FASES.length
+    setFiltros((prev) => ({ ...prev, idVar5M, fases: fases === 1 ? [1] : prev.fases }))
+  }
+
   // Marca o desmarca una fase; se guardan en orden A, B, C.
   const alternarFase = (id) => (e) => {
     setFiltros((prev) => ({
@@ -260,7 +289,7 @@ export default function ConsultaPerfiles5M() {
   }
 
   // Datos de la consulta mostrada (no de los filtros que se estén editando).
-  const variable = resultado && VARIABLES_5M.find((v) => v.id === resultado.filtros.idVar5M)
+  const variable = resultado && variables.find((v) => v.id === resultado.filtros.idVar5M)
   const unidad = variable?.unidad ?? ''
   const periodos = resultado?.periodos ?? []
   const medidor =
@@ -391,8 +420,8 @@ export default function ConsultaPerfiles5M() {
           </label>
           <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
             Variable
-            <select value={filtros.idVar5M} onChange={cambiar('idVar5M', Number)} className={claseControl()}>
-              {VARIABLES_5M.map((v) => (
+            <select value={filtros.idVar5M} onChange={cambiarVariable} className={claseControl()}>
+              {variables.map((v) => (
                 <option key={v.id} value={v.id}>
                   {v.nombre}
                   {v.unidad && ` (${v.unidad})`}
@@ -400,19 +429,22 @@ export default function ConsultaPerfiles5M() {
               ))}
             </select>
           </label>
-          {/* Fases: una, dos o las tres (casillas con el color de su línea). */}
+          {/* Fases: una, dos o las tres (casillas con el color de su línea).
+              En variables de una sola fase, B y C quedan deshabilitadas. */}
           <fieldset className="flex flex-col gap-1.5">
             <legend className="mb-1.5 text-sm font-medium text-slate-700">Fases</legend>
             <div className="flex h-[38px] items-center gap-2">
               {FASES.map((f) => (
                 <label
                   key={f.id}
-                  className="flex h-full flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-slate-300 bg-white text-sm text-slate-700 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-500"
+                  title={f.id > fasesVariable ? 'Esta variable se mide solo en la fase A.' : undefined}
+                  className="flex h-full flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-slate-300 bg-white text-sm text-slate-700 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-500 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-40"
                 >
                   <input
                     type="checkbox"
                     checked={filtros.fases.includes(f.id)}
                     onChange={alternarFase(f.id)}
+                    disabled={f.id > fasesVariable}
                     className="sr-only"
                   />
                   <MuestraFase color={f.color} />
