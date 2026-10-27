@@ -12,32 +12,16 @@
  *     · "Editar": correo, nombre, rol, estado activo/inactivo y tiempo de
  *       sesión (PUT /Users/{id}). La contraseña no se modifica por aquí, y
  *       la "baja" de un usuario se hace desmarcando "Activo".
- *       Dentro de la edición está además "Restablecer contraseña", que asigna
- *       una contraseña nueva a un usuario que olvidó la suya
- *       (PUT /Users/{id}/contrasena). La anterior no se puede consultar porque
- *       el backend solo guarda su hash.
  * - Las cuentas de SuperAdministrador solo las edita otro SuperAdministrador
  *   (al Administrador no le aparece "Editar" en esas filas).
  * - Mientras el formulario está abierto se oculta la tabla, para que solo se
  *   vea la configuración del usuario que se edita.
  */
 import { useEffect, useState } from 'react'
-import {
-  ROLES,
-  listarUsuarios,
-  actualizarUsuario,
-  restablecerContrasena,
-} from '../../services/usuariosService'
+import { ROLES, listarUsuarios, actualizarUsuario } from '../../services/usuariosService'
 import { useValidacion } from '../../hooks/useValidacion'
-import {
-  validarTexto,
-  validarCorreo,
-  validarEntero,
-  validarContrasena,
-  CONTRASENA_MAX,
-} from '../../utils/validaciones'
+import { validarTexto, validarCorreo, validarEntero } from '../../utils/validaciones'
 import CampoFormulario from '../common/CampoFormulario'
-import RequisitosContrasena from '../common/RequisitosContrasena'
 import { claseControl } from '../common/clasesFormulario'
 import { useFiltroTabla } from '../../hooks/useFiltroTabla'
 import BuscadorTabla from '../common/BuscadorTabla'
@@ -216,129 +200,6 @@ function FormularioUsuario({ usuario, onGuardado, onCancelar, esSuperAdmin }) {
 }
 
 // ---------------------------------------------------------------------------
-// Formulario de restablecimiento de contraseña
-// ---------------------------------------------------------------------------
-
-// Se muestra debajo del formulario de edición. Es un <form> aparte (no se
-// pueden anidar) porque usa su propio endpoint y no depende de "Guardar".
-// Props:
-// - usuario: usuario (de usuariosService) al que se le asigna la contraseña.
-// - onRestablecida: callback tras restablecer (SeccionContrasena lo reinicia).
-function FormularioContrasena({ usuario, onRestablecida }) {
-  const [form, setForm] = useState({ contrasena: '', confirmacion: '' })
-  const [guardando, setGuardando] = useState(false)
-  const [error, setError] = useState(null) // Error devuelto por el WebService.
-  const { errorDe, ariaDe, validarAlEnviar } = useValidacion(
-    form,
-    {
-      contrasena: validarContrasena,
-      // Se pide dos veces para evitar asignar una contraseña con un error de dedo.
-      confirmacion: (v) =>
-        !v ? 'Confirma la contraseña.' : v !== form.contrasena ? 'Las contraseñas no coinciden.' : null,
-    },
-    'contrasena',
-  )
-
-  // Props comunes de los inputs: valor, eventos, estilos y accesibilidad.
-  const propsDe = (campo) => ({
-    ...ariaDe(campo),
-    type: 'password',
-    maxLength: CONTRASENA_MAX,
-    autoComplete: 'new-password',
-    value: form[campo],
-    onChange: (e) => setForm((prev) => ({ ...prev, [campo]: e.target.value })),
-    className: claseControl(Boolean(errorDe(campo))),
-  })
-
-  const guardar = async (e) => {
-    e.preventDefault()
-    if (!validarAlEnviar()) return
-
-    setGuardando(true)
-    setError(null)
-    try {
-      await restablecerContrasena(usuario.id, form.contrasena)
-      onRestablecida()
-    } catch (err) {
-      setError(err.message)
-      setGuardando(false)
-    }
-  }
-
-  return (
-    <form noValidate onSubmit={guardar}>
-      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-800">
-        Restablecer contraseña
-      </h3>
-      <p className="mb-4 text-sm text-slate-600">
-        La contraseña actual no se puede consultar; se reemplaza por la nueva. Comunícasela
-        al usuario ({usuario.correo}) por un medio seguro.
-      </p>
-
-      {error && (
-        <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-          {error}
-        </div>
-      )}
-
-      <fieldset disabled={guardando} className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <CampoFormulario
-          id="contrasena-contrasena"
-          etiqueta="Contraseña nueva"
-          error={errorDe('contrasena')}
-          debajo={<RequisitosContrasena valor={form.contrasena} />}
-        >
-          <input {...propsDe('contrasena')} />
-        </CampoFormulario>
-
-        <CampoFormulario
-          id="contrasena-confirmacion"
-          etiqueta="Confirmar contraseña"
-          error={errorDe('confirmacion')}
-        >
-          <input {...propsDe('confirmacion')} />
-        </CampoFormulario>
-      </fieldset>
-
-      <div className="mt-5 flex justify-end">
-        <button
-          type="submit"
-          disabled={guardando}
-          className="cursor-pointer rounded-lg border border-blue-600 px-4 py-2 text-sm font-semibold text-blue-600 transition-colors hover:bg-blue-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {guardando ? 'Restableciendo…' : 'Restablecer contraseña'}
-        </button>
-      </div>
-    </form>
-  )
-}
-
-// Envoltura del formulario de contraseña: tras restablecer muestra el aviso y,
-// con `key`, monta un formulario limpio (campos vacíos y sin errores marcados).
-function SeccionContrasena({ usuario }) {
-  const [intento, setIntento] = useState(0)
-  const [aviso, setAviso] = useState(null)
-
-  const alRestablecer = () => {
-    setAviso('Contraseña restablecida correctamente.')
-    setIntento((n) => n + 1)
-  }
-
-  return (
-    <div className="border-b border-slate-200 bg-slate-50 px-6 pb-5">
-      <div className="border-t border-slate-200 pt-5">
-        {aviso && (
-          <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
-            {aviso}
-          </div>
-        )}
-        <FormularioContrasena key={intento} usuario={usuario} onRestablecida={alRestablecer} />
-      </div>
-    </div>
-  )
-}
-
-// ---------------------------------------------------------------------------
 // Vista principal
 // ---------------------------------------------------------------------------
 
@@ -416,9 +277,6 @@ export default function GestionUsuarios({ esSuperAdmin }) {
           esSuperAdmin={esSuperAdmin}
         />
       )}
-
-      {/* Su `key` lleva prefijo para no repetir la del formulario de edición (mismo padre). */}
-      {enEdicion && <SeccionContrasena key={`contrasena-${enEdicion.id}`} usuario={enEdicion} />}
 
       {/* Mensajes de estado. */}
       {aviso && (

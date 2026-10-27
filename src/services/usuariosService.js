@@ -9,7 +9,6 @@
  *   GET  /Users         -> lista de todos los usuarios
  *   PUT  /Users/{id}    -> edición { correo, nombreUsuario, rol, edo, tiempoSesion }
  *                          (no cambia la contraseña; la baja es con edo = false)
- *   PUT  /Users/{id}/contrasena -> restablecimiento { nuevaContrasena }
  *
  * El backend maneja el rol como número (enum TipoRol: 1 = Administrador,
  * 2 = Usuario, 5 = SuperAdministrador). Aquí se traduce a texto para la UI y
@@ -67,15 +66,4 @@ export async function actualizarUsuario(id, { correo, nombreUsuario, rol, activo
     tiempoSesion,
   })
   return parsearUsuario(actualizado)
-}
-
-/**
- * Asigna una contraseña nueva a un usuario (por ejemplo, si olvidó la suya).
- * El administrador no ve la contraseña anterior: el backend solo guarda su hash.
- * @param {number} id
- * @param {string} nuevaContrasena - Debe cumplir REQUISITOS_CONTRASENA (utils/validaciones.js).
- * @returns {Promise<{ mensaje: string }>} Mensaje de confirmación del backend.
- */
-export async function restablecerContrasena(id, nuevaContrasena) {
-  return apiPut(`${RUTA}/${id}/contrasena`, { nuevaContrasena })
 }
