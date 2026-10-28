@@ -2,8 +2,8 @@
  * CommunicationsTabs.jsx
  * ---------------------------------------------------------------------------
  * Barra de pestañas horizontal usada por MainForm.jsx para navegar entre los
- * distintos Tabs del módulo Medidores (Instantáneos, Valores 5M, Calidad,
- * Consumos, Coms).
+ * distintos Tabs del módulo Medidores (Instantáneos, Valores 5M, Calidad, Fasores,
+ * Consumos, Eventos, Armónicos, Puntos de ajuste, Coms).
  *
  * Rol en el sistema:
  * Componente puramente de navegación/UI: no guarda su propio estado, recibe
@@ -12,7 +12,7 @@
  */
 
 // Catálogo estático de pestañas disponibles en el módulo Medidores.
-const TABS = ['Instantáneos', 'Valores 5M', 'Calidad', 'Consumos', 'Coms']
+const TABS = ['Instantáneos', 'Valores 5M', 'Calidad', 'Fasores', 'Consumos', 'Eventos', 'Armónicos', 'Puntos de ajuste', 'Coms']
 
 // Props:
 // - activeTab: nombre de la pestaña actualmente seleccionada (controlado por MainForm.jsx).
