@@ -14,8 +14,8 @@
  *   visor al medidor).
  * - Firmware solo se lee; Reset de fábrica pide confirmación.
  *
- * Permisos: todos pueden solicitar; modificar, descargar y el reset solo el
- * SuperAdministrador y el Administrador. A diferencia del resto de "Datos en
+ * Permisos: MainForm.jsx solo muestra esta pestaña al SuperAdministrador y al
+ * Administrador; `puedeModificar` se conserva como respaldo. A diferencia del resto de "Datos en
  * línea" (solo lectura), aquí los administradores sí modifican: enviar
  * ajustes al medidor es una operación en línea por naturaleza.
  *

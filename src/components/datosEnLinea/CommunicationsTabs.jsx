@@ -17,12 +17,13 @@ const TABS = ['Instantáneos', 'Valores 5M', 'Calidad', 'Fasores', 'Consumos', '
 // Props:
 // - activeTab: nombre de la pestaña actualmente seleccionada (controlado por MainForm.jsx).
 // - onTabChange: callback que MainForm.jsx usa para cambiar la pestaña activa.
-function CommunicationsTabs({ activeTab, onTabChange }) {
+// - pestanasOcultas: pestañas que no se muestran (por ejemplo, según el rol).
+function CommunicationsTabs({ activeTab, onTabChange, pestanasOcultas = [] }) {
   return (
     // Contenedor con scroll horizontal para que las pestañas quepan en pantallas angostas.
     <div className="overflow-x-auto border-b border-gray-200 bg-gray-100 px-4 pt-2">
       <nav className="flex gap-1">
-        {TABS.map((tab) => {
+        {TABS.filter((tab) => !pestanasOcultas.includes(tab)).map((tab) => {
           // Resalta la pestaña activa con un borde inferior y fondo blanco.
           const isActive = tab === activeTab
           return (

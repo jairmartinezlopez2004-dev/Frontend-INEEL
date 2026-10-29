@@ -33,6 +33,9 @@ import TabPuntosAjuste from './TabPuntosAjuste'
 // futura que aún no tenga un componente asociado.
 const TABS_MAQUETADAS = ['Coms', 'Instantáneos', 'Valores 5M', 'Calidad', 'Fasores', 'Consumos', 'Eventos', 'Armónicos', 'Puntos de ajuste']
 
+// rolId del SuperAdministrador y del Administrador: los únicos que ven Puntos de ajuste.
+const ROLES_ADMINISTRADOR = [1, 2]
+
 // Props:
 // - medidor: medidor seleccionado en el catálogo (se reenvía a las pestañas).
 // - usuarioLogueado: usuario autenticado (para permisos por rol).
@@ -40,11 +43,16 @@ const TABS_MAQUETADAS = ['Coms', 'Instantáneos', 'Valores 5M', 'Calidad', 'Faso
 function MainForm({ medidor, usuarioLogueado, soloLectura = false }) {
   // Nombre de la pestaña actualmente seleccionada dentro del módulo Medidores.
   const [activeTab, setActiveTab] = useState('Coms')
+  const esAdmin = ROLES_ADMINISTRADOR.includes(usuarioLogueado?.rolId)
 
   return (
     <div className="flex h-full flex-col">
       {/* Barra de pestañas (Coms, Instantáneos, Valores 5M, Calidad, Fasores, Consumos, Eventos, Armónicos, Puntos de ajuste). */}
-      <CommunicationsTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      <CommunicationsTabs
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        pestanasOcultas={esAdmin ? [] : ['Puntos de ajuste']}
+      />
 
       {/* Renderizado condicional de vistas: solo se monta el Tab que coincide
           con la pestaña activa, para no mantener en memoria/DOM los demás. */}
@@ -58,8 +66,8 @@ function MainForm({ medidor, usuarioLogueado, soloLectura = false }) {
       {activeTab === 'Consumos' && <TabConsumos />}
       {activeTab === 'Eventos' && <TabEventosMedidor medidor={medidor} />}
       {activeTab === 'Armónicos' && <TabArmonicos />}
-      {/* Puntos de ajuste ignora `soloLectura`: los administradores siempre modifican. */}
-      {activeTab === 'Puntos de ajuste' && <TabPuntosAjuste usuarioLogueado={usuarioLogueado} />}
+      {/* Puntos de ajuste: solo administradores, e ignora `soloLectura` porque siempre modifican. */}
+      {activeTab === 'Puntos de ajuste' && esAdmin && <TabPuntosAjuste usuarioLogueado={usuarioLogueado} />}
       {!TABS_MAQUETADAS.includes(activeTab) && (
         <div className="flex flex-1 items-center justify-center p-6 text-gray-400">
           Módulo {activeTab} en construcción
