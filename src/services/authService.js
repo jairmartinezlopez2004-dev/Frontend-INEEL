@@ -107,6 +107,20 @@ export function registrarCuenta({ nombreUsuario, correo, contrasena }) {
 }
 
 /**
+ * Restablece la contraseña de quien la olvidó con POST /Contrasena/restablecer.
+ * Es público (no requiere sesión) y no envía correo de verificación; el
+ * backend registra cada cambio en su auditoría.
+ *
+ * @param {{ correo: string, nuevaContrasena: string }} datos
+ * @returns {Promise<object>} Respuesta del backend ({ mensaje }).
+ * @throws {ApiError} Si no hay una cuenta activa con ese correo, la contraseña
+ *   no cumple la política o es igual a la actual (400), o no hay conexión.
+ */
+export function restablecerContrasena({ correo, nuevaContrasena }) {
+  return apiPost('/Contrasena/restablecer', { correo, nuevaContrasena })
+}
+
+/**
  * Extiende la sesión: pide un token nuevo con POST /Auth/renew.
  * El backend lo genera con el `tiempoSesion` del usuario en la base de datos
  * (60 minutos por defecto). Solo funciona mientras el token actual siga vigente.

@@ -6,8 +6,9 @@
  * Rol en el sistema:
  * Gestiona las credenciales de acceso del usuario y las valida contra el
  * WebService (POST /Auth/login) mediante services/authService.js.
- * Desde aquí también se abre el formulario "Crear cuenta" (Registro.jsx);
- * al terminar el registro se regresa al Login con el correo ya escrito.
+ * Desde aquí también se abren los formularios "Crear cuenta" (Registro.jsx)
+ * y "¿Olvidaste tu contraseña?" (RestablecerContrasena.jsx); al terminar
+ * cualquiera de los dos se regresa al Login con el correo ya escrito.
  */
 import { useState } from 'react';
 import { iniciarSesion } from '../../services/authService';
@@ -15,6 +16,7 @@ import { useValidacion } from '../../hooks/useValidacion';
 import { validarTexto, validarCorreo, CONTRASENA_MAX } from '../../utils/validaciones';
 import { MensajeCampo } from '../common/CampoFormulario';
 import Registro from './Registro';
+import RestablecerContrasena from './RestablecerContrasena';
 import { CLASE_INPUT, CLASE_INPUT_OK, CLASE_INPUT_ERROR } from './clasesAuth';
 
 // Reglas de cada campo. La cuenta debe ser un correo (el WebService rechaza
@@ -33,9 +35,10 @@ export default function Login({ onLoginSuccess }) {
   const [error, setError] = useState('');
   // Estado para indicar si la aplicación está esperando
   const [cargando, setCargando] = useState(false);
-  // true mientras se muestra el formulario "Crear cuenta" en lugar del Login.
-  const [registrando, setRegistrando] = useState(false);
-  // Aviso de éxito al volver del registro.
+  // Formulario visible: 'login', 'registro' (Crear cuenta) o 'restablecer'
+  // (¿Olvidaste tu contraseña?).
+  const [vista, setVista] = useState('login');
+  // Aviso de éxito al volver del registro o del restablecimiento.
   const [aviso, setAviso] = useState('');
   // El id de cada input es `login-<campo>` (lo arma ariaDe).
   const { errorDe, ariaDe, validarAlEnviar } = useValidacion({ cuenta, clave }, VALIDADORES, 'login');
@@ -52,7 +55,24 @@ export default function Login({ onLoginSuccess }) {
     setClave('');
     setError('');
     setAviso('Cuenta creada. Ya puedes iniciar sesión.');
-    setRegistrando(false);
+    setVista('login');
+  };
+
+  // Al cambiar la contraseña se vuelve al Login con el correo escrito y el
+  // mensaje del backend ("Contraseña actualizada. Ya puedes iniciar sesión…").
+  const alRestablecer = (correo, mensaje) => {
+    setCuenta(correo);
+    setClave('');
+    setError('');
+    setAviso(mensaje || 'Contraseña actualizada. Ya puedes iniciar sesión.');
+    setVista('login');
+  };
+
+  // Abre otro formulario limpiando los avisos del Login.
+  const abrir = (nuevaVista) => {
+    setError('');
+    setAviso('');
+    setVista(nuevaVista);
   };
 
   const handleSubmit = async (e) => {
@@ -86,8 +106,14 @@ export default function Login({ onLoginSuccess }) {
           />
         </div>
 
-        {registrando ? (
-          <Registro onRegistrado={alRegistrarse} onCancelar={() => setRegistrando(false)} />
+        {vista === 'registro' ? (
+          <Registro onRegistrado={alRegistrarse} onCancelar={() => setVista('login')} />
+        ) : vista === 'restablecer' ? (
+          <RestablecerContrasena
+            correoInicial={cuenta.trim()}
+            onRestablecida={alRestablecer}
+            onCancelar={() => setVista('login')}
+          />
         ) : (
           <>
             {/* Aviso de cuenta creada */}
@@ -141,8 +167,15 @@ export default function Login({ onLoginSuccess }) {
                   className={claseDe('clave')}
                   placeholder="••••••••"
                 />
-                <div className="mt-1">
+                <div className="mt-1 flex items-start justify-between gap-3">
                   <MensajeCampo id="login-clave" error={errorDe('clave')} />
+                  <button
+                    type="button"
+                    onClick={() => abrir('restablecer')}
+                    className="ml-auto shrink-0 text-sm font-medium text-blue-600 hover:underline"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </button>
                 </div>
               </div>
 
@@ -160,11 +193,7 @@ export default function Login({ onLoginSuccess }) {
               ¿No tienes cuenta?{' '}
               <button
                 type="button"
-                onClick={() => {
-                  setError('');
-                  setAviso('');
-                  setRegistrando(true);
-                }}
+                onClick={() => abrir('registro')}
                 className="font-medium text-blue-600 hover:underline"
               >
                 Regístrate
