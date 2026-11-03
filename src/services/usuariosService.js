@@ -21,8 +21,8 @@ import { apiGet, apiPut } from './api'
 const RUTA = '/Users'
 
 // Enum TipoRol del backend.
-const ROL_A_NUMERO = { SuperAdministrador: 5, Administrador: 1, Usuario: 2 }
-const NUMERO_A_ROL = { 5: 'SuperAdministrador', 1: 'Administrador', 2: 'Usuario' }
+const ROL_A_NUMERO = { SuperAdministrador: 3, Administrador: 1, Usuario: 2 }
+const NUMERO_A_ROL = { 3: 'SuperAdministrador', 1: 'Administrador', 2: 'Usuario' }
 
 // Roles disponibles para los <select> de la UI.
 export const ROLES = Object.keys(ROL_A_NUMERO)
