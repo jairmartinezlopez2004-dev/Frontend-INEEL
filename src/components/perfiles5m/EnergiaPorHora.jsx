@@ -10,20 +10,17 @@
  *   y rango de fechas, y pulsa "Consultar". La vista empieza vacía, igual que
  *   Mediciones 5 minutales.
  * - Muestra un resumen (total del rango, hora pico, promedio por hora, horas
- *   incompletas), los totales por día, la gráfica (GraficaEnergiaHora) y la
- *   tabla hora por hora.
+ *   incompletas), los totales por día y la tabla hora por hora.
  * - El backend solo trabaja en fase A para energía y suma los 12 intervalos
  *   de 5 minutos de cada hora; una hora con menos de 12 lecturas se marca
  *   como incompleta.
  * - Es de solo consulta para todos los roles.
  */
-import { Suspense, lazy, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { VARIABLES_5M, consultarEnergiaHora, formatoValor, listarVariables5M } from '../../services/medicion5MService'
 import { listarControladoresRF } from '../../services/controladoresRFService'
 import { claseControl } from '../common/clasesFormulario'
 import SelectorRangoFechas from '../common/SelectorRangoFechas'
-// ECharts solo se descarga al mostrar la gráfica.
-const GraficaEnergiaHora = lazy(() => import('./GraficaEnergiaHora'))
 
 // Lecturas de 5 minutos de una hora completa.
 const LECTURAS_POR_HORA = 12
@@ -260,7 +257,7 @@ export default function EnergiaPorHora() {
               </span>
             </div>
 
-            <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <DatoResumen etiqueta="Total del rango" valor={formatoValor(totalRango)} unidad={unidad} />
               <DatoResumen
                 etiqueta="Hora pico"
@@ -275,10 +272,6 @@ export default function EnergiaPorHora() {
                 detalle={`Con menos de ${LECTURAS_POR_HORA} lecturas de 5 minutos`}
               />
             </div>
-
-            <Suspense fallback={<div className="h-[380px] animate-pulse rounded-lg bg-slate-100" />}>
-              <GraficaEnergiaHora filas={filas} unidad={unidad} />
-            </Suspense>
           </section>
 
           {/* Totales por día (solo si hay más de un día). */}
