@@ -18,8 +18,9 @@
  * - Solo el Administrador ve "+ Nuevo controlador" y "Editar"
  *   (POST / PUT /ControladorRF); el backend además rechaza con 403 a quien no lo sea.
  * - El backend no permite eliminar controladores: la baja se hace editando
- *   el estado a Inactivo (edo 20).
- * - El estado (`edo`) se muestra con EstadoBadge (10 activo, 11 en uso, 20 inactivo).
+ *   el estado a Inactivo (edo 0).
+ * - El estado (`edo`) se muestra con EstadoBadge (0 inactivo, 10 activo, 11 en uso,
+ *   20 en mantenimiento).
  */
 import { useEffect, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router'

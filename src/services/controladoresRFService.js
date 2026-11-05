@@ -15,8 +15,8 @@
  * Los GET incluyen `medidores` (los medidores QP asociados), que se
  * normalizan con parsearMedidor de medidoresService.js. El backend no tiene
  * endpoint para eliminar controladores: la baja se hace editando con
- * `edo` = 20. `edo` usa el mismo catálogo que los medidores (ESTADOS_EQUIPO
- * en medidoresService.js: 10 activo, 11 en uso, 20 inactivo).
+ * `edo` = 0. `edo` usa el mismo catálogo que los medidores (ESTADOS_EQUIPO
+ * en medidoresService.js: 0 inactivo, 10 activo, 11 en uso, 20 en mantenimiento).
  */
 import { apiGet, apiPost, apiPut } from './api'
 import { parsearMedidor } from './medidoresService'

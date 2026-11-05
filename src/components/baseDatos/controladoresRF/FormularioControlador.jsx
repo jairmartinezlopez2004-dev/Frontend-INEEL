@@ -6,7 +6,7 @@
  * detalle de un controlador (edición). Envía POST / PUT /ControladorRF.
  *
  * El estado (`edo`) se elige del catálogo compartido con los medidores
- * (ESTADOS_EQUIPO: 10 activo, 11 en uso, 20 inactivo). No hay eliminación:
+ * (ESTADOS_EQUIPO: 0 inactivo, 10 activo, 11 en uso, 20 en mantenimiento). No hay eliminación:
  * para dar de baja un controlador se guarda con estado Inactivo.
  */
 import { useState } from 'react'
