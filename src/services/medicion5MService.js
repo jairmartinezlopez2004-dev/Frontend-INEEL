@@ -13,6 +13,9 @@
  *   GET /Medicion5M/promedio-semana -> filas DIARIAS con { anio, semana, fecha, valorPromedio }
  *   GET /Medicion5M/promedio-mes    -> filas DIARIAS con { anio, mes, fecha, valorPromedio }
  *   GET /Medicion5M/promedio-anio   -> promedio mensual { anio, mes, valorPromedio }
+ *   GET /Medicion5M/energia-hora    -> total de energía por hora y acumulado del día (solo fase A):
+ *                                      { idVar5M, simbolo, fecha, hora, horaTexto, totalHora,
+ *                                        acumuladoDia, intervalos }
  *
  * El backend no permite modificar mediciones: solo se consultan las vistas.
  *
@@ -232,5 +235,31 @@ export async function consultarFases({ fases, ...filtros }, { signal } = {}) {
     series,
     periodos: ordenados,
     mensaje: ordenados.length === 0 ? resultados[0].mensaje : null,
+  }
+}
+
+/**
+ * Total de energía por hora y acumulado del día (vista vw_Medicion5M_EnergiaHora
+ * del backend). El backend suma los 12 intervalos de 5 minutos de cada hora y
+ * solo trabaja en fase A, así que no se envía fase.
+ *
+ * @param {object} filtros
+ * @param {number} filtros.idMedidor
+ * @param {number} filtros.idVar5M - Variable de energía (P5M_EE, P5M_ER, …).
+ * @param {string} filtros.fechaInicio - yyyy-MM-dd.
+ * @param {string} filtros.fechaFin - yyyy-MM-dd.
+ * @returns {Promise<{ filas: Array<{ fecha, hora, horaTexto, totalHora, acumuladoDia, intervalos }>,
+ *   mensaje: string|null }>} `mensaje` trae el aviso del backend cuando no hay datos.
+ */
+export async function consultarEnergiaHora({ idMedidor, idVar5M, fechaInicio, fechaFin }, { signal } = {}) {
+  const query = new URLSearchParams({ idMedidor, idVar5M, fechaInicio, fechaFin })
+  try {
+    const filas = await apiGet(`${RUTA}/energia-hora?${query}`, { signal })
+    return { filas: filas ?? [], mensaje: null }
+  } catch (err) {
+    if (err instanceof ApiError && err.httpStatus === 404) {
+      return { filas: [], mensaje: err.message }
+    }
+    throw err
   }
 }

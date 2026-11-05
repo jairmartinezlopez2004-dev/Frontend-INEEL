@@ -18,6 +18,7 @@
  *     /configuracion/controladores-rf/3/medidores/12   Detalle del medidor 12
  *     /en-linea/controladores-rf[/…]         Datos en línea (solo lectura)
  *     /perfiles-5m/mediciones                Perfiles 5 Minutales
+ *     /perfiles-5m/energia-hora              Perfiles 5 Minutales: energía por hora
  *     /eventos/eventos-registrados           Eventos registrados
  *
  *   Los módulos de configuración son: controladores-rf, eventos,
@@ -40,6 +41,7 @@ import GestionUnidades from './components/baseDatos/unidades/GestionUnidades'
 import GestionPuntosIO from './components/baseDatos/puntosIO/GestionPuntosIO'
 import GestionGruposIO from './components/baseDatos/gruposIO/GestionGruposIO'
 import ConsultaPerfiles5M from './components/perfiles5m/ConsultaPerfiles5M'
+import EnergiaPorHora from './components/perfiles5m/EnergiaPorHora'
 import { restaurarSesion, cerrarSesion } from './services/authService'
 
 // rolId del SuperAdministrador y del Administrador en la UI (ver ROL_IDS en
@@ -199,10 +201,11 @@ function App() {
             mediciones de cinco minutos de cualquier medidor. */}
         <Route
           path="/perfiles-5m"
-          element={<LayoutSistema rutaBase="/perfiles-5m" rutasVisibles={['mediciones']} {...propsLayout} />}
+          element={<LayoutSistema rutaBase="/perfiles-5m" rutasVisibles={['mediciones', 'energia-hora']} {...propsLayout} />}
         >
           <Route index element={<Navigate to="mediciones" replace />} />
           <Route path="mediciones" element={<ConsultaPerfiles5M />} />
+          <Route path="energia-hora" element={<EnergiaPorHora />} />
           <Route path="*" element={<Navigate to="mediciones" replace />} />
         </Route>
 

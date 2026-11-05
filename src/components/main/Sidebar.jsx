@@ -28,6 +28,7 @@ const NAV_ITEMS = [
   { ruta: 'usuarios', label: 'Usuarios', soloAdmin: true },
   // Solo aparece donde `rutasVisibles` la incluye (opción Perfiles 5 Minutales).
   { ruta: 'mediciones', label: 'Mediciones 5 minutales', soloSiVisible: true },
+  { ruta: 'energia-hora', label: 'Energía por hora', soloSiVisible: true },
   // Solo aparece en la opción Eventos registrados.
   { ruta: 'eventos-registrados', label: 'Eventos registrados', soloSiVisible: true },
 ];
