@@ -18,6 +18,7 @@ import { MensajeCampo } from '../common/CampoFormulario';
 import Registro from './Registro';
 import RestablecerContrasena from './RestablecerContrasena';
 import { CLASE_INPUT, CLASE_INPUT_OK, CLASE_INPUT_ERROR } from './clasesAuth';
+import InputContrasena from '../common/InputContrasena';
 
 // Reglas de cada campo. La cuenta debe ser un correo (el WebService rechaza
 // con 400 lo que no lo sea); la contraseña solo no debe estar vacía: las
@@ -157,9 +158,8 @@ export default function Login({ onLoginSuccess }) {
                 <label htmlFor="login-clave" className="block text-sm font-medium text-gray-700 mb-1">
                   Contraseña
                 </label>
-                <input
+                <InputContrasena
                   {...ariaDe('clave')}
-                  type="password"
                   maxLength={CONTRASENA_MAX} // Mismo máximo que el registro y Usuarios (utils/validaciones.js)
                   autoComplete="current-password"
                   value={clave}

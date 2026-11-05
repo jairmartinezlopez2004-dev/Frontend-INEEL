@@ -22,6 +22,7 @@ import {
 import { MensajeCampo } from '../common/CampoFormulario';
 import RequisitosContrasena from '../common/RequisitosContrasena';
 import { CLASE_INPUT, CLASE_INPUT_OK, CLASE_INPUT_ERROR } from './clasesAuth';
+import InputContrasena from '../common/InputContrasena';
 
 // Mismo largo máximo de correo que el Login y el registro.
 const CORREO_MAX = 50;
@@ -75,12 +76,15 @@ export default function RestablecerContrasena({ correoInicial = '', onRestableci
   };
 
   // Campo con etiqueta, input, mensaje de error y contenido opcional debajo.
-  const campo = (nombre, etiqueta, props, debajo) => (
+  // Los campos con type 'password' usan InputContrasena (botón de ojo para mostrarla).
+  const campo = (nombre, etiqueta, props, debajo) => {
+    const Control = props.type === 'password' ? InputContrasena : 'input';
+    return (
     <div>
       <label htmlFor={`restablecer-${nombre}`} className="block text-sm font-medium text-gray-700 mb-1">
         {etiqueta}
       </label>
-      <input
+      <Control
         {...ariaDe(nombre)}
         {...props}
         value={form[nombre]}
@@ -92,7 +96,8 @@ export default function RestablecerContrasena({ correoInicial = '', onRestableci
         {debajo}
       </div>
     </div>
-  );
+    );
+  };
 
   return (
     <>

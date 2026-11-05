@@ -21,6 +21,7 @@ import {
 import { MensajeCampo } from '../common/CampoFormulario';
 import RequisitosContrasena from '../common/RequisitosContrasena';
 import { CLASE_INPUT, CLASE_INPUT_OK, CLASE_INPUT_ERROR } from './clasesAuth';
+import InputContrasena from '../common/InputContrasena';
 
 // Largos de correo y nombre: el correo hasta 50 (igual que el Login) y el
 // nombre hasta 50 (columna nombreUsuario de la BD).
@@ -81,12 +82,15 @@ export default function Registro({ onRegistrado, onCancelar }) {
   };
 
   // Campo con etiqueta, input, mensaje de error y contenido opcional debajo.
-  const campo = (nombre, etiqueta, props, debajo) => (
+  // Los campos con type 'password' usan InputContrasena (botón de ojo para mostrarla).
+  const campo = (nombre, etiqueta, props, debajo) => {
+    const Control = props.type === 'password' ? InputContrasena : 'input';
+    return (
     <div>
       <label htmlFor={`registro-${nombre}`} className="block text-sm font-medium text-gray-700 mb-1">
         {etiqueta}
       </label>
-      <input
+      <Control
         {...ariaDe(nombre)}
         {...props}
         value={form[nombre]}
@@ -98,7 +102,8 @@ export default function Registro({ onRegistrado, onCancelar }) {
         {debajo}
       </div>
     </div>
-  );
+    );
+  };
 
   return (
     <>

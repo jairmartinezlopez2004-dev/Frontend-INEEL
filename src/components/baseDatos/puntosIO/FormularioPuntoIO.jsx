@@ -19,6 +19,7 @@ import { useValidacion } from '../../../hooks/useValidacion'
 import { validarTexto, validarEntero, validarEnteroConSigno, CONTRASENA_MAX } from '../../../utils/validaciones'
 import CampoFormulario from '../../common/CampoFormulario'
 import { claseControl } from '../../common/clasesFormulario'
+import InputContrasena from '../../common/InputContrasena'
 
 // Mayor valor de un `int` de SQL Server (direcciones CCEC y Modbus).
 const INT_MAX = 2147483647
@@ -234,7 +235,7 @@ export default function FormularioPuntoIO({
           error={errorDe('contrasena')}
           ayuda="Por seguridad, cada cambio a un punto IO se confirma con tu contraseña."
         >
-          <input type="password" maxLength={CONTRASENA_MAX} autoComplete="current-password" {...propsDe('contrasena')} />
+          <InputContrasena maxLength={CONTRASENA_MAX} autoComplete="current-password" {...propsDe('contrasena')} />
         </CampoFormulario>
       </fieldset>
 
