@@ -1,20 +1,20 @@
 /**
  * ConexionMedidor.jsx
  * ---------------------------------------------------------------------------
- * Tarjeta "Conexión con el medidor" de la pestaña Coms: el usuario elige el
- * tipo de transporte (Serial o Ethernet) y pulsa "Conectar"; el backend
- * intenta la conexión con el medidor y responde si se logró.
+ * Tarjeta "Conexión con el medidor" de la pestaña Coms: el usuario pulsa
+ * "Conectar" y el backend intenta la conexión con el medidor por el puerto
+ * serial y responde si se logró.
  *
  * Rol en el sistema:
  * - Se muestra en TabComunicaciones arriba de la configuración de
  *   comunicaciones, solo para SuperAdministrador y Administrador (el backend
  *   también rechaza a los demás con 403).
  * - No depende de `soloLectura`: conectar no modifica la configuración.
- * - Los parámetros de cada transporte los toma el backend de su archivo
- *   TransporteConfig.json; aquí solo se elige cuál usar.
+ * - Solo se envía el idMedidor: el backend toma dirRed y dirRF de la base de
+ *   datos y los parámetros del puerto de sus archivos JSON.
  */
 import { useEffect, useRef, useState } from 'react'
-import { conectarMedidor, TIPOS_TRANSPORTE } from '../../services/conexionMedidorService'
+import { conectarMedidor } from '../../services/conexionMedidorService'
 
 // Estilos del mensaje de resultado según el estado de la conexión.
 const CLASES_ESTADO = {
@@ -24,9 +24,8 @@ const CLASES_ESTADO = {
 }
 
 // Props:
-// - medidor: medidor seleccionado (se usa su dirRed).
+// - medidor: medidor seleccionado (se usan su id y su dirRed).
 export default function ConexionMedidor({ medidor }) {
-  const [tipoTransporte, setTipoTransporte] = useState(TIPOS_TRANSPORTE[0].valor)
   // estado: null (sin intento) | { tipo: 'conectando' | 'conectado' | 'error', texto }
   const [estado, setEstado] = useState(null)
   const controladorRef = useRef(null)
@@ -35,22 +34,16 @@ export default function ConexionMedidor({ medidor }) {
   useEffect(() => () => controladorRef.current?.abort(), [])
 
   const conectando = estado?.tipo === 'conectando'
-  const textoTransporte = TIPOS_TRANSPORTE.find((t) => t.valor === tipoTransporte)?.texto
-
-  const elegirTransporte = (valor) => {
-    setTipoTransporte(valor)
-    setEstado(null) // El resultado anterior ya no corresponde al transporte elegido.
-  }
 
   const conectar = async () => {
     controladorRef.current?.abort()
     const controlador = new AbortController()
     controladorRef.current = controlador
 
-    setEstado({ tipo: 'conectando', texto: `Conectando con el medidor ${medidor.dirRed} por ${textoTransporte}…` })
+    setEstado({ tipo: 'conectando', texto: `Conectando con el medidor ${medidor.dirRed} por puerto serial…` })
     try {
-      const mensaje = await conectarMedidor(medidor.dirRed, tipoTransporte, { signal: controlador.signal })
-      setEstado({ tipo: 'conectado', texto: `${mensaje} (${textoTransporte})` })
+      const mensaje = await conectarMedidor(medidor.id, { signal: controlador.signal })
+      setEstado({ tipo: 'conectado', texto: mensaje })
     } catch (err) {
       if (err.name === 'AbortError') return
       setEstado({ tipo: 'error', texto: err.message })
@@ -63,43 +56,17 @@ export default function ConexionMedidor({ medidor }) {
         Conexión con el medidor
       </h2>
 
-      <div className="flex flex-wrap items-end gap-4">
-        <fieldset disabled={conectando}>
-          <legend className="mb-1.5 text-sm font-semibold text-slate-900">Tipo de transporte</legend>
-          {/* Botones tipo interruptor: uno de los dos queda marcado. */}
-          <div role="radiogroup" aria-label="Tipo de transporte" className="inline-flex overflow-hidden rounded-lg border border-slate-300">
-            {TIPOS_TRANSPORTE.map((t) => {
-              const activo = t.valor === tipoTransporte
-              return (
-                <button
-                  key={t.valor}
-                  type="button"
-                  role="radio"
-                  aria-checked={activo}
-                  onClick={() => elegirTransporte(t.valor)}
-                  className={`px-5 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed ${
-                    activo ? 'bg-blue-600 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  {t.texto}
-                </button>
-              )
-            })}
-          </div>
-        </fieldset>
-
-        <button
-          type="button"
-          onClick={conectar}
-          disabled={conectando}
-          className="cursor-pointer rounded-lg bg-blue-600 px-6 py-2 font-semibold text-white transition-colors hover:bg-blue-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {conectando ? 'Conectando…' : 'Conectar'}
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={conectar}
+        disabled={conectando}
+        className="cursor-pointer rounded-lg bg-blue-600 px-6 py-2 font-semibold text-white transition-colors hover:bg-blue-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {conectando ? 'Conectando…' : 'Conectar'}
+      </button>
 
       <p className="mt-2 text-xs text-slate-500">
-        Los parámetros de cada transporte (puerto COM, IP, puerto, timeout) los toma el servidor de su configuración.
+        La conexión es por puerto serial. El puerto COM, la velocidad y el timeout los toma el servidor de su configuración.
       </p>
 
       {estado && (
