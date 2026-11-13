@@ -6,8 +6,9 @@
  * Rol en el sistema:
  * Lo muestra Login.jsx al pulsar "Regístrate". Envía nombre, correo y
  * contraseña al WebService (POST /Auth/register) mediante authService.js. El
- * backend siempre crea la cuenta con rol Usuario y no inicia sesión, así que
- * al terminar se regresa al Login con el correo ya escrito.
+ * backend siempre crea la cuenta con rol Usuario, inactiva y sin iniciar
+ * sesión: un Administrador o SuperAdministrador debe activarla en Usuarios.
+ * Al terminar se regresa al Login con el correo ya escrito y ese aviso.
  */
 import { useState } from 'react';
 import { registrarCuenta } from '../../services/authService';

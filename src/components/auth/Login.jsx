@@ -28,6 +28,10 @@ const VALIDADORES = {
   clave: (v) => validarTexto(v, { nombre: 'La contraseña', femenino: true, recortar: false }),
 };
 
+// Texto exacto con el que el WebService rechaza el login de una cuenta con
+// edo = false (Services/AuthService.cs).
+const MENSAJE_INACTIVO_BACKEND = 'El usuario está inactivo.';
+
 export default function Login({ onLoginSuccess }) {
   // Estados para capturar cuenta y contraseña del formulario
   const [cuenta, setCuenta] = useState('');
@@ -49,13 +53,14 @@ export default function Login({ onLoginSuccess }) {
   // Envía las credenciales al WebService (POST /Auth/login). Si son válidas,
   // entrega a App.jsx el usuario ya armado por authService; si no, muestra
   // el mensaje del backend (p. ej. "Correo o Contraseña incorrectos").
-  // Al crear la cuenta se vuelve al Login con el correo escrito, para que la
-  // persona solo tenga que escribir su contraseña.
+  // Al crear la cuenta se vuelve al Login con el correo escrito. La cuenta
+  // nace inactiva: no puede entrar hasta que un Administrador o
+  // SuperAdministrador la active en Base de datos → Usuarios.
   const alRegistrarse = (correo) => {
     setCuenta(correo);
     setClave('');
     setError('');
-    setAviso('Cuenta creada. Ya puedes iniciar sesión.');
+    setAviso('Cuenta creada. Un administrador debe activarla antes de que puedas iniciar sesión.');
     setVista('login');
   };
 
@@ -88,7 +93,12 @@ export default function Login({ onLoginSuccess }) {
       const usuario = await iniciarSesion(cuenta.trim(), clave);
       onLoginSuccess(usuario);
     } catch (err) {
-      setError(err.message);
+      // Cuenta recién registrada (aún sin activar) o dada de baja.
+      setError(
+        err.message === MENSAJE_INACTIVO_BACKEND
+          ? 'Tu cuenta no está activa. Pide a un administrador que te dé acceso.'
+          : err.message,
+      );
     } finally {
       setCargando(false);
     }
@@ -137,7 +147,7 @@ export default function Login({ onLoginSuccess }) {
           
               <div>
                 <label htmlFor="login-cuenta" className="block text-sm font-medium text-gray-700 mb-1">
-                  Correo electrónico
+                  Usuario
                 </label>
                 <input
                   {...ariaDe('cuenta')}

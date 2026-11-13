@@ -96,7 +96,8 @@ export async function iniciarSesion(correo, contrasena) {
 
 /**
  * Registra una cuenta nueva con POST /Auth/register. El backend siempre le
- * asigna el rol Usuario y no inicia sesión: la persona entra después con el Login.
+ * asigna el rol Usuario, la deja inactiva y no inicia sesión: la persona entra
+ * con el Login cuando un Administrador o SuperAdministrador la activa.
  *
  * @param {{ nombreUsuario: string, correo: string, contrasena: string }} datos
  * @returns {Promise<object>} Respuesta del backend ({ mensaje, usuario }).
