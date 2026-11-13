@@ -33,7 +33,9 @@
 // - valor: valor numérico/textual a mostrar (dato simulado o leído del WebService).
 // - unidad: unidad de medida (V, A, kW, %, etc.).
 // - checked / onChange: opcionales; si se proveen, la casilla pasa a modo controlado.
-function MonitorMedidaTile({ titulo, valor, unidad, checked, onChange }) {
+// - seleccionable: false oculta la casilla (vistas que leen todas las medidas,
+//   como Instantáneos, donde el backend no recibe una selección).
+function MonitorMedidaTile({ titulo, valor, unidad, checked, onChange, seleccionable = true }) {
   // Se considera "controlado" solo si el padre pasó explícitamente la prop `checked`.
   const esControlado = checked !== undefined
 
@@ -56,12 +58,14 @@ function MonitorMedidaTile({ titulo, valor, unidad, checked, onChange }) {
         {/* Casilla para incluir/excluir esta medida de la próxima solicitud.
             Según `esControlado`, se le pasan las props de checkbox controlado
             (checked + onChange) o simplemente un valor inicial (defaultChecked). */}
-        <input
-          type="checkbox"
-          {...(esControlado ? { checked, onChange } : { defaultChecked: false })}
-          aria-label={`Incluir ${titulo}`}
-          className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-        />
+        {seleccionable && (
+          <input
+            type="checkbox"
+            {...(esControlado ? { checked, onChange } : { defaultChecked: false })}
+            aria-label={`Incluir ${titulo}`}
+            className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+          />
+        )}
       </div>
 
       {/* Unidad de medida, alineada a la derecha en la parte inferior de la tarjeta. */}

@@ -59,7 +59,7 @@ function MainForm({ medidor, usuarioLogueado, soloLectura = false }) {
       {activeTab === 'Coms' && (
         <TabComunicaciones medidor={medidor} usuarioLogueado={usuarioLogueado} soloLectura={soloLectura} />
       )}
-      {activeTab === 'Instantáneos' && <TabInstantaneos />}
+      {activeTab === 'Instantáneos' && <TabInstantaneos medidor={medidor} usuarioLogueado={usuarioLogueado} />}
       {activeTab === 'Valores 5M' && <TabValores5M />}
       {activeTab === 'Calidad' && <TabCalidad />}
       {activeTab === 'Fasores' && <TabFasores />}

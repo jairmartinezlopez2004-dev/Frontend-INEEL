@@ -1,153 +1,192 @@
 /**
  * TabInstantaneos.jsx
  * ---------------------------------------------------------------------------
- * Vista de "Valores instantáneos" del medidor: muestra, agrupadas por fase
- * (A, B, C, Promedios y Línea/Frecuencia), las mediciones eléctricas más
- * recientes (tensión, corriente, potencias, factor de potencia, etc.).
+ * Vista de "Valores instantáneos" del medidor: al pulsar "Solicitar" pide al
+ * backend la lectura en línea y muestra, agrupadas por fase (A, B, C,
+ * Promedios y Línea/Frecuencia), las mediciones eléctricas recibidas.
  *
  * Rol en el sistema:
- * Permite al usuario elegir qué variables desea solicitar al medidor
- * (mediante las casillas de cada tarjeta y el checkbox "Seleccionar todos"),
- * ajustar el número de fases a consultar, y disparar la solicitud con el
- * botón "Solicitar".
- *
- * Integración con el WebService (lectura de Instantáneos):
- * - FASES es el catálogo de variables a mostrar; hoy sus `valor` son datos de
- *   ejemplo. En producción, estos valores deberán actualizarse con la
- *   respuesta del método del WebService encargado de leer instantáneos del
- *   medidor (por ejemplo, LeerInstantaneos), probablemente refrescándose
- *   periódicamente.
- * - El estado `seleccionados` representa qué medidas (ids) el usuario marcó
- *   para incluir en la próxima solicitud; el botón "Solicitar" es el punto
- *   donde, al conectar el backend, se armaría y enviaría esa petición.
+ * - Pestaña de MainForm (Datos en línea). Recibe el medidor seleccionado.
+ * - La lectura usa POST /ConexionMedidor/instantaneos (conexionMedidorService),
+ *   que solo admite SuperAdministrador y Administrador; a los demás roles se
+ *   les muestra el aviso en lugar del botón.
+ * - El backend lee siempre todos los puntos de PuntosIO del grupo funcional 1
+ *   (IdGF = 1) y no recibe una selección, por eso las tarjetas no tienen casilla.
+ * - Cada tarjeta se llena con el punto cuyo `tag` coincide con su `tag`
+ *   (sin distinguir mayúsculas). Si el backend devuelve puntos que no están
+ *   en el catálogo FASES, se muestran en una sección "Otros puntos".
  */
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import MonitorMedidaTile from '../common/MonitorMedidaTile'
+import { solicitarInstantaneos } from '../../services/conexionMedidorService'
+
+// rolId del SuperAdministrador y del Administrador en la UI (authService.js).
+const ROLES_ADMINISTRADOR = [1, 2]
 
 // Catálogo de variables eléctricas instantáneas, agrupadas por fase.
-// Cada `medida` tiene un id único (usado para el estado de selección),
-// un título, un valor de ejemplo y su unidad. Los `null` representan
-// espacios vacíos en la grilla (para mantener alineadas las columnas).
+// `tag` es el Tag del punto en PuntosIO (grupo funcional 1). Los `null`
+// representan espacios vacíos en la grilla (para mantener alineadas las columnas).
 const FASES = [
   {
     id: 'faseA',
     etiqueta: 'Fase A',
     medidas: [
-      { id: 'va', titulo: 'VA (Fase A - RMS)', valor: '120.5', unidad: 'V' },
-      { id: 'ia', titulo: 'IA (Fase A - RMS)', valor: '4.230', unidad: 'A' },
-      { id: 'pa', titulo: 'Potencia activa A', valor: '0.510', unidad: 'kW' },
-      { id: 'qa', titulo: 'Potencia reactiva A', valor: '0.120', unidad: 'kVAR' },
-      { id: 'sa', titulo: 'Potencia aparente A', valor: '0.524', unidad: 'kVA' },
-      { id: 'fpa', titulo: 'Factor de potencia A', valor: '0.973', unidad: '—' },
+      { tag: 'VA', titulo: 'VA (Fase A - RMS)', unidad: 'V' },
+      { tag: 'IA', titulo: 'IA (Fase A - RMS)', unidad: 'A' },
+      { tag: 'PA', titulo: 'Potencia activa A', unidad: 'kW' },
+      { tag: 'PRA', titulo: 'Potencia reactiva A', unidad: 'kVAR' },
+      { tag: 'PAA', titulo: 'Potencia aparente A', unidad: 'kVA' },
+      { tag: 'FPA', titulo: 'Factor de potencia A', unidad: '—' },
     ],
   },
   {
     id: 'faseB',
     etiqueta: 'Fase B',
     medidas: [
-      { id: 'vb', titulo: 'VB (Fase B - RMS)', valor: '119.8', unidad: 'V' },
-      { id: 'ib', titulo: 'IB (Fase B - RMS)', valor: '4.185', unidad: 'A' },
-      { id: 'pb', titulo: 'Potencia activa B', valor: '0.501', unidad: 'kW' },
-      { id: 'qb', titulo: 'Potencia reactiva B', valor: '0.115', unidad: 'kVAR' },
-      { id: 'sb', titulo: 'Potencia aparente B', valor: '0.514', unidad: 'kVA' },
-      { id: 'fpb', titulo: 'Factor de potencia B', valor: '0.975', unidad: '—' },
+      { tag: 'VB', titulo: 'VB (Fase B - RMS)', unidad: 'V' },
+      { tag: 'IB', titulo: 'IB (Fase B - RMS)', unidad: 'A' },
+      { tag: 'PB', titulo: 'Potencia activa B', unidad: 'kW' },
+      { tag: 'PRB', titulo: 'Potencia reactiva B', unidad: 'kVAR' },
+      { tag: 'PAB', titulo: 'Potencia aparente B', unidad: 'kVA' },
+      { tag: 'FPB', titulo: 'Factor de potencia B', unidad: '—' },
     ],
   },
   {
     id: 'faseC',
     etiqueta: 'Fase C',
     medidas: [
-      { id: 'vc', titulo: 'VC (Fase C - RMS)', valor: '121.1', unidad: 'V' },
-      { id: 'ic', titulo: 'IC (Fase C - RMS)', valor: '4.267', unidad: 'A' },
-      { id: 'pc', titulo: 'Potencia activa C', valor: '0.517', unidad: 'kW' },
-      { id: 'qc', titulo: 'Potencia reactiva C', valor: '0.122', unidad: 'kVAR' },
-      { id: 'sc', titulo: 'Potencia aparente C', valor: '0.531', unidad: 'kVA' },
-      { id: 'fpc', titulo: 'Factor de potencia C', valor: '0.972', unidad: '—' },
+      { tag: 'VC', titulo: 'VC (Fase C - RMS)', unidad: 'V' },
+      { tag: 'IC', titulo: 'IC (Fase C - RMS)', unidad: 'A' },
+      { tag: 'PC', titulo: 'Potencia activa C', unidad: 'kW' },
+      { tag: 'PRC', titulo: 'Potencia reactiva C', unidad: 'kVAR' },
+      { tag: 'PAC', titulo: 'Potencia aparente C', unidad: 'kVA' },
+      { tag: 'FPC', titulo: 'Factor de potencia C', unidad: '—' },
     ],
   },
   {
     id: 'promedios',
     etiqueta: 'Promedios',
     medidas: [
-      { id: 'vprom', titulo: 'V Promedio', valor: '120.5', unidad: 'V' },
-      { id: 'iprom', titulo: 'I Promedio', valor: '4.227', unidad: 'A' },
-      { id: 'pprom', titulo: 'Potencia activa prom.', valor: '0.509', unidad: 'kW' },
-      { id: 'qprom', titulo: 'Potencia reactiva prom.', valor: '0.119', unidad: 'kVAR' },
-      { id: 'sprom', titulo: 'Potencia aparente prom.', valor: '0.523', unidad: 'kVA' },
-      { id: 'fpprom', titulo: 'Factor de potencia prom.', valor: '0.973', unidad: '—' },
+      { tag: 'Vprom', titulo: 'V Promedio', unidad: 'V' },
+      { tag: 'Iprom', titulo: 'I Promedio', unidad: 'A' },
+      { tag: 'Pprom', titulo: 'Potencia activa prom.', unidad: 'kW' },
+      { tag: 'PRprom', titulo: 'Potencia reactiva prom.', unidad: 'kVAR' },
+      { tag: 'PAprom', titulo: 'Potencia aparente prom.', unidad: 'kVA' },
+      { tag: 'FP3F', titulo: 'Factor de potencia 3F', unidad: '—' },
     ],
   },
   {
     id: 'linea',
     etiqueta: 'Línea y frecuencia',
     medidas: [
-      { id: 'vab', titulo: 'Vab (Línea)', valor: '208.3', unidad: 'V' },
-      { id: 'vbc', titulo: 'Vbc (Línea)', valor: '207.9', unidad: 'V' },
-      { id: 'vca', titulo: 'Vca (Línea)', valor: '208.1', unidad: 'V' },
-      { id: 'frec', titulo: 'Frecuencia', valor: '60.01', unidad: 'Hz' },
+      { tag: 'Vab', titulo: 'Vab (Línea)', unidad: 'V' },
+      { tag: 'Vbc', titulo: 'Vbc (Línea)', unidad: 'V' },
+      { tag: 'Vca', titulo: 'Vca (Línea)', unidad: 'V' },
+      { tag: 'Frec', titulo: 'Frecuencia', unidad: 'Hz' },
       null,
       null,
     ],
   },
 ]
 
-// Lista plana de todos los ids de medidas existentes en FASES (ignorando los
-// espacios vacíos `null`). Se usa para saber si "todas" están seleccionadas
-// y para poder seleccionarlas/deseleccionarlas de una sola vez.
-const TODOS_LOS_IDS = FASES.flatMap((fase) =>
-  fase.medidas.filter(Boolean).map((medida) => medida.id),
+// Tags del catálogo en minúsculas, para detectar puntos que no están en FASES.
+const TAGS_CATALOGO = new Set(
+  FASES.flatMap((fase) => fase.medidas.filter(Boolean).map((medida) => medida.tag.toLowerCase())),
 )
 
-function TabInstantaneos() {
-  // Conjunto (Set) con los ids de las medidas actualmente marcadas por el usuario.
-  // Se usa Set en lugar de un array para verificar pertenencia (has) de forma eficiente.
-  const [seleccionados, setSeleccionados] = useState(() => new Set())
+// Estilos del mensaje de resultado según el estado de la lectura.
+const CLASES_ESTADO = {
+  enCurso: 'border-blue-200 bg-blue-50 text-blue-700',
+  exito: 'border-green-200 bg-green-50 text-green-700',
+  error: 'border-red-200 bg-red-50 text-red-700',
+}
 
-  // true si absolutamente todas las medidas de la pantalla están seleccionadas;
-  // controla el estado (checked) del checkbox maestro "Seleccionar todos".
-  const todosSeleccionados = TODOS_LOS_IDS.every((id) => seleccionados.has(id))
+// Da formato al valor recibido: números con hasta 3 decimales; sin valor -> "—".
+function formatearValor(valor) {
+  if (valor === null || valor === undefined || valor === '') return '—'
+  const numero = Number(valor)
+  if (Number.isNaN(numero)) return String(valor)
+  return numero.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 3 })
+}
 
-  // Manejador del checkbox "Seleccionar todos": si se marca, selecciona todas
-  // las medidas de golpe; si se desmarca, limpia la selección completa.
-  const alternarTodos = (event) => {
-    setSeleccionados(event.target.checked ? new Set(TODOS_LOS_IDS) : new Set())
-  }
+// Props:
+// - medidor: medidor seleccionado (se usan su id y su dirRed).
+// - usuarioLogueado: usuario autenticado (solo administradores pueden leer).
+function TabInstantaneos({ medidor, usuarioLogueado }) {
+  const esAdmin = ROLES_ADMINISTRADOR.includes(usuarioLogueado?.rolId)
 
-  // Fábrica de manejadores para cada checkbox individual de MonitorMedidaTile:
-  // agrega o quita el id correspondiente del conjunto de seleccionados.
-  const alternarMedida = (id) => (event) => {
-    setSeleccionados((prev) => {
-      const siguiente = new Set(prev)
-      if (event.target.checked) {
-        siguiente.add(id)
-      } else {
-        siguiente.delete(id)
-      }
-      return siguiente
-    })
+  // Puntos de la última lectura exitosa, indexados por tag en minúsculas.
+  const [valoresPorTag, setValoresPorTag] = useState(() => new Map())
+  // Puntos devueltos que no aparecen en el catálogo FASES.
+  const [otrosPuntos, setOtrosPuntos] = useState([])
+  // Hora de la última lectura exitosa.
+  const [ultimaLectura, setUltimaLectura] = useState(null)
+  // estado: null | { tipo: 'enCurso' | 'exito' | 'error', texto }
+  const [estado, setEstado] = useState(null)
+  const controladorRef = useRef(null)
+
+  // Si el usuario sale de la pestaña con una lectura en curso, se cancela.
+  useEffect(() => () => controladorRef.current?.abort(), [])
+
+  const leyendo = estado?.tipo === 'enCurso'
+
+  const solicitar = async () => {
+    controladorRef.current?.abort()
+    const controlador = new AbortController()
+    controladorRef.current = controlador
+
+    setEstado({ tipo: 'enCurso', texto: `Solicitando valores instantáneos al medidor ${medidor.dirRed}…` })
+    try {
+      const { mensaje, puntos } = await solicitarInstantaneos(medidor.id, { signal: controlador.signal })
+      setValoresPorTag(new Map(puntos.map((punto) => [String(punto.tag).toLowerCase(), punto.valor])))
+      setOtrosPuntos(puntos.filter((punto) => !TAGS_CATALOGO.has(String(punto.tag).toLowerCase())))
+      setUltimaLectura(new Date())
+      setEstado({ tipo: 'exito', texto: mensaje })
+    } catch (err) {
+      if (err.name === 'AbortError') return
+      setEstado({ tipo: 'error', texto: err.message })
+    }
   }
 
   return (
     // Contenedor con scroll propio para acomodar todas las secciones de fases.
     <div className="flex-1 overflow-auto bg-gray-50 p-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-6">
-        {/* Encabezado de la vista: título a la izquierda, checkbox maestro a la derecha. */}
-        <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-bold uppercase tracking-wide text-slate-800">
-            Valores instantáneos
-          </h2>
+        {/* Encabezado: título y hora de la última lectura a la izquierda, botón a la derecha. */}
+        <div className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-bold uppercase tracking-wide text-slate-800">
+                Valores instantáneos
+              </h2>
+              <p className="mt-1 text-xs text-slate-500">
+                {ultimaLectura
+                  ? `Última lectura: ${ultimaLectura.toLocaleString('es-MX')}`
+                  : 'Sin lectura. Pulse «Solicitar» para leer los valores del medidor.'}
+              </p>
+            </div>
 
-          {/* Checkbox maestro "Seleccionar todos": marca/desmarca todas las
-              medidas visibles en esta pantalla de una sola vez. */}
-          <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-900">
-            <input
-              type="checkbox"
-              checked={todosSeleccionados}
-              onChange={alternarTodos}
-              className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-            />
-            Seleccionar todos
-          </label>
+            {esAdmin ? (
+              <button
+                type="button"
+                onClick={solicitar}
+                disabled={leyendo || !medidor}
+                className="transform cursor-pointer rounded-lg bg-blue-600 px-8 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {leyendo ? 'Solicitando…' : 'Solicitar'}
+              </button>
+            ) : (
+              <p className="text-sm text-slate-500">
+                Solo el Administrador puede solicitar lecturas al medidor.
+              </p>
+            )}
+          </div>
+
+          {estado && (
+            <div role="status" className={`rounded-md border p-3 text-sm ${CLASES_ESTADO[estado.tipo]}`}>
+              {estado.texto}
+            </div>
+          )}
         </div>
 
         {/* Una sección (tarjeta) por cada fase/grupo de medidas. */}
@@ -164,14 +203,11 @@ function TabInstantaneos() {
               {fase.medidas.map((medida, index) =>
                 medida ? (
                   <MonitorMedidaTile
-                    key={medida.id}
+                    key={medida.tag}
                     titulo={medida.titulo}
-                    valor={medida.valor}
+                    valor={formatearValor(valoresPorTag.get(medida.tag.toLowerCase()))}
                     unidad={medida.unidad}
-                    // Checkbox controlado: su estado viene del Set `seleccionados`
-                    // y sus cambios se notifican mediante `alternarMedida`.
-                    checked={seleccionados.has(medida.id)}
-                    onChange={alternarMedida(medida.id)}
+                    seleccionable={false}
                   />
                 ) : (
                   // Espacio invisible para mantener la alineación de la grilla
@@ -183,26 +219,25 @@ function TabInstantaneos() {
           </section>
         ))}
 
-        {/* Pie de la vista: selector de número de fases + botón de solicitud al medidor. */}
-        <div className="flex items-center justify-end gap-3 px-2 pt-2">
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-900">
-            Fases
-            <input
-              type="number"
-              defaultValue={0}
-              className="w-16 rounded-md border-0 bg-gray-100 px-3 py-1.5 text-center text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-            />
-          </label>
-          {/* Botón "Solicitar": estilo unificado con el resto de la aplicación.
-              Pendiente de conectar con el WebService para enviar la solicitud
-              de lectura de instantáneos usando las medidas en `seleccionados`. */}
-          <button
-            type="button"
-            className="transform cursor-pointer rounded-lg bg-blue-600 px-8 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md active:scale-95"
-          >
-            Solicitar
-          </button>
-        </div>
+        {/* Puntos del grupo funcional 1 que el catálogo todavía no contempla. */}
+        {otrosPuntos.length > 0 && (
+          <section className="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-black/5">
+            <h3 className="mb-6 text-xs font-semibold uppercase tracking-widest text-gray-900">
+              Otros puntos
+            </h3>
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
+              {otrosPuntos.map((punto) => (
+                <MonitorMedidaTile
+                  key={punto.idPunto}
+                  titulo={punto.tag}
+                  valor={formatearValor(punto.valor)}
+                  unidad=""
+                  seleccionable={false}
+                />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   )
