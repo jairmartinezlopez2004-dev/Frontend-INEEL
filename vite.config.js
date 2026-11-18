@@ -1,5 +1,5 @@
 /**
- * Configuración de Vite para el Visor SISMEDIA-RT.
+ * Configuración de Vite para el visor.
  *
  * Vite es el bundler/servidor de desarrollo del proyecto. Aquí se define:
  * - El plugin de React (soporte JSX, Fast Refresh, etc.).
