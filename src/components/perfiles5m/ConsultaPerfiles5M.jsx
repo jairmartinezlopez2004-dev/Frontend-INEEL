@@ -9,6 +9,9 @@
  * - El usuario elige medidor (agrupado por controlador RF), variable, una o
  *   varias fases (A, B, C), rango de fechas y agrupación (cada 5 minutos, o
  *   promedio por hora, día, semana, mes o mensual del año) y pulsa "Consultar".
+ * - En las variables de energía (kWh, kVARh) la agrupación solo ofrece
+ *   totales (por hora, día, semana, mes o año): se suman los registros de 5
+ *   minutos, sin promedios. Solo se miden en la fase A.
  * - El resultado se muestra como resumen (mínimo, promedio, máximo y, en
  *   variables de energía, total) por fase, una gráfica de ECharts con una
  *   serie por fase (GraficaECharts.jsx) y la tabla de valores con una columna
@@ -31,9 +34,11 @@
  */
 import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import {
-  AGRUPACIONES,
   FASES,
   VARIABLES_5M,
+  agrupacionCompatible,
+  agrupacionesPara,
+  buscarAgrupacion,
   consultarFases,
   formatoValor,
   listarVariables5M,
@@ -56,14 +61,19 @@ const MAX_DIAS_CRUDO = 31
 const MIN_PERIODOS_VENTANA = 4
 
 // Caracteres de la clave del periodo que corresponden a la fecha del evento:
-// 10 = "yyyy-MM-dd", 7 = "yyyy-MM". Por semana no se puede ubicar un evento
-// porque la clave es "año-semana".
-const PREFIJO_FECHA = { crudo: 10, hora: 10, dia: 10, mes: 7, anio: 7 }
-
-// Lecturas de 5 minutos que resume cada periodo, para obtener el total de
-// energía a partir de los promedios (promedio × lecturas). Por semana o mes no
-// se calcula porque el backend no indica cuántos días con datos tiene cada uno.
-const LECTURAS_POR_PERIODO = { crudo: 1, hora: 12, dia: 288 }
+// 10 = "yyyy-MM-dd", 7 = "yyyy-MM", 4 = "yyyy". Por semana no se puede ubicar
+// un evento porque la clave es "año-semana".
+const PREFIJO_FECHA = {
+  crudo: 10,
+  hora: 10,
+  dia: 10,
+  mes: 7,
+  anio: 7,
+  totalHora: 10,
+  totalDia: 10,
+  totalMes: 7,
+  totalAnio: 4,
+}
 
 /** Índices de los periodos que caen en la fecha yyyy-MM-dd (vacío si no se puede ubicar). */
 function indicesDeFecha(fecha, agrupacion, periodos) {
@@ -258,7 +268,9 @@ export default function ConsultaPerfiles5M() {
     }
     setCargando(true)
     setError(null)
-    setConsulta({ ...filtrosConsulta })
+    // Los totales de energía solo existen en la fase A.
+    const { energia } = buscarAgrupacion(filtrosConsulta.agrupacion)
+    setConsulta({ ...filtrosConsulta, ...(energia ? { fases: [1] } : {}) })
   }
 
   const cambiar = (campo, convertir = (v) => v) => (e) => {
@@ -268,12 +280,29 @@ export default function ConsultaPerfiles5M() {
   // Fases en que se mide la variable elegida (1 = solo A).
   const fasesVariable = variables.find((v) => v.id === filtros.idVar5M)?.fases ?? FASES.length
 
-  // Al elegir una variable de una sola fase, solo queda marcada la A.
+  // Agrupaciones que se ofrecen para la variable elegida: con energía solo
+  // aparecen los totales (por hora, día, semana, mes o año). La agrupación
+  // elegida se ajusta a ellas (p. ej. si el catálogo de GET /Vars5M llega
+  // después y la variable resulta ser de energía).
+  const variableElegida = variables.find((v) => v.id === filtros.idVar5M)
+  const agrupacionesVariable = agrupacionesPara(variableElegida)
+  const agrupacionElegida = agrupacionCompatible(filtros.agrupacion, variableElegida)
+
+  // Al elegir una variable de una sola fase, solo queda marcada la A. Si la
+  // agrupación elegida no aplica a la nueva variable, se cambia por su
+  // equivalente (p. ej. "Promedio por día" ↔ "Total por día").
   const cambiarVariable = (e) => {
     const idVar5M = Number(e.target.value)
-    const fases = variables.find((v) => v.id === idVar5M)?.fases ?? FASES.length
-    setFiltros((prev) => ({ ...prev, idVar5M, fases: fases === 1 ? [1] : prev.fases }))
+    const nueva = variables.find((v) => v.id === idVar5M)
+    const fases = nueva?.fases ?? FASES.length
+    setFiltros((prev) => ({
+      ...prev,
+      idVar5M,
+      fases: fases === 1 ? [1] : prev.fases,
+      agrupacion: agrupacionCompatible(prev.agrupacion, nueva),
+    }))
   }
+
 
   // Marca o desmarca una fase; se guardan en orden A, B, C.
   const alternarFase = (id) => (e) => {
@@ -285,7 +314,7 @@ export default function ConsultaPerfiles5M() {
 
   const alEnviar = (e) => {
     e.preventDefault()
-    consultar(filtros)
+    consultar({ ...filtros, agrupacion: agrupacionElegida })
   }
 
   // Datos de la consulta mostrada (no de los filtros que se estén editando).
@@ -295,7 +324,7 @@ export default function ConsultaPerfiles5M() {
   const medidor =
     resultado && controladores.flatMap((c) => c.medidores).find((m) => m.id === resultado.filtros.idMedidor)
   const agrupacion = resultado?.filtros.agrupacion
-  const nombreAgrupacion = resultado && AGRUPACIONES.find((a) => a.id === agrupacion).nombre
+  const nombreAgrupacion = resultado && buscarAgrupacion(agrupacion).nombre
 
   // Tramo visible (la ventana de navegación, o todos los periodos).
   const desde = ventana?.desde ?? 0
@@ -304,11 +333,13 @@ export default function ConsultaPerfiles5M() {
   const periodosVisibles = periodos.slice(desde, hasta + 1)
   const clavesVisibles = new Set(periodosVisibles.map((p) => p.clave))
 
-  // Total solo en variables de energía (kWh, kVARh), donde sumar tiene sentido;
-  // con promedios se multiplica por las lecturas de 5 minutos de cada periodo.
+  // Total solo en variables de energía (kWh, kVARh), donde sumar tiene sentido.
+  // Cada periodo ya es un total real (suma de sus registros de 5 minutos), así
+  // que el total del tramo visible es la suma de los periodos: sin promedios
+  // ni multiplicaciones.
   const esEnergia = unidad.endsWith('h')
-  const lecturasPorPeriodo = esEnergia ? LECTURAS_POR_PERIODO[agrupacion] : undefined
-  const totalDe = (resumen) => (lecturasPorPeriodo && resumen.suma != null ? resumen.suma * lecturasPorPeriodo : null)
+  const conTotal = Boolean(resultado && buscarAgrupacion(agrupacion).energia)
+  const totalDe = (resumen) => (conTotal ? resumen.suma : null)
 
   // Una serie por fase consultada: nombre, color, valores por periodo y
   // resumen del tramo visible.
@@ -326,7 +357,7 @@ export default function ConsultaPerfiles5M() {
     }
   })
   const variasFases = series.length > 1
-  const totalFases = lecturasPorPeriodo ? series.reduce((suma, s) => suma + (s.resumen.total ?? 0), 0) : null
+  const totalFases = conTotal ? series.reduce((suma, s) => suma + (s.resumen.total ?? 0), 0) : null
 
   // Eventos registrados del medidor consultado dentro del rango de fechas, con
   // los periodos de la gráfica que abarca su día (vacío si no se puede ubicar).
@@ -459,13 +490,13 @@ export default function ConsultaPerfiles5M() {
               desde={filtros.fechaInicio}
               hasta={filtros.fechaFin}
               onCambiar={(fechaInicio, fechaFin) => setFiltros((prev) => ({ ...prev, fechaInicio, fechaFin }))}
-              maxDias={filtros.agrupacion === 'crudo' ? MAX_DIAS_CRUDO : undefined}
+              maxDias={agrupacionElegida === 'crudo' ? MAX_DIAS_CRUDO : undefined}
             />
           </div>
           <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
             Agrupación
-            <select value={filtros.agrupacion} onChange={cambiar('agrupacion')} className={claseControl()}>
-              {AGRUPACIONES.map((a) => (
+            <select value={agrupacionElegida} onChange={cambiar('agrupacion')} className={claseControl()}>
+              {agrupacionesVariable.map((a) => (
                 <option key={a.id} value={a.id}>
                   {a.nombre}
                 </option>
@@ -526,7 +557,7 @@ export default function ConsultaPerfiles5M() {
                     <th scope="col" className={`${CLASE_TH} pl-0 text-left`}>
                       Fase
                     </th>
-                    {['Mínimo', 'Promedio', 'Máximo', ...(lecturasPorPeriodo ? ['Total'] : [])].map((titulo) => (
+                    {['Mínimo', 'Promedio', 'Máximo', ...(conTotal ? ['Total'] : [])].map((titulo) => (
                       <th key={titulo} scope="col" className={`${CLASE_TH} text-right`}>
                         {titulo} {unidad && `(${unidad})`}
                       </th>
@@ -546,7 +577,7 @@ export default function ConsultaPerfiles5M() {
                         s.resumen.minimo,
                         s.resumen.promedio,
                         s.resumen.maximo,
-                        ...(lecturasPorPeriodo ? [s.resumen.total] : []),
+                        ...(conTotal ? [s.resumen.total] : []),
                       ].map((v, i) => (
                         <td key={i} className="px-4 py-2 text-right font-mono text-slate-900">
                           {formatoValor(v)}
@@ -556,7 +587,7 @@ export default function ConsultaPerfiles5M() {
                   ))}
                 </tbody>
                 {/* Total de las fases juntas (solo energía). */}
-                {lecturasPorPeriodo && (
+                {conTotal && (
                   <tfoot>
                     <tr className="border-t border-slate-300">
                       <th scope="row" colSpan={4} className="py-2 pr-4 text-left font-semibold text-slate-900">
@@ -571,21 +602,14 @@ export default function ConsultaPerfiles5M() {
               </table>
             ) : (
               <div
-                className={`mb-6 grid grid-cols-1 gap-3 ${lecturasPorPeriodo ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-3'}`}
+                className={`mb-6 grid grid-cols-1 gap-3 ${conTotal ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-3'}`}
               >
                 <DatoResumen etiqueta="Mínimo" valor={series[0].resumen.minimo} unidad={unidad} />
                 <DatoResumen etiqueta="Promedio" valor={series[0].resumen.promedio} unidad={unidad} />
                 <DatoResumen etiqueta="Máximo" valor={series[0].resumen.maximo} unidad={unidad} />
-                {lecturasPorPeriodo && <DatoResumen etiqueta="Total" valor={series[0].resumen.total} unidad={unidad} />}
+                {conTotal && <DatoResumen etiqueta="Total" valor={series[0].resumen.total} unidad={unidad} />}
               </div>
             )}
-            {/* Por qué no hay total en energía agrupada por semana, mes o año. */}
-            {esEnergia && !lecturasPorPeriodo && (
-              <p className="-mt-4 mb-6 text-xs text-slate-500">
-                El total de energía se muestra al agrupar cada 5 minutos, por hora o por día.
-              </p>
-            )}
-
             {/* Tramo visible o, sin zoom, cómo acercarse (el zoom se maneja en la gráfica). */}
             <p className="mb-3 text-xs text-slate-500">
               {ventana
@@ -660,7 +684,7 @@ export default function ConsultaPerfiles5M() {
                             </button>
                           ) : (
                             <span className="text-xs text-slate-400">
-                              {agrupacion === 'semana' ? 'No se ubica por semana' : 'Sin mediciones ese día'}
+                              {agrupacion === 'semana' || agrupacion === 'totalSemana' ? 'No se ubica por semana' : 'Sin mediciones ese día'}
                             </span>
                           )}
                         </td>
