@@ -33,6 +33,18 @@ const VALIDADORES = {
 // edo = false (Services/AuthService.cs).
 const MENSAJE_INACTIVO_BACKEND = 'El usuario está inactivo.';
 
+/**
+ * Aviso que se muestra después de registrarse, según la respuesta del backend
+ * a POST /Auth/register ({ mensaje, usuario }). Si no trae `usuario.edo`, se
+ * usa el `mensaje` del backend tal cual.
+ */
+function avisoDeRegistro(respuesta) {
+  const activa = respuesta?.usuario?.edo;
+  if (activa === false) return 'Cuenta creada. Un administrador debe activarla antes de que puedas iniciar sesión.';
+  if (activa === true) return 'Cuenta creada. Ya puedes iniciar sesión.';
+  return respuesta?.mensaje || 'Cuenta creada.';
+}
+
 export default function Login({ onLoginSuccess }) {
   // Estados para capturar cuenta y contraseña del formulario
   const [cuenta, setCuenta] = useState('');
@@ -54,14 +66,15 @@ export default function Login({ onLoginSuccess }) {
   // Envía las credenciales al WebService (POST /Auth/login). Si son válidas,
   // entrega a App.jsx el usuario ya armado por authService; si no, muestra
   // el mensaje del backend (p. ej. "Correo o Contraseña incorrectos").
-  // Al crear la cuenta se vuelve al Login con el correo escrito. La cuenta
-  // nace inactiva: no puede entrar hasta que un Administrador o
-  // SuperAdministrador la active en Base de datos → Usuarios.
-  const alRegistrarse = (correo) => {
+  // Al crear la cuenta se vuelve al Login con el correo escrito. El aviso
+  // depende de lo que respondió el backend: si la cuenta quedó inactiva
+  // (usuario.edo = false), un Administrador o SuperAdministrador debe
+  // activarla en Base de datos → Usuarios; si quedó activa, ya puede entrar.
+  const alRegistrarse = (correo, respuesta) => {
     setCuenta(correo);
     setClave('');
     setError('');
-    setAviso('Cuenta creada. Un administrador debe activarla antes de que puedas iniciar sesión.');
+    setAviso(avisoDeRegistro(respuesta));
     setVista('login');
   };
 

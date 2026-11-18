@@ -43,7 +43,8 @@ const validadoresPara = (contrasena) => ({
 });
 
 // Props:
-// - onRegistrado: callback con el correo de la cuenta creada.
+// - onRegistrado: callback con el correo de la cuenta creada y la respuesta
+//   del backend ({ mensaje, usuario }), para saber si la cuenta quedó activa.
 // - onCancelar: callback para volver al Login sin registrarse.
 export default function Registro({ onRegistrado, onCancelar }) {
   const [form, setForm] = useState(FORM_VACIO);
@@ -70,12 +71,12 @@ export default function Registro({ onRegistrado, onCancelar }) {
 
     const correo = form.correo.trim();
     try {
-      await registrarCuenta({
+      const respuesta = await registrarCuenta({
         nombreUsuario: form.nombreUsuario.trim(),
         correo,
         contrasena: form.contrasena,
       });
-      onRegistrado(correo);
+      onRegistrado(correo, respuesta);
     } catch (err) {
       setError(err.message);
       setCargando(false);
