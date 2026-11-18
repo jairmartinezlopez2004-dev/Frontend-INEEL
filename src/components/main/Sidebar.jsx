@@ -86,7 +86,7 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
 
         {/* Pie del Menú (Versión) */}
         <div className="border-t border-slate-800 px-6 py-4 text-xs text-slate-500 text-center">
-          v0.1.0 (SISMEDIA-RT)
+          v0.1.0
         </div>
       </div>
     </aside>

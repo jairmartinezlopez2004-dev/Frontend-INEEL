@@ -1,0 +1,10 @@
+{
+  "empresa": {
+    "nombre": "Instituto Nacional de Electricidad y Energías Limpias (INEEL)",
+    "logo": "/logo-ineel-texto.png"
+  },
+  "tituloSistema": "MEDICIÓN CALIDAD DE LA POTENCIA INEEL V1.0.1",
+  "tituloPestana": "Medición Calidad de la Potencia",
+  "iconoPestana": "/favicon-32.png",
+  "piePagina": "Software desarrollado con el apoyo de la Secretaría de Ciencia, Humanidades, Tecnología e Innovación (SECITI), a través del proyecto MADTEC-2025-M-538"
+}

@@ -19,8 +19,7 @@
  */
 import { useState } from 'react'
 import ConfirmDialog from '../common/ConfirmDialog'
-
-const SYSTEM_TITLE = ' MEDICIÓN CALIDAD DE LA POTENCIA INEEL V1.0.1'
+import { obtenerConfiguracion } from '../../config/configuracion'
 
 // Ícono de menú hamburguesa (SVG) usado en el botón de colapsar/expandir el Sidebar.
 function HamburgerIcon() {
@@ -65,6 +64,8 @@ function LogoutIcon() {
 // - onToggleSidebar: callback que App.jsx usa para alternar la visibilidad del Sidebar.
 // - onLogout: callback que App.jsx usa para cerrar la sesión y volver al Login.
 function Header({ currentUser, isSidebarOpen, onToggleSidebar, onLogout }) {
+  // Logo, nombre de la empresa y título del sistema (config.json).
+  const { empresa, tituloSistema } = obtenerConfiguracion()
   // true mientras se muestra la confirmación de "¿Cerrar sesión?".
   const [confirmandoSalida, setConfirmandoSalida] = useState(false)
 
@@ -88,15 +89,15 @@ function Header({ currentUser, isSidebarOpen, onToggleSidebar, onLogout }) {
             por eso se usa h-14 (56 px) en un header de 64 px: el logo visible
             queda en ~48 px, el tamaño habitual en una barra superior. */}
         <img
-          src="/logo-ineel-texto.png"
-          alt="INEEL"
+          src={empresa.logo}
+          alt={empresa.nombre}
           className="h-14 w-auto shrink-0 object-contain"
         />
 
         {/* Título del sistema, oculto en pantallas muy pequeñas para no saturar el header. */}
         <div className="hidden min-w-0 border-l border-gray-200 pl-4 leading-tight sm:block">
           <h1 className="truncate text-sm font-bold uppercase tracking-wide text-slate-800 sm:text-base">
-            {SYSTEM_TITLE}
+            {tituloSistema}
           </h1>
         </div>
       </div>

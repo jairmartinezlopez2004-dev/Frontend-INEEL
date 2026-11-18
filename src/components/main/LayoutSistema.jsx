@@ -18,6 +18,7 @@ import { Outlet } from 'react-router'
 import Header from './Header'
 import Sidebar from './Sidebar'
 import StatusBar from './StatusBar'
+import { obtenerConfiguracion } from '../../config/configuracion'
 
 // Props:
 // - rutaBase: prefijo del tipo de consulta ('/configuracion', '/en-linea', '/perfiles-5m' o '/eventos').
@@ -79,7 +80,7 @@ export default function LayoutSistema({
 
       {/* FOOTER INSTITUCIONAL */}
       <footer className="w-full shrink-0 border-t border-slate-800 bg-slate-900 py-2 text-center text-[11px] font-medium tracking-wide text-slate-400">
-        © 2026 Instituto Nacional de Electricidad y Energías Limpias (INEEL). Visor de Calidad de la Potencia v1.0.1.
+        {obtenerConfiguracion().piePagina}
       </footer>
     </div>
   )

@@ -1,7 +1,7 @@
 /**
  * App.jsx
  * ---------------------------------------------------------------------------
- * Componente raíz del Visor SISMEDIA-RT.
+ * Componente raíz del visor.
  *
  * Rol en el sistema:
  * - Controla el flujo de autenticación: mientras no haya un usuario logueado

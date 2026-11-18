@@ -1,7 +1,7 @@
 /**
  * authService.js
  * ---------------------------------------------------------------------------
- * Autenticación contra el WebService (.NET) del Visor SISMEDIA-RT.
+ * Autenticación contra el WebService (.NET) del visor.
  *
  * Rol en el sistema:
  * - Envía las credenciales a POST /Auth/login y guarda el token JWT en

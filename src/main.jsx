@@ -1,5 +1,5 @@
 /**
- * Punto de entrada de la aplicación (SISMEDIA-RT).
+ * Punto de entrada de la aplicación.
  *
  * Este archivo es el primero que ejecuta el navegador: monta el árbol de
  * componentes de React (empezando por <App />) dentro del elemento
@@ -15,13 +15,18 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 import './index.css'
 import App from './App.jsx'
+import { cargarConfiguracion } from './config/configuracion'
 
 // StrictMode ejecuta ciertas funciones dos veces en desarrollo (no en producción)
 // para ayudar a detectar efectos secundarios impuros; no afecta el comportamiento final.
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </StrictMode>,
-)
+// Primero se lee /config.json (logo, textos e ícono de la empresa) y luego se
+// dibuja la app; cargarConfiguracion() nunca falla (usa valores por defecto).
+cargarConfiguracion().then(() => {
+  createRoot(document.getElementById('root')).render(
+    <StrictMode>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </StrictMode>,
+  )
+})

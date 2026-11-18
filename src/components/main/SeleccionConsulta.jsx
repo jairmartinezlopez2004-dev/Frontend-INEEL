@@ -20,6 +20,7 @@
  */
 import { useState } from 'react'
 import ConfirmDialog from '../common/ConfirmDialog'
+import { obtenerConfiguracion } from '../../config/configuracion'
 
 // Íconos provisionales (SVG de trazo). Se pueden reemplazar por los definitivos
 // cambiando solo estos componentes.
@@ -73,6 +74,8 @@ const OPCIONES = [
 // - onSeleccionar: callback con la ruta de la opción elegida ('/configuracion', '/perfiles-5m', '/en-linea' o '/eventos').
 // - onLogout: callback para cerrar la sesión y volver al Login.
 export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout }) {
+  // Logo, nombre de la empresa y pie de página (config.json).
+  const { empresa, piePagina } = obtenerConfiguracion()
   // true mientras se muestra la confirmación de "¿Cerrar sesión?".
   const [confirmandoSalida, setConfirmandoSalida] = useState(false)
 
@@ -82,7 +85,7 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
           blanco, por eso va sobre una placa blanca. */}
       <header className="flex items-center justify-between gap-4 border-b border-slate-800 px-4 py-3 sm:px-8">
         <div className="rounded-md bg-white px-2 py-1">
-          <img src="/logo-ineel-texto.png" alt="INEEL" className="h-10 w-auto object-contain" />
+          <img src={empresa.logo} alt={empresa.nombre} className="h-10 w-auto object-contain" />
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden text-right leading-tight sm:block">
@@ -138,7 +141,7 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
       </main>
 
       <footer className="border-t border-slate-800 py-2 text-center text-[11px] font-medium tracking-wide text-slate-500">
-        © 2026 Instituto Nacional de Electricidad y Energías Limpias (INEEL). Visor de Calidad de la Potencia v1.0.1.
+        {piePagina}
       </footer>
 
       <ConfirmDialog

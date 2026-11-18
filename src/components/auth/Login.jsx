@@ -1,7 +1,7 @@
 /**
  * Login.jsx
  * ---------------------------------------------------------------------------
- * Pantalla de inicio de sesión del Visor SISMEDIA-RT.
+ * Pantalla de inicio de sesión del visor.
  *
  * Rol en el sistema:
  * Gestiona las credenciales de acceso del usuario y las valida contra el
@@ -19,6 +19,7 @@ import Registro from './Registro';
 import RestablecerContrasena from './RestablecerContrasena';
 import { CLASE_INPUT, CLASE_INPUT_OK, CLASE_INPUT_ERROR } from './clasesAuth';
 import InputContrasena from '../common/InputContrasena';
+import { obtenerConfiguracion } from '../../config/configuracion';
 
 // Reglas de cada campo. La cuenta debe ser un correo (el WebService rechaza
 // con 400 lo que no lo sea); la contraseña solo no debe estar vacía: las
@@ -111,8 +112,8 @@ export default function Login({ onLoginSuccess }) {
         {/* Logotipo Institucional */}
         <div className="text-center mb-8">
           <img
-            src="/logo-ineel-texto.png"
-            alt="Instituto Nacional de Electricidad y Energías Limpias"
+            src={obtenerConfiguracion().empresa.logo}
+            alt={obtenerConfiguracion().empresa.nombre}
             className="h-28 mx-auto object-contain" // 112 px: tamaño habitual de logo en pantallas de acceso
           />
         </div>
@@ -211,11 +212,6 @@ export default function Login({ onLoginSuccess }) {
             </p>
           </>
         )}
-
-        {/* Pie de página corporativo */}
-        <div className="mt-8 text-center text-xs text-gray-400">
-          Sistema de Submedición de Energía Eléctrica (SISMEDIA-RT)
-        </div>
         
       </div>
     </div>
