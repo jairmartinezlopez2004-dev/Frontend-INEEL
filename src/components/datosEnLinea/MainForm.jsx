@@ -60,10 +60,10 @@ function MainForm({ medidor, usuarioLogueado, soloLectura = false }) {
         <TabComunicaciones medidor={medidor} usuarioLogueado={usuarioLogueado} soloLectura={soloLectura} />
       )}
       {activeTab === 'Instantáneos' && <TabInstantaneos medidor={medidor} usuarioLogueado={usuarioLogueado} />}
-      {activeTab === 'Valores 5M' && <TabValores5M />}
-      {activeTab === 'Calidad' && <TabCalidad />}
+      {activeTab === 'Valores 5M' && <TabValores5M medidor={medidor} usuarioLogueado={usuarioLogueado} />}
+      {activeTab === 'Calidad' && <TabCalidad medidor={medidor} usuarioLogueado={usuarioLogueado} />}
       {activeTab === 'Fasores' && <TabFasores />}
-      {activeTab === 'Consumos' && <TabConsumos />}
+      {activeTab === 'Consumos' && <TabConsumos medidor={medidor} usuarioLogueado={usuarioLogueado} />}
       {activeTab === 'Eventos' && <TabEventosMedidor medidor={medidor} />}
       {activeTab === 'Armónicos' && <TabArmonicos />}
       {/* Puntos de ajuste: solo administradores, e ignora `soloLectura` porque siempre modifican. */}

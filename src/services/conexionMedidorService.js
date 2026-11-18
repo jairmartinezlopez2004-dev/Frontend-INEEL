@@ -60,32 +60,47 @@ export async function sincronizarMedidor(idMedidor, { signal } = {}) {
 }
 
 /**
- * Pide al backend los valores instantáneos del medidor: conecta y llama a
- * SolInstT de la DLL con todos los puntos de PuntosIO del grupo funcional 1
- * (IdGF = 1). El frontend no envía la lista de puntos.
+ * Rutas de lectura por grupo funcional (PuntosIO.IdGF) y el método de la DLL
+ * que usa el backend en cada una. Todas reciben { idMedidor } y leen todos
+ * los puntos activos (Edo = 1) del grupo; el frontend no envía la lista.
+ */
+export const GRUPOS_LECTURA = {
+  instantaneos: { idGF: 1, descripcion: 'instantáneos' }, // SolInstT
+  variables5min: { idGF: 2, descripcion: 'variables 5 minutales' }, // SolUV5M
+  consumos: { idGF: 3, descripcion: 'consumos' }, // SolConsumos
+  calidadpotencia: { idGF: 5, descripcion: 'calidad de la potencia' }, // SolCalPot
+}
+
+/**
+ * Pide al backend la lectura en línea de un grupo de puntos del medidor:
+ * conecta y llama al método de la DLL que corresponde al grupo.
  *
- *   POST /ConexionMedidor/instantaneos  { idMedidor }
- *     -> 200 { idMedidor, conectado: true, lecturaExitosa: true, mensaje,
+ *   POST /ConexionMedidor/<grupo>  { idMedidor }
+ *     -> 200 { idMedidor, idGF, conectado: true, lecturaExitosa: true, mensaje,
  *              puntos: [{ idPunto, tag, dirCCEC, dirModbus, valor }] }
- *     -> 503 { idMedidor, conectado, lecturaExitosa: false, mensaje }
+ *     -> 503 { idMedidor, idGF, conectado, lecturaExitosa: false, mensaje }
+ *            no conectó, no leyó, no hay puntos activos o el puerto estuvo
+ *            ocupado más de 30 s (conviene reintentar)
  *     -> 404 { mensaje }  no existe el medidor
  *
  * `valor` es null cuando la DLL no devolvió valor para ese punto.
  *
+ * @param {keyof GRUPOS_LECTURA} grupo - 'instantaneos', 'variables5min', 'consumos' o 'calidadpotencia'.
  * @param {number} idMedidor - Identificador del medidor (MedidorQP.idMedidor).
  * @param {object} [opciones]
  * @param {AbortSignal} [opciones.signal] - Para cancelar si el usuario sale de la vista.
  * @returns {Promise<{ mensaje: string, puntos: Array<{ idPunto: number, tag: string, dirCCEC: number, dirModbus: number, valor: number|null }> }>}
  * @throws {ApiError} Si no se pudo conectar o leer (503) o la petición falló.
  */
-export async function solicitarInstantaneos(idMedidor, { signal } = {}) {
+export async function solicitarLecturaGrupo(grupo, idMedidor, { signal } = {}) {
+  if (!GRUPOS_LECTURA[grupo]) throw new Error(`Grupo de lectura desconocido: ${grupo}`)
   const respuesta = await apiPost(
-    '/ConexionMedidor/instantaneos',
+    `/ConexionMedidor/${grupo}`,
     { idMedidor: Number(idMedidor) },
     { signal },
   )
   return {
-    mensaje: respuesta?.mensaje || 'Lectura de instantáneos completada.',
+    mensaje: respuesta?.mensaje || `Lectura de ${GRUPOS_LECTURA[grupo].descripcion} completada.`,
     puntos: Array.isArray(respuesta?.puntos) ? respuesta.puntos : [],
   }
 }
