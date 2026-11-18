@@ -39,7 +39,7 @@ export default function GestionGruposIO({ tipo, esAdmin }) {
   // Buscador de la tabla: filtra por las columnas visibles (el estado por su texto).
   const filtro = useFiltroTabla(grupos, (g) => [
     g.id,
-    g.nombre,
+    g.nombreVisible,
     g.activo ? 'Activo' : 'Inactivo',
   ])
 
@@ -154,7 +154,7 @@ export default function GestionGruposIO({ tipo, esAdmin }) {
                   <td className="px-4 py-3 font-mono text-slate-700">{grupo.id}</td>
                   {/* Hay registros con nombre vacío en la base de datos; se marcan con un guion. */}
                   <td className="px-4 py-3 text-slate-900">
-                    {grupo.nombre.trim() || <span className="text-slate-400">— (sin nombre)</span>}
+                    {grupo.nombreVisible.trim() || <span className="text-slate-400">— (sin nombre)</span>}
                   </td>
                   <td className="px-4 py-3">
                     <EstadoActivo activo={grupo.activo} />

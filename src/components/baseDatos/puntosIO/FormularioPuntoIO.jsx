@@ -163,7 +163,7 @@ export default function FormularioPuntoIO({
         <CampoFormulario id="puntoIO-idGF" etiqueta="Grupo funcional" error={errorDe('idGF')}>
           <select {...propsDe('idGF')}>
             <option value="">Elige un grupo…</option>
-            <OpcionesCatalogo elementos={gruposFuncionales} />
+            <OpcionesCatalogo elementos={gruposFuncionales} texto={(g) => g.nombreVisible} />
           </select>
         </CampoFormulario>
 

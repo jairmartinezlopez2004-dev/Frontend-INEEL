@@ -26,7 +26,7 @@ export const TIPOS_GRUPO = {
     campoId: 'idGF',
     titulo: 'Grupos funcionales IO',
     singular: 'grupo funcional',
-    ejemplo: 'Instantaneos',
+    ejemplo: 'Instantáneos',
   },
   electrico: {
     ruta: '/IO_GrupoElectrico',
@@ -40,9 +40,25 @@ export const TIPOS_GRUPO = {
 // Límite de longitud del nombre (varchar(50) en ambas tablas).
 export const LIMITES = { nombre: 50 }
 
-/** Normaliza un grupo del backend a { id, nombre, activo }. */
+// Nombres de grupos funcionales que en la base de datos están sin acento y
+// cómo se muestran en pantalla (clave en minúsculas). Solo cambia lo que se
+// ve: `nombre` conserva el valor real, que es el que se edita y se guarda.
+const NOMBRES_CON_ACENTO = {
+  instantaneos: 'Instantáneos',
+  armonicos: 'Armónicos',
+  calibracion: 'Calibración',
+}
+
+/**
+ * Normaliza un grupo del backend a { id, nombre, nombreVisible, activo }.
+ * `nombreVisible` es el texto para tablas y selectores (con acentos en los
+ * grupos funcionales); `nombre` es el dato tal como está en la base.
+ */
 function parsearGrupo(campoId, g) {
-  return { id: g[campoId], nombre: g.nombre ?? '', activo: g.edo }
+  const nombre = g.nombre ?? ''
+  const nombreVisible =
+    campoId === TIPOS_GRUPO.funcional.campoId ? (NOMBRES_CON_ACENTO[nombre.trim().toLowerCase()] ?? nombre) : nombre
+  return { id: g[campoId], nombre, nombreVisible, activo: g.edo }
 }
 
 /** Cuerpo que esperan el POST y el PUT. */

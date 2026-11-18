@@ -62,7 +62,7 @@ export default function FormularioGrupoIO({ tipo, grupo, onGuardado, onCancelar 
     // noValidate desactiva los globos del navegador: se valida con VALIDADORES.
     <form noValidate onSubmit={guardar} className="border-b border-slate-200 bg-slate-50 px-6 py-5">
       <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-800">
-        {esEdicion ? `Editar ${singular}: ${grupo.nombre || `#${grupo.id}`}` : `Nuevo ${singular}`}
+        {esEdicion ? `Editar ${singular}: ${grupo.nombreVisible || `#${grupo.id}`}` : `Nuevo ${singular}`}
       </h3>
 
       {error && (

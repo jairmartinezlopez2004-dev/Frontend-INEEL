@@ -40,7 +40,7 @@ const COLUMNAS = [
 ]
 
 /** Nombre del elemento del catálogo con ese id, o "#id" si no está o no tiene nombre. */
-function nombreEn(catalogo, id, texto = (e) => e.nombre) {
+function nombreEn(catalogo, id, texto = (e) => e.nombreVisible ?? e.nombre) {
   const elemento = catalogo.find((e) => e.id === id)
   return (elemento && texto(elemento).trim()) || `#${id}`
 }
