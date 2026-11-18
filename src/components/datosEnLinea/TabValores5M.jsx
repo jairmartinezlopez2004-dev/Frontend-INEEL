@@ -62,9 +62,9 @@ const FILAS = [
     id: 'factor-potencia',
     etiqueta: 'Factor de potencia',
     medidas: [
-      { tag: 'UV5M_FPA', titulo: 'FPA', unidad: '—' },
-      { tag: 'UV5M_FPB', titulo: 'FPB', unidad: '—' },
-      { tag: 'UV5M_FPC', titulo: 'FPC', unidad: '—' },
+      { tag: 'UV5M_FPA', titulo: 'FPA', unidad: '(-)' },
+      { tag: 'UV5M_FPB', titulo: 'FPB', unidad: '(-)' },
+      { tag: 'UV5M_FPC', titulo: 'FPC', unidad: '(-)' },
       null,
       null,
       null,

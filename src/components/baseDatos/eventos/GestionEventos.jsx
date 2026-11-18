@@ -14,7 +14,7 @@
  */
 import { useEffect, useState } from 'react'
 import { listarEventos } from '../../../services/eventosConfigService'
-import { listarUnidades, textoUnidad } from '../../../services/unidadesService'
+import { listarUnidades, textoUnidad, claseCeldaUnidad } from '../../../services/unidadesService'
 import FormularioEvento from './FormularioEvento'
 import EstadoActivo from '../../common/EstadoActivo'
 import { useFiltroTabla } from '../../../hooks/useFiltroTabla'
@@ -167,7 +167,9 @@ export default function GestionEventos({ esAdmin }) {
                 <tr key={evento.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-mono text-slate-700">{evento.numEvento}</td>
                   <td className="px-4 py-3 text-slate-900">{evento.descripcion}</td>
-                  <td className="px-4 py-3 text-slate-700">{unidadDe(evento.idUnidad)}</td>
+                  <td className={`px-4 py-3 text-slate-700 ${claseCeldaUnidad(unidadDe(evento.idUnidad))}`}>
+                    {unidadDe(evento.idUnidad)}
+                  </td>
                   <td className="px-4 py-3">
                     <EstadoActivo activo={evento.activo} />
                   </td>

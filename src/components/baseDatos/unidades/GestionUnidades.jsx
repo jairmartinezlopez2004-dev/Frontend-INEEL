@@ -12,7 +12,7 @@
  *   inactiva (edo = false).
  */
 import { useEffect, useState } from 'react'
-import { listarUnidades } from '../../../services/unidadesService'
+import { listarUnidades, SIN_UNIDAD, nombreVisible, claseCeldaUnidad } from '../../../services/unidadesService'
 import FormularioUnidad from './FormularioUnidad'
 import EstadoActivo from '../../common/EstadoActivo'
 import { useFiltroTabla } from '../../../hooks/useFiltroTabla'
@@ -36,8 +36,8 @@ export default function GestionUnidades({ esAdmin }) {
   // Buscador de la tabla: filtra por las columnas visibles (el estado por su texto).
   const filtro = useFiltroTabla(unidades, (u) => [
     u.id,
-    u.simbolo,
-    u.nombre,
+    u.simbolo || SIN_UNIDAD,
+    nombreVisible(u),
     u.activa ? 'Activa' : 'Inactiva',
   ])
 
@@ -149,10 +149,12 @@ export default function GestionUnidades({ esAdmin }) {
               {filtro.filtradas.map((unidad) => (
                 <tr key={unidad.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-mono text-slate-700">{unidad.id}</td>
-                  <td className="px-4 py-3 font-mono text-slate-900">
-                    {unidad.simbolo || <span className="text-slate-400">—</span>}
+                  <td className={`px-4 py-3 font-mono text-slate-900 ${unidad.simbolo ? '' : 'text-center'}`}>
+                    {unidad.simbolo || <span className="text-slate-400">{SIN_UNIDAD}</span>}
                   </td>
-                  <td className="px-4 py-3 text-slate-900">{unidad.nombre}</td>
+                  <td className={`px-4 py-3 text-slate-900 ${claseCeldaUnidad(nombreVisible(unidad))}`}>
+                    {nombreVisible(unidad)}
+                  </td>
                   <td className="px-4 py-3">
                     <EstadoActivo activo={unidad.activa} textoActivo="Activa" textoInactivo="Inactiva" />
                   </td>

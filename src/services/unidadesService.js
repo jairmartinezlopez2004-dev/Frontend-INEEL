@@ -14,6 +14,11 @@
  * y la baja se hace editando la unidad como inactiva. `simbolo` puede venir
  * null en registros ya guardados (por ejemplo, "Sin Unidad (FP)"), pero el
  * backend lo exige en altas y ediciones.
+ *
+ * Las unidades sin símbolo (como la del factor de potencia, "Sin Unidad
+ * (FP)") se muestran en pantalla solo como SIN_UNIDAD ("(-)"), centrado en
+ * las tablas (ver claseCeldaUnidad); el nombre real
+ * se conserva en la base de datos y en el formulario de edición.
  */
 import { apiGet, apiPost, apiPut } from './api'
 
@@ -38,12 +43,25 @@ function aCuerpo({ simbolo, nombre, activa }) {
   return { simbolo: simbolo.trim(), nombre: nombre.trim(), edo: activa }
 }
 
+// Texto que se muestra en lugar de una unidad sin símbolo.
+export const SIN_UNIDAD = '(-)'
+
+/** Clase extra para la celda de una tabla: centra el texto cuando es SIN_UNIDAD. */
+export function claseCeldaUnidad(texto) {
+  return texto === SIN_UNIDAD ? 'text-center' : ''
+}
+
 /**
- * Texto con el que se muestra una unidad: "V – Voltaje", o solo el nombre si
- * no tiene símbolo.
+ * Texto con el que se muestra una unidad: "V – Voltaje", o SIN_UNIDAD si no
+ * tiene símbolo.
  */
 export function textoUnidad(unidad) {
-  return unidad.simbolo ? `${unidad.simbolo} – ${unidad.nombre}` : unidad.nombre
+  return unidad.simbolo ? `${unidad.simbolo} – ${unidad.nombre}` : SIN_UNIDAD
+}
+
+/** Nombre que se muestra en tablas: el real, o SIN_UNIDAD si no tiene símbolo. */
+export function nombreVisible(unidad) {
+  return unidad.simbolo ? unidad.nombre : SIN_UNIDAD
 }
 
 /**

@@ -23,7 +23,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { listarEventos } from '../../services/eventosConfigService'
-import { listarUnidades } from '../../services/unidadesService'
+import { listarUnidades, SIN_UNIDAD, claseCeldaUnidad } from '../../services/unidadesService'
 
 // Columnas ordenables: clave del renglón, encabezado y alineación.
 const COLUMNAS = [
@@ -137,7 +137,7 @@ function TabEventosMedidor({ medidor }) {
     const { signal } = controlador
     Promise.all([listarEventos({ signal }), listarUnidades({ signal })])
       .then(([listaEventos, listaUnidades]) => {
-        const simbolos = new Map(listaUnidades.map((u) => [u.id, u.simbolo || u.nombre]))
+        const simbolos = new Map(listaUnidades.map((u) => [u.id, u.simbolo || SIN_UNIDAD]))
         setCatalogo(
           listaEventos
             .filter((e) => e.activo)
@@ -300,7 +300,7 @@ function TabEventosMedidor({ medidor }) {
                       <td className="px-4 py-2.5 text-right font-mono tabular-nums text-gray-900">
                         {Number.isFinite(e.consumo) ? e.consumo.toFixed(2) : '—'}
                       </td>
-                      <td className="px-4 py-2.5 text-gray-700">{e.unidad}</td>
+                      <td className={`px-4 py-2.5 text-gray-700 ${claseCeldaUnidad(e.unidad)}`}>{e.unidad}</td>
                       <td className="px-4 py-2.5 whitespace-nowrap text-gray-700">{e.fecha}</td>
                       <td className="px-4 py-2.5 whitespace-nowrap text-gray-700">{e.hora}</td>
                       <td className="px-4 py-2.5 text-center">

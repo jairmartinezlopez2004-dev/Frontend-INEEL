@@ -16,7 +16,7 @@
 import { useEffect, useState } from 'react'
 import { listarPuntosIO } from '../../../services/puntosIOService'
 import { listarGrupos } from '../../../services/gruposIOService'
-import { listarUnidades, textoUnidad } from '../../../services/unidadesService'
+import { listarUnidades, textoUnidad, claseCeldaUnidad } from '../../../services/unidadesService'
 import FormularioPuntoIO from './FormularioPuntoIO'
 import EstadoActivo from '../../common/EstadoActivo'
 import { useFiltroTabla } from '../../../hooks/useFiltroTabla'
@@ -192,7 +192,9 @@ export default function GestionPuntosIO({ esSuperAdmin }) {
                   </td>
                   <td className="px-4 py-3 text-slate-700">{nombreEn(catalogos.funcionales, punto.idGF)}</td>
                   <td className="px-4 py-3 text-slate-700">{nombreEn(catalogos.electricos, punto.idGE)}</td>
-                  <td className="px-4 py-3 text-slate-700">
+                  <td
+                    className={`px-4 py-3 text-slate-700 ${claseCeldaUnidad(nombreEn(catalogos.unidades, punto.idUnidad, textoUnidad))}`}
+                  >
                     {nombreEn(catalogos.unidades, punto.idUnidad, textoUnidad)}
                   </td>
                   <td className="px-4 py-3 font-mono text-slate-700">{punto.tipoDato}</td>

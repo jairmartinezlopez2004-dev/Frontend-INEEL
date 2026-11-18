@@ -33,7 +33,7 @@ const FASES = [
       { tag: 'PA', titulo: 'Potencia activa A', unidad: 'kW' },
       { tag: 'PRA', titulo: 'Potencia reactiva A', unidad: 'kVAR' },
       { tag: 'PAA', titulo: 'Potencia aparente A', unidad: 'kVA' },
-      { tag: 'FPA', titulo: 'Factor de potencia A', unidad: '—' },
+      { tag: 'FPA', titulo: 'Factor de potencia A', unidad: '(-)' },
     ],
   },
   {
@@ -45,7 +45,7 @@ const FASES = [
       { tag: 'PB', titulo: 'Potencia activa B', unidad: 'kW' },
       { tag: 'PRB', titulo: 'Potencia reactiva B', unidad: 'kVAR' },
       { tag: 'PAB', titulo: 'Potencia aparente B', unidad: 'kVA' },
-      { tag: 'FPB', titulo: 'Factor de potencia B', unidad: '—' },
+      { tag: 'FPB', titulo: 'Factor de potencia B', unidad: '(-)' },
     ],
   },
   {
@@ -57,7 +57,7 @@ const FASES = [
       { tag: 'PC', titulo: 'Potencia activa C', unidad: 'kW' },
       { tag: 'PRC', titulo: 'Potencia reactiva C', unidad: 'kVAR' },
       { tag: 'PAC', titulo: 'Potencia aparente C', unidad: 'kVA' },
-      { tag: 'FPC', titulo: 'Factor de potencia C', unidad: '—' },
+      { tag: 'FPC', titulo: 'Factor de potencia C', unidad: '(-)' },
     ],
   },
   {
@@ -69,7 +69,7 @@ const FASES = [
       { tag: 'Pprom', titulo: 'Potencia activa prom.', unidad: 'kW' },
       { tag: 'PRprom', titulo: 'Potencia reactiva prom.', unidad: 'kVAR' },
       { tag: 'PAprom', titulo: 'Potencia aparente prom.', unidad: 'kVA' },
-      { tag: 'FP3F', titulo: 'Factor de potencia 3F', unidad: '—' },
+      { tag: 'FP3F', titulo: 'Factor de potencia 3F', unidad: '(-)' },
     ],
   },
   {
