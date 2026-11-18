@@ -7,8 +7,8 @@
  * Al iniciar, main.jsx llama a cargarConfiguracion(), que lee /config.json
  * (public/config.json en el proyecto; en IIS queda junto a index.html) antes
  * de dibujar la aplicación. Los componentes leen los valores con
- * obtenerConfiguracion(): logo y nombre de la empresa (Header, Login,
- * SeleccionConsulta), título del sistema (Header), pie de página
+ * obtenerConfiguracion(): logo y nombre de la empresa y logos adicionales
+ * (Header, Login, SeleccionConsulta), título del sistema (Header), pie de página
  * (LayoutSistema, SeleccionConsulta) y título e ícono de la pestaña.
  *
  * Para otra empresa basta con editar config.json en la carpeta publicada y
@@ -22,12 +22,19 @@ const POR_DEFECTO = {
   empresa: {
     nombre: 'Instituto Nacional de Electricidad y Energías Limpias (INEEL)',
     logo: '/logo-ineel-texto.png',
+    // Logos que se muestran junto al de la empresa: [{ ruta, nombre }].
+    logosAdicionales: [
+      {
+        ruta: '/logo-secihti.svg',
+        nombre: 'Secretaría de Ciencia, Humanidades, Tecnología e Innovación (SECIHTI)',
+      },
+    ],
   },
   tituloSistema: 'MEDICIÓN CALIDAD DE LA POTENCIA INEEL V1.0.1',
   tituloPestana: 'Medición Calidad de la Potencia',
   iconoPestana: '/favicon-32.png',
   piePagina:
-    'Software desarrollado con el apoyo de la Secretaría de Ciencia, Humanidades, Tecnología e Innovación (SECITI), a través del proyecto MADTEC-2025-M-538',
+    'Software desarrollado con el apoyo de la Secretaría de Ciencia, Humanidades, Tecnología e Innovación (SECIHTI), a través del proyecto MADTEC-2025-M-538',
 }
 
 let configuracion = POR_DEFECTO
@@ -37,6 +44,18 @@ function texto(valor, respaldo) {
   return typeof valor === 'string' && valor.trim() !== '' ? valor.trim() : respaldo
 }
 
+/**
+ * Logos adicionales válidos ({ ruta, nombre } con ruta no vacía). Si el campo
+ * no viene en config.json se usan los de por defecto; una lista vacía quita
+ * todos.
+ */
+function logosAdicionales(valor) {
+  if (!Array.isArray(valor)) return POR_DEFECTO.empresa.logosAdicionales
+  return valor
+    .filter((logo) => typeof logo?.ruta === 'string' && logo.ruta.trim() !== '')
+    .map((logo) => ({ ruta: logo.ruta.trim(), nombre: texto(logo.nombre, '') }))
+}
+
 /** Combina lo leído de config.json con los valores por defecto, campo por campo. */
 function combinar(leido) {
   const empresa = leido?.empresa ?? {}
@@ -44,6 +63,7 @@ function combinar(leido) {
     empresa: {
       nombre: texto(empresa.nombre, POR_DEFECTO.empresa.nombre),
       logo: texto(empresa.logo, POR_DEFECTO.empresa.logo),
+      logosAdicionales: logosAdicionales(empresa.logosAdicionales),
     },
     tituloSistema: texto(leido?.tituloSistema, POR_DEFECTO.tituloSistema),
     tituloPestana: texto(leido?.tituloPestana, POR_DEFECTO.tituloPestana),

@@ -20,6 +20,7 @@
 import { useState } from 'react'
 import ConfirmDialog from '../common/ConfirmDialog'
 import { obtenerConfiguracion } from '../../config/configuracion'
+import LogosInstitucionales from '../common/LogosInstitucionales'
 
 // Ícono de menú hamburguesa (SVG) usado en el botón de colapsar/expandir el Sidebar.
 function HamburgerIcon() {
@@ -64,8 +65,8 @@ function LogoutIcon() {
 // - onToggleSidebar: callback que App.jsx usa para alternar la visibilidad del Sidebar.
 // - onLogout: callback que App.jsx usa para cerrar la sesión y volver al Login.
 function Header({ currentUser, isSidebarOpen, onToggleSidebar, onLogout }) {
-  // Logo, nombre de la empresa y título del sistema (config.json).
-  const { empresa, tituloSistema } = obtenerConfiguracion()
+  // Título del sistema (config.json); los logos los pone LogosInstitucionales.
+  const { tituloSistema } = obtenerConfiguracion()
   // true mientras se muestra la confirmación de "¿Cerrar sesión?".
   const [confirmandoSalida, setConfirmandoSalida] = useState(false)
 
@@ -88,11 +89,7 @@ function Header({ currentUser, isSidebarOpen, onToggleSidebar, onLogout }) {
         {/* Logotipo institucional del INEEL. El PNG trae margen blanco alrededor,
             por eso se usa h-14 (56 px) en un header de 64 px: el logo visible
             queda en ~48 px, el tamaño habitual en una barra superior. */}
-        <img
-          src={empresa.logo}
-          alt={empresa.nombre}
-          className="h-14 w-auto shrink-0 object-contain"
-        />
+        <LogosInstitucionales clasePrincipal="h-14" claseAdicional="hidden h-7 md:block" />
 
         {/* Título del sistema, oculto en pantallas muy pequeñas para no saturar el header. */}
         <div className="hidden min-w-0 border-l border-gray-200 pl-4 leading-tight sm:block">

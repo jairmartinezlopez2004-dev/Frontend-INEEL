@@ -19,7 +19,7 @@ import Registro from './Registro';
 import RestablecerContrasena from './RestablecerContrasena';
 import { CLASE_INPUT, CLASE_INPUT_OK, CLASE_INPUT_ERROR } from './clasesAuth';
 import InputContrasena from '../common/InputContrasena';
-import { obtenerConfiguracion } from '../../config/configuracion';
+import LogosInstitucionales from '../common/LogosInstitucionales';
 
 // Reglas de cada campo. La cuenta debe ser un correo (el WebService rechaza
 // con 400 lo que no lo sea); la contraseña solo no debe estar vacía: las
@@ -109,14 +109,10 @@ export default function Login({ onLoginSuccess }) {
     <div className="min-h-screen flex items-center justify-center bg-slate-50">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg border border-gray-200 p-8">
         
-        {/* Logotipo Institucional */}
-        <div className="text-center mb-8">
-          <img
-            src={obtenerConfiguracion().empresa.logo}
-            alt={obtenerConfiguracion().empresa.nombre}
-            className="h-28 mx-auto object-contain" // 112 px: tamaño habitual de logo en pantallas de acceso
-          />
-        </div>
+        {/* Logotipos institucionales (config.json), centrados y apilados: arriba
+            los adicionales (SECIHTI) y debajo el de la empresa (INEEL). Este
+            bloque es común a inicio de sesión, registro y restablecer contraseña. */}
+        <LogosInstitucionales vertical clasePrincipal="h-24" claseAdicional="h-9" className="mb-8" />
 
         {vista === 'registro' ? (
           <Registro onRegistrado={alRegistrarse} onCancelar={() => setVista('login')} />

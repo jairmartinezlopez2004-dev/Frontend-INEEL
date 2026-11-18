@@ -21,6 +21,7 @@
 import { useState } from 'react'
 import ConfirmDialog from '../common/ConfirmDialog'
 import { obtenerConfiguracion } from '../../config/configuracion'
+import LogosInstitucionales from '../common/LogosInstitucionales'
 
 // Íconos provisionales (SVG de trazo). Se pueden reemplazar por los definitivos
 // cambiando solo estos componentes.
@@ -63,7 +64,7 @@ function IconoEventos() {
 // Opciones de consulta. `ruta` = dirección a la que lleva la tarjeta (ver App.jsx);
 // `disponible: false` = aún sin vista (tarjeta deshabilitada).
 const OPCIONES = [
-  { id: 'baseDatos', ruta: '/configuracion', titulo: 'Base de Datos', detalle: '(configuración)', Icono: IconoBaseDatos, disponible: true },
+  { id: 'baseDatos', ruta: '/configuracion', titulo: 'Base de Datos', detalle: '(Configuración)', Icono: IconoBaseDatos, disponible: true },
   { id: 'perfiles5M', ruta: '/perfiles-5m', titulo: 'Perfiles 5 Minutales', Icono: IconoPerfiles, disponible: true },
   { id: 'enLinea', ruta: '/en-linea', titulo: 'Datos en línea', Icono: IconoEnLinea, disponible: true },
   { id: 'eventos', ruta: '/eventos', titulo: 'Eventos registrados', Icono: IconoEventos, disponible: true },
@@ -74,8 +75,8 @@ const OPCIONES = [
 // - onSeleccionar: callback con la ruta de la opción elegida ('/configuracion', '/perfiles-5m', '/en-linea' o '/eventos').
 // - onLogout: callback para cerrar la sesión y volver al Login.
 export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout }) {
-  // Logo, nombre de la empresa y pie de página (config.json).
-  const { empresa, piePagina } = obtenerConfiguracion()
+  // Pie de página (config.json); los logos los pone LogosInstitucionales.
+  const { piePagina } = obtenerConfiguracion()
   // true mientras se muestra la confirmación de "¿Cerrar sesión?".
   const [confirmandoSalida, setConfirmandoSalida] = useState(false)
 
@@ -84,8 +85,8 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
       {/* Barra superior: logotipo, usuario y cerrar sesión. El logo trae fondo
           blanco, por eso va sobre una placa blanca. */}
       <header className="flex items-center justify-between gap-4 border-b border-slate-800 px-4 py-3 sm:px-8">
-        <div className="rounded-md bg-white px-2 py-1">
-          <img src={empresa.logo} alt={empresa.nombre} className="h-10 w-auto object-contain" />
+        <div className="min-w-0 rounded-md bg-white px-2 py-1">
+          <LogosInstitucionales clasePrincipal="h-10" claseAdicional="hidden h-6 sm:block" />
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden text-right leading-tight sm:block">
