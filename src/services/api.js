@@ -12,6 +12,10 @@
  *   (400 validación, 401 sin sesión, 403 sin permiso, 404 no encontrado),
  *   con el detalle en `{ mensaje }` o `{ message }`. Ese mensaje se lanza
  *   como ApiError.
+ * - El usuario final nunca ve rutas, parámetros ni códigos HTTP: si el
+ *   backend no manda un mensaje, o si el error es del servidor (500, 502,
+ *   504) o de red, se muestra un texto comprensible y el detalle técnico se
+ *   deja en la consola del navegador para quien dé soporte.
  *
  * URL base:
  * En desarrollo se usa la ruta relativa "/api", que el proxy de Vite
@@ -26,12 +30,30 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL ?? '/api'
 // Clave de sessionStorage donde authService.js guarda el token JWT del login.
 export const TOKEN_KEY = 'sismedia_token'
 
-// Mensajes por defecto cuando el backend no envía `message`.
+// Mensajes por defecto cuando el backend no envía `mensaje` / `message`.
 const MENSAJES_HTTP = {
+  400: 'Los datos enviados no son válidos. Revísalos e intenta de nuevo.',
   401: 'La sesión expiró o no es válida. Vuelve a iniciar sesión.',
   403: 'No tienes permisos para realizar esta acción.',
-  404: 'El recurso solicitado no existe.',
+  404: 'No se encontró la información solicitada.',
+  503: 'El servicio no está disponible en este momento. Intenta de nuevo en unos minutos.',
 }
+
+// Errores internos del servidor o del proxy: aunque traigan texto, suele ser
+// técnico (o la página de error de ASP.NET en desarrollo), así que siempre se
+// muestra este mensaje.
+const STATUS_ERROR_SERVIDOR = new Set([500, 502, 504])
+const MENSAJE_ERROR_SERVIDOR =
+  'No fue posible completar la operación porque el servidor no respondió correctamente. ' +
+  'Intenta de nuevo en unos minutos; si el problema continúa, avisa al administrador del sistema.'
+
+// Sin conexión con el servidor (red caída, API apagada, CORS).
+const MENSAJE_SIN_CONEXION =
+  'No fue posible conectar con el servidor. Verifica tu conexión e intenta de nuevo.'
+
+// Último recurso para códigos que no tienen mensaje propio.
+const MENSAJE_GENERICO =
+  'Ocurrió un error inesperado. Intenta de nuevo; si el problema continúa, avisa al administrador del sistema.'
 
 /**
  * Error propio de la API: permite distinguir en los componentes un error
@@ -74,7 +96,8 @@ export async function peticion(ruta, { method = 'GET', body, signal } = {}) {
     // Si el componente canceló la petición, se propaga tal cual para que
     // el componente la ignore (no es un error real para el usuario).
     if (err.name === 'AbortError') throw err
-    throw new ApiError('No fue posible conectar con el WebService.')
+    console.error(`[api] Sin conexión: ${method} ${API_BASE_URL}${ruta}`, err)
+    throw new ApiError(MENSAJE_SIN_CONEXION)
   }
 
   // Algunas respuestas (p. ej. 401 de [Authorize]) llegan sin cuerpo.
@@ -87,15 +110,24 @@ export async function peticion(ruta, { method = 'GET', body, signal } = {}) {
   }
 
   if (!res.ok) {
-    // Errores de validación automáticos de ASP.NET: { title, errors: { Campo: [msg] } }
-    const erroresValidacion = datos?.errors && Object.values(datos.errors).flat().join(' ')
-    // El backend manda el detalle en `message` (main) o en `mensaje` (rama pruebas).
-    const mensaje =
-      datos?.mensaje ||
-      datos?.message ||
-      erroresValidacion ||
-      MENSAJES_HTTP[res.status] ||
-      `Error HTTP ${res.status} al consultar ${ruta}.`
+    // Detalle técnico solo para soporte (consola del navegador).
+    const registrar = res.status >= 500 ? console.error : console.warn
+    registrar(`[api] ${method} ${API_BASE_URL}${ruta} -> HTTP ${res.status}`, datos ?? texto)
+
+    let mensaje
+    if (STATUS_ERROR_SERVIDOR.has(res.status)) {
+      mensaje = MENSAJE_ERROR_SERVIDOR
+    } else {
+      // Errores de validación automáticos de ASP.NET: { title, errors: { Campo: [msg] } }
+      const erroresValidacion = datos?.errors && Object.values(datos.errors).flat().join(' ')
+      // El backend manda el detalle en `mensaje` o en `message`.
+      mensaje =
+        datos?.mensaje ||
+        datos?.message ||
+        erroresValidacion ||
+        MENSAJES_HTTP[res.status] ||
+        MENSAJE_GENERICO
+    }
     throw new ApiError(mensaje, { httpStatus: res.status })
   }
 
