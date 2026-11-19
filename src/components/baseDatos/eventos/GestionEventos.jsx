@@ -144,7 +144,7 @@ export default function GestionEventos({ esAdmin }) {
       {!error && eventos.length > 0 && (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200 text-sm">
-            <thead className="bg-azul-700">
+            <thead className="bg-verde-600">
               <tr>
                 {COLUMNAS.map((col) => (
                   <th

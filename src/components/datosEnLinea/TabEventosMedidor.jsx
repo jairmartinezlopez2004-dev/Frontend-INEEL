@@ -256,7 +256,7 @@ function TabEventosMedidor({ medidor }) {
         <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
           <div className="max-h-[60vh] overflow-auto">
             <table className="w-full text-sm">
-              <thead className="sticky top-0 z-10 bg-azul-700 text-xs font-semibold text-white">
+              <thead className="sticky top-0 z-10 bg-verde-600 text-xs font-semibold text-white">
                 <tr>
                   {COLUMNAS.map((c) => (
                     <th key={c.clave} className={`px-4 py-3 ${c.derecha ? 'text-right' : 'text-left'}`}>

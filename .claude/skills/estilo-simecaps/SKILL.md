@@ -26,7 +26,7 @@ Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **
 | Ícono de los títulos, opción activa del menú, subrayado de pestaña activa | verde: `bg-verde-500`, `bg-verde-600`, `border-verde-400` |
 | Menú lateral | **blanco** con borde derecho gris, texto `text-azul-800`, hover `bg-azul-50`; opción activa `bg-verde-600 text-white` |
 | Barra de pestañas del medidor | `bg-azul-800`, texto `text-azul-200`, activa blanca con subrayado verde |
-| Encabezados de tabla | `bg-azul-700` con texto blanco |
+| Encabezados de tabla | **verde** `bg-verde-600` con texto blanco (en todas las tablas) |
 | Barra superior | blanca (por los logos), borde inferior gris fino (la franja verde se probó y no gustó) |
 | Pies y barra de estado | `bg-azul-950`, texto `text-azul-200` |
 | Error | `text-red-600`, `bg-red-50`, `border-red-500` |

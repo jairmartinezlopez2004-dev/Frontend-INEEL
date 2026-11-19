@@ -559,7 +559,7 @@ export default function ConsultaPerfiles5M() {
             {/* Resumen: tarjetas con una fase; tabla por fase con varias. */}
             {variasFases ? (
               <table className="mb-6 w-full text-sm">
-                <thead className="bg-azul-700">
+                <thead className="bg-verde-600">
                   <tr>
                     <th scope="col" className={`${CLASE_TH} text-left`}>
                       Fase
@@ -665,7 +665,7 @@ export default function ConsultaPerfiles5M() {
             {!errorEventos && eventosDelRango.length > 0 && (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-slate-200 text-sm">
-                  <thead className="bg-azul-700">
+                  <thead className="bg-verde-600">
                     <tr>
                       {['Fecha', 'Evento', 'Consumo', ''].map((titulo) => (
                         <th key={titulo} scope="col" className={`${CLASE_TH} text-left`}>
@@ -713,7 +713,7 @@ export default function ConsultaPerfiles5M() {
             </div>
             <div className="max-h-96 overflow-auto">
               <table className="min-w-full divide-y divide-slate-200 text-sm">
-                <thead className="sticky top-0 bg-azul-700">
+                <thead className="sticky top-0 bg-verde-600">
                   <tr>
                     <th scope="col" className={`${CLASE_TH} text-left`}>
                       Periodo
