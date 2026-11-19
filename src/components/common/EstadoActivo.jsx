@@ -13,7 +13,7 @@ export default function EstadoActivo({ activo, textoActivo = 'Activo', textoInac
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase ring-1 ring-inset whitespace-nowrap ${
         activo
-          ? 'bg-green-100 text-green-800 ring-green-600/20'
+          ? 'bg-verde-100 text-verde-800 ring-verde-600/20'
           : 'bg-red-100 text-red-800 ring-red-600/20'
       }`}
     >

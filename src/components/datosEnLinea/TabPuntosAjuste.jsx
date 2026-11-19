@@ -148,19 +148,19 @@ function crearMedidorSimulado() {
 // --------------------------------------------------------------------------
 
 const claseBotonPrimario =
-  'transform cursor-pointer rounded-lg bg-blue-600 px-6 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50'
+  'transform cursor-pointer rounded-lg bg-azul-700 px-6 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-azul-800 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50'
 const claseBotonSecundario =
   'cursor-pointer rounded-lg bg-gray-100 px-6 py-2.5 font-semibold text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
 // Recuadro de solo lectura con el mismo estilo de valor que Instantáneos.
 const claseDisplay =
-  'w-full rounded-md bg-gray-50 px-3 py-2 text-right font-mono text-lg font-semibold tabular-nums text-green-500'
+  'w-full rounded-md bg-gray-50 px-3 py-2 text-right font-mono text-lg font-semibold tabular-nums text-verde-500'
 
 function Mensaje({ mensaje }) {
   if (!mensaje) return null
   return (
     <div
       className={`rounded-lg px-4 py-3 text-sm ${
-        mensaje.tipo === 'error' ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700'
+        mensaje.tipo === 'error' ? 'bg-red-50 text-red-700' : 'bg-verde-50 text-verde-700'
       }`}
     >
       {mensaje.texto}
@@ -176,7 +176,7 @@ function CasillaModificar({ checked, onChange, disabled }) {
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
         disabled={disabled}
-        className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-blue-600"
+        className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-azul-700"
       />
       Modificar valores
     </label>
@@ -385,7 +385,7 @@ function SeccionFecha({ medidor, puedeModificar }) {
           <output className={claseDisplay}>{textoFechaHora(ahora)}</output>
         </div>
         {segundos !== null && (
-          <p className={`text-center text-sm font-medium ${Math.abs(segundos) > 5 ? 'text-amber-700' : 'text-emerald-700'}`}>
+          <p className={`text-center text-sm font-medium ${Math.abs(segundos) > 5 ? 'text-amber-700' : 'text-verde-700'}`}>
             {segundos === 0
               ? 'El reloj del medidor está sincronizado.'
               : `El medidor va ${Math.abs(segundos)} s ${segundos > 0 ? 'adelantado' : 'atrasado'}.`}
@@ -567,7 +567,7 @@ function TabPuntosAjuste({ usuarioLogueado }) {
                 onClick={() => setSeccion(m.id)}
                 className={`cursor-pointer whitespace-nowrap rounded-md border-l-4 px-4 py-2.5 text-left text-sm font-medium transition-colors ${
                   seccion === m.id
-                    ? 'border-blue-600 bg-blue-50 text-blue-700'
+                    ? 'border-azul-700 bg-azul-50 text-azul-800'
                     : 'border-transparent text-slate-900 hover:bg-slate-100'
                 }`}
               >

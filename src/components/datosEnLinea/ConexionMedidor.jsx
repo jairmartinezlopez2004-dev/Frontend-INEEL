@@ -26,8 +26,8 @@ import TituloSeccion from '../common/TituloSeccion'
 
 // Estilos del mensaje de resultado según el estado de la operación.
 const CLASES_ESTADO = {
-  enCurso: 'border-blue-200 bg-blue-50 text-blue-700',
-  exito: 'border-green-200 bg-green-50 text-green-700',
+  enCurso: 'border-azul-200 bg-azul-50 text-azul-800',
+  exito: 'border-verde-200 bg-verde-50 text-verde-700',
   error: 'border-red-200 bg-red-50 text-red-700',
 }
 
@@ -82,7 +82,7 @@ export default function ConexionMedidor({ medidor }) {
           type="button"
           onClick={conectar}
           disabled={enCurso}
-          className={`${CLASES_BOTON} bg-blue-600 hover:bg-blue-700`}
+          className={`${CLASES_BOTON} bg-azul-700 hover:bg-azul-800`}
         >
           <Plug className="h-4 w-4" aria-hidden="true" />
           {enCurso && estado.operacion === 'conectar' ? 'Conectando…' : 'Conectar'}
@@ -92,7 +92,7 @@ export default function ConexionMedidor({ medidor }) {
           type="button"
           onClick={sincronizar}
           disabled={enCurso}
-          className={`${CLASES_BOTON} bg-blue-600 hover:bg-blue-700`}
+          className={`${CLASES_BOTON} bg-azul-700 hover:bg-azul-800`}
         >
           <RefreshCw className={`h-4 w-4 ${enCurso && estado.operacion === 'sincronizar' ? 'animate-spin' : ''}`} aria-hidden="true" />
           {enCurso && estado.operacion === 'sincronizar' ? 'Sincronizando…' : 'Sincronizar'}

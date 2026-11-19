@@ -62,7 +62,7 @@ const OPCIONES = {
 // Clases compartidas por inputs y selects. Las variantes `disabled:` dan el
 // aspecto de "solo lectura" cuando el <fieldset> está deshabilitado.
 const CLASES_CONTROL =
-  'rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500'
+  'rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-azul-600 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500'
 
 // ---------------------------------------------------------------------------
 // Sub-componentes de formulario (controlados)
@@ -101,7 +101,7 @@ function CampoCheckbox({ etiqueta, checked, onChange }) {
         type="checkbox"
         checked={checked}
         onChange={onChange}
-        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed"
+        className="h-4 w-4 rounded border-slate-300 text-azul-700 focus:ring-2 focus:ring-azul-600 disabled:cursor-not-allowed"
       />
       <span className="text-sm font-semibold text-slate-900">{etiqueta}</span>
     </label>
@@ -220,7 +220,7 @@ export default function ConfiguracionComunicaciones({ medidor, usuarioLogueado, 
   // Estilos de la caja de aviso según su tipo.
   const CLASES_AVISO = {
     error: 'border-red-200 bg-red-50 text-red-700',
-    exito: 'border-green-200 bg-green-50 text-green-700',
+    exito: 'border-verde-200 bg-verde-50 text-verde-700',
     info: 'border-amber-200 bg-amber-50 text-amber-800',
   }
 
@@ -246,7 +246,7 @@ export default function ConfiguracionComunicaciones({ medidor, usuarioLogueado, 
               setEditando(true)
               setAviso(null)
             }}
-            className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-blue-600 px-4 py-2 text-sm font-semibold text-blue-600 transition-colors hover:bg-blue-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-azul-700 px-4 py-2 text-sm font-semibold text-azul-700 transition-colors hover:bg-azul-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Pencil className="h-4 w-4" aria-hidden="true" />
             Editar
@@ -375,7 +375,7 @@ export default function ConfiguracionComunicaciones({ medidor, usuarioLogueado, 
           <button
             type="submit"
             disabled={guardando}
-            className="cursor-pointer rounded-lg bg-blue-600 px-6 py-2 font-semibold text-white transition-colors hover:bg-blue-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            className="cursor-pointer rounded-lg bg-azul-700 px-6 py-2 font-semibold text-white transition-colors hover:bg-azul-800 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {guardando ? 'Guardando…' : 'Guardar'}
           </button>

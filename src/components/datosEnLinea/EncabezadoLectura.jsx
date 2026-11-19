@@ -16,8 +16,8 @@ import TituloSeccion from '../common/TituloSeccion'
 
 // Estilos del mensaje de resultado según el estado de la lectura.
 const CLASES_ESTADO = {
-  enCurso: 'border-blue-200 bg-blue-50 text-blue-700',
-  exito: 'border-green-200 bg-green-50 text-green-700',
+  enCurso: 'border-azul-200 bg-azul-50 text-azul-800',
+  exito: 'border-verde-200 bg-verde-50 text-verde-700',
   error: 'border-red-200 bg-red-50 text-red-700',
 }
 
@@ -47,7 +47,7 @@ export default function EncabezadoLectura({ Icono, titulo, lectura, medidor }) {
             type="button"
             onClick={solicitar}
             disabled={leyendo || !medidor}
-            className="inline-flex transform cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex transform cursor-pointer items-center gap-2 rounded-lg bg-azul-700 px-6 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-azul-800 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Download className={`h-4 w-4 ${leyendo ? 'animate-pulse' : ''}`} aria-hidden="true" />
             {leyendo ? 'Solicitando…' : 'Solicitar'}

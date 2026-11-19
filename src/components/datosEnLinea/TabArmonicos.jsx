@@ -59,7 +59,7 @@ function calcularThd(valores) {
 const horaActual = () => new Date().toLocaleTimeString('es-MX', { hour12: false })
 
 const claseSelect =
-  'w-full rounded-md border-0 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200'
+  'w-full rounded-md border-0 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-azul-200'
 
 function TabArmonicos() {
   // Catálogo de variables: el de respaldo hasta que responda el WebService.
@@ -181,7 +181,7 @@ function TabArmonicos() {
                 onClick={solicitar}
                 disabled={!variable}
                 title={variable ? undefined : 'Seleccione una variable'}
-                className="transform cursor-pointer rounded-lg bg-blue-600 px-6 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                className="transform cursor-pointer rounded-lg bg-azul-700 px-6 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-azul-800 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Solicitar
               </button>
@@ -189,7 +189,7 @@ function TabArmonicos() {
                 type="button"
                 onClick={() => setVista('grafico')}
                 disabled={!hayDatos}
-                className="transform cursor-pointer rounded-lg bg-blue-600 px-6 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                className="transform cursor-pointer rounded-lg bg-azul-700 px-6 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-azul-800 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Graficar
               </button>
@@ -209,8 +209,8 @@ function TabArmonicos() {
                   onClick={() => setVista(t.id)}
                   className={`rounded-t-md border-b-2 px-4 py-2 text-sm font-medium transition-all cursor-pointer ${
                     vista === t.id
-                      ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                      ? 'border-azul-700 text-azul-700'
+                      : 'border-transparent text-gray-700 hover:bg-azul-50 hover:text-azul-700'
                   }`}
                 >
                   {t.texto}
@@ -228,7 +228,7 @@ function TabArmonicos() {
                     </h3>
                     <div className="overflow-x-auto rounded-lg ring-1 ring-gray-200">
                       <table className="w-full text-sm">
-                        <thead className="bg-blue-50 text-xs font-semibold text-blue-900">
+                        <thead className="bg-azul-700 text-xs font-semibold text-white">
                           <tr>
                             <th className="px-3 py-2 text-left">#</th>
                             <th className="px-3 py-2 text-left">Hora</th>
@@ -292,7 +292,7 @@ function TabArmonicos() {
                           type="checkbox"
                           checked={conFundamental}
                           onChange={(e) => setConFundamental(e.target.checked)}
-                          className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                          className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-azul-700 focus:outline-none focus:ring-2 focus:ring-azul-200"
                         />
                         Mostrar fundamental (A1)
                       </label>

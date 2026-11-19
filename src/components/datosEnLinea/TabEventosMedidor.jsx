@@ -246,7 +246,7 @@ function TabEventosMedidor({ medidor }) {
         {(errorCatalogo || mensaje) && (
           <div
             className={`rounded-lg px-4 py-3 text-sm ${
-              errorCatalogo || mensaje?.tipo === 'error' ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700'
+              errorCatalogo || mensaje?.tipo === 'error' ? 'bg-red-50 text-red-700' : 'bg-verde-50 text-verde-700'
             }`}
           >
             {errorCatalogo || mensaje.texto}
@@ -256,17 +256,17 @@ function TabEventosMedidor({ medidor }) {
         <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
           <div className="max-h-[60vh] overflow-auto">
             <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-blue-50 text-xs font-semibold text-blue-900">
+              <thead className="sticky top-0 z-10 bg-azul-700 text-xs font-semibold text-white">
                 <tr>
                   {COLUMNAS.map((c) => (
                     <th key={c.clave} className={`px-4 py-3 ${c.derecha ? 'text-right' : 'text-left'}`}>
                       <button
                         type="button"
                         onClick={() => ordenarPor(c.clave)}
-                        className="inline-flex cursor-pointer items-center gap-1 hover:text-blue-600"
+                        className="inline-flex cursor-pointer items-center gap-1 hover:text-azul-700"
                       >
                         {c.titulo}
-                        <span className="w-2 text-blue-600">
+                        <span className="w-2 text-azul-700">
                           {orden.clave === c.clave ? (orden.descendente ? '▼' : '▲') : ''}
                         </span>
                       </button>
@@ -281,7 +281,7 @@ function TabEventosMedidor({ medidor }) {
                         disabled={eventos.length === 0}
                         onChange={(e) => setMarcados(e.target.checked ? new Set(eventos.map((ev) => ev.clave)) : new Set())}
                         aria-label="Marcar todos para guardar"
-                        className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-blue-600"
+                        className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-azul-700"
                       />
                     </label>
                   </th>
@@ -311,7 +311,7 @@ function TabEventosMedidor({ medidor }) {
                           checked={marcados.has(e.clave)}
                           onChange={alternarMarcado(e.clave)}
                           aria-label={`Guardar evento ${e.numEvento} del ${e.fecha} ${e.hora}`}
-                          className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-blue-600"
+                          className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-azul-700"
                         />
                       </td>
                     </tr>
@@ -328,7 +328,7 @@ function TabEventosMedidor({ medidor }) {
             onClick={solicitar}
             disabled={catalogo.length === 0}
             title={catalogo.length === 0 ? 'Cargando catálogo de eventos…' : undefined}
-            className="transform cursor-pointer rounded-lg bg-blue-600 px-8 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            className="transform cursor-pointer rounded-lg bg-azul-700 px-8 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-azul-800 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Solicitar
           </button>

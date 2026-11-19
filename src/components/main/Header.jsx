@@ -38,7 +38,7 @@ function Header({ currentUser, isSidebarOpen, onToggleSidebar, onLogout }) {
 
   return (
     // Barra superior fija con logo a la izquierda y perfil de usuario a la derecha (layout tipo Gmail).
-    <header className="z-20 flex h-16 w-full shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 shadow-sm sm:px-6">
+    <header className="z-20 flex h-16 w-full shrink-0 items-center justify-between border-b-4 border-verde-500 bg-white px-4 shadow-sm sm:px-6">
       <div className="flex min-w-0 items-center gap-4">
         {/* Botón que colapsa/expande el menú lateral (Sidebar) mediante onToggleSidebar. */}
         <button
@@ -78,7 +78,7 @@ function Header({ currentUser, isSidebarOpen, onToggleSidebar, onLogout }) {
             <p className="text-xs text-gray-500">{currentUser.rol}</p>
           </div>
           {/* Círculo con las iniciales del usuario (ej. "OM"), calculadas en Login.jsx. */}
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-verde-600 text-sm font-semibold text-white">
             {currentUser.iniciales}
           </div>
         </div>

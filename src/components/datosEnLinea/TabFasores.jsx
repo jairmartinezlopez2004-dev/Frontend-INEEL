@@ -167,8 +167,8 @@ function TabFasores() {
         <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <TituloSeccion Icono={Compass} titulo="Fasores" />
           {adquiriendo && (
-            <span className="flex items-center gap-2 text-sm font-medium text-emerald-600">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
+            <span className="flex items-center gap-2 text-sm font-medium text-verde-600">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-verde-500" />
               Adquiriendo cada {periodo} s
             </span>
           )}
@@ -197,7 +197,7 @@ function TabFasores() {
                     </th>
                     {lectura[fila.clave].map((valor, k) => (
                       <td key={k} className="rounded-md bg-gray-50 px-3 py-2 text-right">
-                        <span className="font-mono text-lg font-semibold text-green-500 tabular-nums">
+                        <span className="font-mono text-lg font-semibold text-verde-500 tabular-nums">
                           {valor.toFixed(fila.decimales)}
                         </span>
                       </td>
@@ -216,7 +216,7 @@ function TabFasores() {
                 value={periodo}
                 disabled={adquiriendo}
                 onChange={(e) => setPeriodo(Math.max(0, Number(e.target.value) || 0))}
-                className="w-20 rounded-md border-0 bg-gray-100 px-3 py-1.5 text-center text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:opacity-60"
+                className="w-20 rounded-md border-0 bg-gray-100 px-3 py-1.5 text-center text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-verde-200 disabled:opacity-60"
               />
             </label>
 
@@ -225,7 +225,7 @@ function TabFasores() {
                 type="button"
                 onClick={solicitar}
                 disabled={adquiriendo}
-                className="transform cursor-pointer rounded-lg bg-blue-600 px-6 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                className="transform cursor-pointer rounded-lg bg-azul-700 px-6 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-azul-800 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Solicitar
               </button>
@@ -252,7 +252,7 @@ function TabFasores() {
             <h3 className="mb-4 text-center text-xs font-semibold uppercase tracking-widest text-slate-600">
               Diagrama fasorial voltaje - corriente
             </h3>
-            <div className="mx-auto aspect-square w-full max-w-xl rounded-xl bg-slate-900 p-2">
+            <div className="mx-auto aspect-square w-full max-w-xl rounded-xl bg-azul-950 p-2">
               <DiagramaFasorial lectura={lectura} />
             </div>
             <div className="mt-3 flex justify-center gap-6 text-xs font-medium text-gray-700">

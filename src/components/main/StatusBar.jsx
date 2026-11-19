@@ -28,11 +28,11 @@ const STATUS_ITEMS = [
 function StatusBar() {
   return (
     // Franja delgada tipo consola, fija en la parte inferior de la aplicación.
-    <footer className="flex h-7 shrink-0 items-center gap-4 overflow-hidden whitespace-nowrap border-t border-slate-700/60 bg-slate-900 px-6 text-[11px] font-medium tracking-wide text-slate-400">
+    <footer className="flex h-7 shrink-0 items-center gap-4 overflow-hidden whitespace-nowrap border-t border-azul-900 bg-azul-950 px-6 text-[11px] font-medium tracking-wide text-azul-200">
       {STATUS_ITEMS.map((item, index) => (
         <span key={item} className="flex items-center gap-4">
           {/* Separador visual "•" entre cada item, excepto antes del primero. */}
-          {index > 0 && <span className="text-slate-600">•</span>}
+          {index > 0 && <span className="text-azul-500">•</span>}
           {item}
         </span>
       ))}

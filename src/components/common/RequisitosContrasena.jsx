@@ -16,7 +16,7 @@ export default function RequisitosContrasena({ valor }) {
       {REQUISITOS_CONTRASENA.map((r) => {
         const cumple = valor !== '' && r.cumple(valor)
         return (
-          <li key={r.texto} className={`flex items-center gap-1.5 ${cumple ? 'text-green-700' : 'text-slate-500'}`}>
+          <li key={r.texto} className={`flex items-center gap-1.5 ${cumple ? 'text-verde-700' : 'text-slate-500'}`}>
             <span aria-hidden="true" className="w-3 text-center font-bold">
               {cumple ? '✓' : '•'}
             </span>

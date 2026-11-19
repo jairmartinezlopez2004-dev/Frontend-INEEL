@@ -47,10 +47,10 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
   const [confirmandoSalida, setConfirmandoSalida] = useState(false)
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 text-slate-800">
+    <div className="flex min-h-screen flex-col bg-azul-50 text-slate-800">
       {/* Barra superior blanca, igual que el Header del sistema: logotipos,
           título, usuario y cerrar sesión. */}
-      <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:px-6">
+      <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b-4 border-verde-500 bg-white px-4 shadow-sm sm:px-6">
         <div className="flex min-w-0 items-center gap-4">
           <LogosInstitucionales clasePrincipal="h-14" claseAdicional="hidden h-7 md:block" />
           <div className="hidden min-w-0 border-l border-gray-200 pl-4 leading-tight lg:block">
@@ -66,7 +66,7 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
             </p>
             <p className="text-xs text-gray-500">{currentUser.rol}</p>
           </div>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-verde-600 text-sm font-semibold text-white">
             {currentUser.iniciales}
           </div>
           <button
@@ -92,11 +92,11 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
               type="button"
               disabled={!disponible}
               onClick={() => onSeleccionar(ruta)}
-              className="group relative flex min-h-56 cursor-pointer flex-col items-center justify-center gap-5 rounded-2xl border border-blue-400 bg-white p-8 text-center shadow-lg shadow-blue-100 transition-transform hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+              className="group relative flex min-h-56 cursor-pointer flex-col items-center justify-center gap-5 rounded-2xl border border-azul-500 bg-white p-8 text-center shadow-lg shadow-azul-100 transition-transform hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-azul-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
             >
               {/* Ícono de la opción. Colores fijos; al pasar el
                   cursor la tarjeta solo se eleva. */}
-              <span className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-white">
+              <span className="flex h-24 w-24 items-center justify-center rounded-full bg-azul-700 text-white">
                 <Icono className="h-12 w-12" strokeWidth={1.5} aria-hidden="true" />
               </span>
               <span className="leading-snug">
@@ -114,7 +114,7 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
       </main>
 
       {/* Pie oscuro, igual que el del resto del sistema (LayoutSistema). */}
-      <footer className="border-t border-slate-800 bg-slate-900 py-2 text-center text-[11px] font-medium tracking-wide text-slate-400">
+      <footer className="border-t border-azul-900 bg-azul-950 py-2 text-center text-[11px] font-medium tracking-wide text-azul-200">
         {piePagina}
       </footer>
 

@@ -7,7 +7,7 @@
 
 const BASE =
   'rounded-md border bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2'
-const NORMAL = 'border-slate-300 focus:ring-blue-500'
+const NORMAL = 'border-slate-300 focus:ring-azul-600'
 const CON_ERROR = 'border-red-500 bg-red-50 focus:ring-red-500'
 
 /** Clases de un control según tenga o no error; `extra` se agrega al final. */

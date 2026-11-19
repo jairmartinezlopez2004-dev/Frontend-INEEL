@@ -71,7 +71,7 @@ export default function LayoutSistema({
         <Sidebar rutaBase={rutaBase} isOpen={isSidebarOpen} esAdmin={esAdmin} rutasVisibles={rutasVisibles} />
 
         {/* CONTENIDO PRINCIPAL: el módulo de la ruta actual. */}
-        <main className="relative flex-1 overflow-y-auto bg-slate-100 p-4 md:p-6">
+        <main className="relative flex-1 overflow-y-auto bg-azul-50 p-4 md:p-6">
           <Outlet />
         </main>
       </div>
@@ -79,7 +79,7 @@ export default function LayoutSistema({
       <StatusBar />
 
       {/* FOOTER INSTITUCIONAL */}
-      <footer className="w-full shrink-0 border-t border-slate-800 bg-slate-900 py-2 text-center text-[11px] font-medium tracking-wide text-slate-400">
+      <footer className="w-full shrink-0 border-t border-azul-900 bg-azul-950 py-2 text-center text-[11px] font-medium tracking-wide text-azul-200">
         {obtenerConfiguracion().piePagina}
       </footer>
     </div>

@@ -115,7 +115,7 @@ export default function GestionEventos({ esAdmin }) {
 
       {/* Mensajes de estado. */}
       {aviso && (
-        <div className="mx-6 mt-4 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+        <div className="mx-6 mt-4 rounded-md border border-verde-200 bg-verde-50 p-3 text-sm text-verde-700">
           {aviso}
         </div>
       )}
@@ -144,13 +144,13 @@ export default function GestionEventos({ esAdmin }) {
       {!error && eventos.length > 0 && (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200 text-sm">
-            <thead className="bg-blue-50">
+            <thead className="bg-azul-700">
               <tr>
                 {COLUMNAS.map((col) => (
                   <th
                     key={col}
                     scope="col"
-                    className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-blue-900"
+                    className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-white"
                   >
                     {col}
                   </th>

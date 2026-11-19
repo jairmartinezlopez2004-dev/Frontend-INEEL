@@ -66,8 +66,8 @@ const ANIOS_ATRAS = 10
 
 // Estilo de las celdas de las cuadrículas de meses y años.
 const CLASE_CELDA =
-  'h-12 cursor-pointer rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:text-slate-300 disabled:hover:bg-transparent'
-const CLASE_CELDA_ACTIVA = 'bg-blue-600 font-semibold text-white hover:bg-blue-700'
+  'h-12 cursor-pointer rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-azul-600 disabled:cursor-not-allowed disabled:text-slate-300 disabled:hover:bg-transparent'
+const CLASE_CELDA_ACTIVA = 'bg-azul-700 font-semibold text-white hover:bg-azul-800'
 const CLASE_CELDA_NORMAL = 'text-slate-700 hover:bg-slate-100'
 
 // Flecha de navegación (‹ o ›) del encabezado del panel.
@@ -98,7 +98,7 @@ function BotonEncabezado({ children, ...props }) {
   return (
     <button
       type="button"
-      className="cursor-pointer rounded-md px-2 py-1 text-sm font-semibold text-slate-900 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+      className="cursor-pointer rounded-md px-2 py-1 text-sm font-semibold text-slate-900 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-azul-600"
       {...props}
     >
       {children}
@@ -125,15 +125,15 @@ const CLASES_CALENDARIO = {
   week: '',
   day: 'p-0 text-center',
   day_button:
-    'mx-auto flex h-9 w-9 cursor-pointer items-center justify-center rounded-md transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:hover:bg-transparent',
-  today: '[&>button]:font-bold [&>button]:text-blue-700',
+    'mx-auto flex h-9 w-9 cursor-pointer items-center justify-center rounded-md transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-azul-600 disabled:cursor-not-allowed disabled:hover:bg-transparent',
+  today: '[&>button]:font-bold [&>button]:text-azul-800',
   outside: '[&>button]:text-slate-300',
   disabled: '[&>button]:text-slate-300',
   selected: '',
   // Extremos en azul fuerte; los días intermedios forman una franja azul clara.
-  range_start: 'rounded-l-md bg-blue-50 [&>button]:bg-blue-600 [&>button]:text-white [&>button]:hover:bg-blue-700',
-  range_end: 'rounded-r-md bg-blue-50 [&>button]:bg-blue-600 [&>button]:text-white [&>button]:hover:bg-blue-700',
-  range_middle: 'bg-blue-50 [&>button]:rounded-none [&>button]:text-blue-900 [&>button]:hover:bg-blue-100',
+  range_start: 'rounded-l-md bg-azul-50 [&>button]:bg-azul-700 [&>button]:text-white [&>button]:hover:bg-azul-800',
+  range_end: 'rounded-r-md bg-azul-50 [&>button]:bg-azul-700 [&>button]:text-white [&>button]:hover:bg-azul-800',
+  range_middle: 'bg-azul-50 [&>button]:rounded-none [&>button]:text-azul-900 [&>button]:hover:bg-azul-100',
 }
 
 // Props:
@@ -243,8 +243,8 @@ export default function SelectorRangoFechas({ desde, hasta, onCambiar, maxDias, 
         onClick={() => (abierto ? cerrar() : abrir())}
         aria-expanded={abierto}
         aria-haspopup="dialog"
-        className={`flex h-[38px] cursor-pointer items-center gap-2 rounded-md border bg-white px-3 text-left text-sm text-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-          abierto ? 'border-blue-500 ring-2 ring-blue-500' : 'border-slate-300 hover:border-slate-400'
+        className={`flex h-[38px] cursor-pointer items-center gap-2 rounded-md border bg-white px-3 text-left text-sm text-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-azul-600 ${
+          abierto ? 'border-azul-600 ring-2 ring-azul-600' : 'border-slate-300 hover:border-slate-400'
         }`}
       >
         {/* Ícono de calendario. */}
@@ -342,7 +342,7 @@ export default function SelectorRangoFechas({ desde, hasta, onCambiar, maxDias, 
                 onDayMouseEnter={(dia) => setDiaHover(dia)}
                 onDayMouseLeave={() => setDiaHover(null)}
                 modifiers={{ vista_previa: vistaPrevia }}
-                modifiersClassNames={{ vista_previa: 'bg-blue-50' }}
+                modifiersClassNames={{ vista_previa: 'bg-azul-50' }}
                 classNames={CLASES_CALENDARIO}
               />
             )}
@@ -409,7 +409,7 @@ export default function SelectorRangoFechas({ desde, hasta, onCambiar, maxDias, 
                 type="button"
                 onClick={() => aplicar(borrador)}
                 disabled={!borrador?.from || !borrador.to}
-                className="cursor-pointer rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="cursor-pointer rounded-md bg-azul-700 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-azul-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Aplicar
               </button>

@@ -18,7 +18,7 @@ export default function BuscadorTabla({
   total,
   visibles,
   placeholder = 'Buscar…',
-  claseFoco = 'focus:ring-blue-500',
+  claseFoco = 'focus:ring-azul-600',
 }) {
   return (
     <div className="flex flex-wrap items-center gap-3 px-6 py-3">

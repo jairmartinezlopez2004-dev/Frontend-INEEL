@@ -17,8 +17,8 @@ import { textoEstadoEquipo } from '../../../services/medidoresService'
 // Clases de Tailwind por estado.
 const CLASES_ESTADO = {
   0: 'bg-red-100 text-red-800 ring-red-600/20',
-  10: 'bg-green-100 text-green-800 ring-green-600/20',
-  11: 'bg-blue-100 text-blue-800 ring-blue-600/20',
+  10: 'bg-verde-100 text-verde-800 ring-verde-600/20',
+  11: 'bg-azul-100 text-azul-900 ring-azul-700/20',
   20: 'bg-amber-100 text-amber-800 ring-amber-600/20',
 }
 

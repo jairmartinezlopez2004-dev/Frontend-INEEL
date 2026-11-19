@@ -17,7 +17,7 @@ import { useEffect, useId, useRef } from 'react'
 // Estilo del botón de confirmar según el tipo de acción.
 const CLASES_TONO = {
   peligro: 'bg-red-600 hover:bg-red-700', // Acciones destructivas (cerrar sesión).
-  primario: 'bg-blue-600 hover:bg-blue-700', // Acciones normales (extender sesión).
+  primario: 'bg-azul-700 hover:bg-azul-800', // Acciones normales (extender sesión).
 }
 
 // Props:
@@ -69,7 +69,7 @@ function ConfirmDialog({
       onCancel={manejarEsc}
       onClick={manejarClicFondo}
       aria-labelledby={idTitulo}
-      className="w-full max-w-sm rounded-xl bg-white p-0 shadow-xl backdrop:bg-slate-900/40"
+      className="w-full max-w-sm rounded-xl bg-white p-0 shadow-xl backdrop:bg-azul-950/40"
     >
       <div className="p-6">
         <h2 id={idTitulo} className="text-base font-semibold text-slate-900">

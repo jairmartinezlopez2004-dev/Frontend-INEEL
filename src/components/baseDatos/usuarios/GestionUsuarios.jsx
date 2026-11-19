@@ -49,7 +49,7 @@ function EstadoUsuario({ activo }) {
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset whitespace-nowrap ${
         activo
-          ? 'bg-green-100 text-green-800 ring-green-600/20'
+          ? 'bg-verde-100 text-verde-800 ring-verde-600/20'
           : 'bg-slate-100 text-slate-600 ring-slate-500/20'
       }`}
     >
@@ -172,7 +172,7 @@ function FormularioUsuario({ usuario, onGuardado, onCancelar, esSuperAdmin }) {
             type="checkbox"
             checked={form.activo}
             onChange={actualizar('activo')}
-            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+            className="h-4 w-4 rounded border-slate-300 text-azul-700 focus:ring-2 focus:ring-azul-600"
           />
           <span className="text-sm font-semibold text-slate-900">
             Activo (desmarcar para dar de baja)
@@ -192,7 +192,7 @@ function FormularioUsuario({ usuario, onGuardado, onCancelar, esSuperAdmin }) {
         <button
           type="submit"
           disabled={guardando}
-          className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="cursor-pointer rounded-lg bg-azul-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-azul-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {guardando ? 'Guardando…' : 'Guardar'}
         </button>
@@ -282,7 +282,7 @@ export default function GestionUsuarios({ esSuperAdmin }) {
 
       {/* Mensajes de estado. */}
       {aviso && (
-        <div className="mx-6 mt-4 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+        <div className="mx-6 mt-4 rounded-md border border-verde-200 bg-verde-50 p-3 text-sm text-verde-700">
           {aviso}
         </div>
       )}
@@ -308,13 +308,13 @@ export default function GestionUsuarios({ esSuperAdmin }) {
       {!formularioAbierto && !error && (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200 text-sm">
-            <thead className="bg-blue-50">
+            <thead className="bg-azul-700">
               <tr>
                 {COLUMNAS.map((col) => (
                   <th
                     key={col}
                     scope="col"
-                    className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-blue-900"
+                    className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-white"
                   >
                     {col}
                   </th>
@@ -336,7 +336,7 @@ export default function GestionUsuarios({ esSuperAdmin }) {
                       <button
                         type="button"
                         onClick={() => abrirFormulario(usuario)}
-                        className="cursor-pointer rounded-md border border-blue-600 px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-600 hover:text-white"
+                        className="cursor-pointer rounded-md border border-azul-700 px-3 py-1.5 text-xs font-semibold text-azul-700 transition-colors hover:bg-azul-700 hover:text-white"
                       >
                         Editar
                       </button>

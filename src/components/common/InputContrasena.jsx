@@ -53,7 +53,7 @@ export default function InputContrasena({ className = '', disabled, ...props }) 
         aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
         aria-pressed={visible}
         title={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-        className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 hover:text-slate-700 focus:outline-none focus-visible:text-blue-600 disabled:opacity-50"
+        className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 hover:text-slate-700 focus:outline-none focus-visible:text-azul-700 disabled:opacity-50"
       >
         {visible ? <IconoOjoTachado /> : <IconoOjo />}
       </button>

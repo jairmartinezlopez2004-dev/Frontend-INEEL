@@ -70,7 +70,7 @@ function DatoResumen({ etiqueta, valor, unidad, detalle }) {
   )
 }
 
-const CLASE_TH = 'whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wide text-blue-900'
+const CLASE_TH = 'whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wide text-white'
 
 export default function EnergiaPorHora() {
   const [controladores, setControladores] = useState([])
@@ -233,7 +233,7 @@ export default function EnergiaPorHora() {
           <button
             type="submit"
             disabled={cargando}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-azul-700 px-6 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-azul-800 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Search className="h-4 w-4" aria-hidden="true" />
             {cargando ? 'Consultando…' : 'Consultar'}
@@ -285,7 +285,7 @@ export default function EnergiaPorHora() {
             <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
               <h3 className="border-b border-slate-200 px-4 py-3 text-sm font-semibold text-slate-900">Total por día</h3>
               <table className="w-full text-sm">
-                <thead className="bg-blue-50 text-left">
+                <thead className="bg-azul-700 text-left">
                   <tr>
                     <th className={CLASE_TH}>Fecha</th>
                     <th className={`${CLASE_TH} text-right`}>Total ({unidad})</th>
@@ -307,7 +307,7 @@ export default function EnergiaPorHora() {
           <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
             <div className="max-h-[480px] overflow-auto">
               <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-blue-50 text-left">
+                <thead className="sticky top-0 bg-azul-700 text-left">
                   <tr>
                     <th className={CLASE_TH}>Fecha</th>
                     <th className={CLASE_TH}>Hora</th>

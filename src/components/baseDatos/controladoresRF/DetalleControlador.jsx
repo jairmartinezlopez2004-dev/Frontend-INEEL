@@ -131,7 +131,7 @@ export default function DetalleControlador({
             Volver a Controladores
           </button>
 
-          {!controlador && cargando && <p className="text-sm text-blue-100">Cargando controlador…</p>}
+          {!controlador && cargando && <p className="text-sm text-azul-100">Cargando controlador…</p>}
 
           {controlador && (
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -198,7 +198,7 @@ export default function DetalleControlador({
           )}
 
           {aviso && (
-            <div className="mx-6 mt-4 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+            <div className="mx-6 mt-4 rounded-md border border-verde-200 bg-verde-50 p-3 text-sm text-verde-700">
               {aviso}
             </div>
           )}
@@ -220,13 +220,13 @@ export default function DetalleControlador({
               {/* Contenedor con scroll horizontal para que la tabla no rompa el layout en pantallas angostas. */}
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-slate-200 text-sm">
-                  <thead className="bg-blue-50">
+                  <thead className="bg-azul-700">
                     <tr>
                       {COLUMNAS.map((col) => (
                         <th
                           key={col}
                           scope="col"
-                          className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-blue-900"
+                          className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-white"
                         >
                           {col}
                         </th>

@@ -13,21 +13,24 @@ Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **
 - Tipografía: **Inter** (`@fontsource-variable/inter`, ya configurada como `font-sans`). No cargar fuentes externas.
 - Textos de marca (logos, título, siglas, leyendas, pie, fondo del login) se leen de `public/config.json` mediante `obtenerConfiguracion()`; nunca se escriben fijos en el código.
 
-## Colores
+## Colores (paleta institucional del INEEL, definida en tailwind.config.js)
+- **azul** (marino del logo, `azul-700` = #2B4A80) y **verde** (hoja del logo, `verde-500` = #63A74A), escalas 50–950. **No usar** `blue-*`, `green-*`, `emerald-*` ni `indigo-*` de Tailwind (salvo los colores de fase A/B/C, que deben coincidir con las gráficas).
+
 | Uso | Clases |
 | --- | --- |
-| Fondo del área de trabajo | `bg-slate-50` |
-| Superficies (barras, tarjetas, tablas, modales) | `bg-white` + `border border-gray-200` |
+| Fondo del área de trabajo | `bg-azul-50` |
+| Superficies (tarjetas, formularios) | `bg-white` + `border border-gray-200` |
 | Texto principal / títulos | `text-slate-800` |
 | Etiquetas de campos | `text-gray-700` (`text-sm font-medium`) |
-| Texto secundario | `text-slate-500` / `text-gray-500` |
-| Acento (acciones, activo, íconos) | azul: `bg-blue-600`, `text-blue-600`, `border-blue-400`, foco `ring-blue-500` |
-| Menú lateral y pies de página | oscuro: `bg-slate-900`, texto `text-slate-400` |
+| Acción principal / acento | `bg-azul-700 hover:bg-azul-800`, foco `ring-azul-600` |
+| Ícono de los títulos, opción activa del menú, subrayado de pestaña activa | verde: `bg-verde-500`, `bg-verde-600`, `border-verde-400` |
+| Menú lateral | `bg-azul-900`, texto `text-azul-100/200` |
+| Barra de pestañas del medidor | `bg-azul-800`, texto `text-azul-200`, activa blanca con subrayado verde |
+| Encabezados de tabla | `bg-azul-700` con texto blanco |
+| Barra superior | blanca (por los logos) con línea inferior `border-b-4 border-verde-500` |
+| Pies y barra de estado | `bg-azul-950`, texto `text-azul-200` |
 | Error | `text-red-600`, `bg-red-50`, `border-red-500` |
-| Éxito | `text-green-700`, `bg-green-50`, `border-green-200` |
-| Avatar del usuario | `bg-indigo-600 text-white` |
-
-No usar fondos oscuros en el área de contenido (se pidió quitar el fondo oscuro de "Datos a Consultar").
+| Éxito | `text-verde-700`, `bg-verde-50`, `border-verde-200` |
 
 ## Componentes
 - **Componentes comunes (úsalos siempre en vez de repetir clases)**:

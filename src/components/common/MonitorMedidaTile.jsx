@@ -50,7 +50,7 @@ function MonitorMedidaTile({ titulo, valor, unidad, checked, onChange, seleccion
       <div className="flex items-center justify-between gap-3">
         {/* Recuadro con el valor numérico de la medida, en fuente monoespaciada. */}
         <div className="min-w-0 flex-1 rounded-md bg-gray-50 px-3 py-2.5">
-          <span className="block truncate font-mono text-2xl font-semibold tracking-tight text-green-500 tabular-nums">
+          <span className="block truncate font-mono text-2xl font-semibold tracking-tight text-verde-500 tabular-nums">
             {valor}
           </span>
         </div>
@@ -63,7 +63,7 @@ function MonitorMedidaTile({ titulo, valor, unidad, checked, onChange, seleccion
             type="checkbox"
             {...(esControlado ? { checked, onChange } : { defaultChecked: false })}
             aria-label={`Incluir ${titulo}`}
-            className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-azul-700 focus:outline-none focus:ring-2 focus:ring-azul-200"
           />
         )}
       </div>

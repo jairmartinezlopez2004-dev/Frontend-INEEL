@@ -67,7 +67,7 @@ function DataTile({ titulo, valor }) {
       <p className="truncate text-center text-[11px] font-semibold uppercase tracking-wide text-slate-600">
         {titulo}
       </p>
-      <p className="mt-2 text-center font-mono text-2xl font-semibold tracking-tight text-green-500 tabular-nums">
+      <p className="mt-2 text-center font-mono text-2xl font-semibold tracking-tight text-verde-500 tabular-nums">
         {valor}
       </p>
     </div>

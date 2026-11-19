@@ -48,7 +48,7 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
     // Menú colapsable: la clase de ancho ("w-64" o "w-0") se anima con transition-[width]
     // para lograr el efecto de expandir/contraer el Sidebar.
     <aside
-      className={`flex shrink-0 overflow-hidden bg-slate-900 text-slate-200 transition-[width] duration-300 ease-in-out ${
+      className={`flex shrink-0 overflow-hidden bg-azul-900 text-azul-100 transition-[width] duration-300 ease-in-out ${
         isOpen ? 'w-64' : 'w-0'
       }`}
     >
@@ -60,7 +60,7 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
           {/* Regresa a la vista principal "¿Consultar datos por medio de?:". */}
           <Link
             to="/"
-            className="mb-3 flex w-full items-center gap-2 rounded-md border border-slate-700 px-3 py-2 text-left text-sm font-medium text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+            className="mb-3 flex w-full items-center gap-2 rounded-md border border-azul-700 px-3 py-2 text-left text-sm font-medium text-azul-100 transition-colors hover:bg-azul-800 hover:text-white"
           >
             <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
             Tipo de consulta
@@ -80,8 +80,8 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
                 // Activa: fondo azul (color de acento del sistema).
                 `flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-blue-600 text-white'
-                    : 'text-slate-400 hover:bg-slate-800/60 hover:text-white'
+                    ? 'bg-verde-600 text-white shadow-sm'
+                    : 'text-azul-200 hover:bg-azul-800 hover:text-white'
                 }`
               }
             >
@@ -92,7 +92,7 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
         </nav>
 
         {/* Pie del Menú (Versión) */}
-        <div className="border-t border-slate-800 px-6 py-4 text-xs text-slate-500 text-center">
+        <div className="border-t border-azul-800 px-6 py-4 text-xs text-azul-300 text-center">
           v0.1.0
         </div>
       </div>

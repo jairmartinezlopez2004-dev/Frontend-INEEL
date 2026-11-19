@@ -31,7 +31,7 @@ function ComsSidebar() {
             key={item}
             className={`whitespace-nowrap rounded-md border-l-4 px-4 py-2.5 text-sm font-medium transition-colors lg:whitespace-normal ${
               isActive
-                ? 'border-blue-600 bg-blue-50 text-blue-700'
+                ? 'border-azul-700 bg-azul-50 text-azul-800'
                 : 'border-transparent text-slate-900 hover:bg-slate-100'
             }`}
           >

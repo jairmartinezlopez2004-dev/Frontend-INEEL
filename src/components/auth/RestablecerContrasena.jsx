@@ -142,7 +142,7 @@ export default function RestablecerContrasena({ correoInicial = '', onRestableci
         <button
           type="submit"
           disabled={cargando}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-md transition-colors shadow-sm disabled:opacity-50"
+          className="w-full bg-azul-700 hover:bg-azul-800 text-white font-medium py-2.5 rounded-md transition-colors shadow-sm disabled:opacity-50"
         >
           {cargando ? 'Guardando...' : 'Cambiar contraseña'}
         </button>
@@ -150,7 +150,7 @@ export default function RestablecerContrasena({ correoInicial = '', onRestableci
 
       <p className="mt-6 text-center text-sm text-gray-600">
         ¿La recordaste?{' '}
-        <button type="button" onClick={onCancelar} className="font-medium text-blue-600 hover:underline">
+        <button type="button" onClick={onCancelar} className="font-medium text-azul-700 hover:underline">
           Inicia sesión
         </button>
       </p>

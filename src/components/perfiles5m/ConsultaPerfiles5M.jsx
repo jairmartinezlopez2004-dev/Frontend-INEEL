@@ -153,7 +153,7 @@ function MuestraFase({ color }) {
 }
 
 const CLASE_TH =
-  'whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wide text-blue-900'
+  'whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wide text-white'
 
 export default function ConsultaPerfiles5M() {
   // Controladores RF con sus medidores, para el selector de medidor.
@@ -475,7 +475,7 @@ export default function ConsultaPerfiles5M() {
                 <label
                   key={f.id}
                   title={f.id > fasesVariable ? 'Esta variable se mide solo en la fase A.' : undefined}
-                  className="flex h-full flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-slate-300 bg-white text-sm text-slate-700 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-500 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-40"
+                  className="flex h-full flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-slate-300 bg-white text-sm text-slate-700 has-[:checked]:border-azul-600 has-[:checked]:bg-azul-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-azul-600 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-40"
                 >
                   <input
                     type="checkbox"
@@ -514,7 +514,7 @@ export default function ConsultaPerfiles5M() {
           <button
             type="submit"
             disabled={cargando}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-azul-700 px-6 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-azul-800 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Search className="h-4 w-4" aria-hidden="true" />
             {cargando ? 'Consultando…' : 'Consultar'}
@@ -559,9 +559,9 @@ export default function ConsultaPerfiles5M() {
             {/* Resumen: tarjetas con una fase; tabla por fase con varias. */}
             {variasFases ? (
               <table className="mb-6 w-full text-sm">
-                <thead>
-                  <tr className="border-b border-slate-200">
-                    <th scope="col" className={`${CLASE_TH} pl-0 text-left`}>
+                <thead className="bg-azul-700">
+                  <tr>
+                    <th scope="col" className={`${CLASE_TH} text-left`}>
                       Fase
                     </th>
                     {['Mínimo', 'Promedio', 'Máximo', ...(conTotal ? ['Total'] : [])].map((titulo) => (
@@ -665,7 +665,7 @@ export default function ConsultaPerfiles5M() {
             {!errorEventos && eventosDelRango.length > 0 && (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-slate-200 text-sm">
-                  <thead className="bg-blue-50">
+                  <thead className="bg-azul-700">
                     <tr>
                       {['Fecha', 'Evento', 'Consumo', ''].map((titulo) => (
                         <th key={titulo} scope="col" className={`${CLASE_TH} text-left`}>
@@ -685,7 +685,7 @@ export default function ConsultaPerfiles5M() {
                             <button
                               type="button"
                               onClick={() => verEvento(e)}
-                              className="cursor-pointer rounded-md border border-blue-600 px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-600 hover:text-white"
+                              className="cursor-pointer rounded-md border border-azul-700 px-3 py-1.5 text-xs font-semibold text-azul-700 transition-colors hover:bg-azul-700 hover:text-white"
                             >
                               Ver en la gráfica
                             </button>
@@ -713,7 +713,7 @@ export default function ConsultaPerfiles5M() {
             </div>
             <div className="max-h-96 overflow-auto">
               <table className="min-w-full divide-y divide-slate-200 text-sm">
-                <thead className="sticky top-0 bg-blue-50">
+                <thead className="sticky top-0 bg-azul-700">
                   <tr>
                     <th scope="col" className={`${CLASE_TH} text-left`}>
                       Periodo

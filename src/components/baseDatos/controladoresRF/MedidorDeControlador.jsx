@@ -47,7 +47,7 @@ export default function MedidorDeControlador({ idControlador, idMedidor, usuario
         <button
           type="button"
           onClick={onVolver}
-          className="mb-3 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
+          className="mb-3 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-azul-700 hover:text-azul-900 hover:underline"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           Volver al controlador

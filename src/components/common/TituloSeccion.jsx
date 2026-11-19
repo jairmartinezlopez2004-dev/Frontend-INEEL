@@ -2,7 +2,7 @@
  * TituloSeccion.jsx
  * ---------------------------------------------------------------------------
  * Título de una sección o tarjeta del sistema con su ícono a la izquierda
- * (círculo azul con el ícono en blanco), para que todas las vistas
+ * (círculo verde con el ícono en blanco), para que todas las vistas
  * (Controladores, Medidores, Unidades, Puntos IO…) se vean iguales.
  *
  * Ver la guía de estilo en .claude/skills/estilo-simecaps.
@@ -22,7 +22,7 @@ export default function TituloSeccion({ Icono, titulo, subtitulo, etiqueta, mayu
       {Icono && (
         <span
           className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-            invertido ? 'bg-white/20 text-white ring-1 ring-white/30' : 'bg-blue-600 text-white shadow-sm shadow-blue-200'
+            invertido ? 'bg-white/20 text-white ring-1 ring-white/30' : 'bg-verde-500 text-white shadow-sm shadow-verde-200'
           }`}
         >
           <Icono className="h-5 w-5" aria-hidden="true" />
@@ -30,7 +30,7 @@ export default function TituloSeccion({ Icono, titulo, subtitulo, etiqueta, mayu
       )}
       <div className="min-w-0 leading-tight">
         {etiqueta && (
-          <p className={`text-xs font-semibold uppercase tracking-wide ${invertido ? 'text-blue-100' : 'text-slate-500'}`}>
+          <p className={`text-xs font-semibold uppercase tracking-wide ${invertido ? 'text-azul-100' : 'text-slate-500'}`}>
             {etiqueta}
           </p>
         )}
@@ -41,7 +41,7 @@ export default function TituloSeccion({ Icono, titulo, subtitulo, etiqueta, mayu
         >
           {titulo}
         </h2>
-        {subtitulo && <p className={`mt-0.5 text-sm ${invertido ? 'text-blue-100' : 'text-slate-500'}`}>{subtitulo}</p>}
+        {subtitulo && <p className={`mt-0.5 text-sm ${invertido ? 'text-azul-100' : 'text-slate-500'}`}>{subtitulo}</p>}
       </div>
     </div>
   )

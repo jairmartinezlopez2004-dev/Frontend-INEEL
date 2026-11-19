@@ -163,7 +163,7 @@ export default function Login({ onLoginSuccess }) {
           <>
             {/* Aviso de cuenta creada */}
             {aviso && (
-              <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-md text-center">
+              <div className="mb-4 p-3 bg-verde-50 border border-verde-200 text-verde-700 text-sm rounded-md text-center">
                 {aviso}
               </div>
             )}
@@ -216,7 +216,7 @@ export default function Login({ onLoginSuccess }) {
                   <button
                     type="button"
                     onClick={() => abrir('restablecer')}
-                    className="ml-auto shrink-0 text-sm font-medium text-blue-600 hover:underline"
+                    className="ml-auto shrink-0 text-sm font-medium text-azul-700 hover:underline"
                   >
                     ¿Olvidaste tu contraseña?
                   </button>
@@ -226,7 +226,7 @@ export default function Login({ onLoginSuccess }) {
               <button
                 type="submit"
                 disabled={cargando}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-md transition-colors shadow-sm disabled:opacity-50"
+                className="w-full bg-azul-700 hover:bg-azul-800 text-white font-medium py-2.5 rounded-md transition-colors shadow-sm disabled:opacity-50"
               >
                 {cargando ? 'Ingresando al sistema...' : 'Iniciar Sesión'}
               </button>
@@ -238,7 +238,7 @@ export default function Login({ onLoginSuccess }) {
               <button
                 type="button"
                 onClick={() => abrir('registro')}
-                className="font-medium text-blue-600 hover:underline"
+                className="font-medium text-azul-700 hover:underline"
               >
                 Regístrate
               </button>

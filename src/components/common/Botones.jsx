@@ -20,7 +20,7 @@ export function BotonPrimario({ Icono = Plus, children, className = '', ...props
   return (
     <button
       type="button"
-      className={`${BASE} rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 active:scale-95 ${className}`}
+      className={`${BASE} rounded-lg bg-azul-700 px-4 py-2 text-sm text-white hover:bg-azul-800 active:scale-95 ${className}`}
       {...props}
     >
       {Icono && <Icono className="h-4 w-4" aria-hidden="true" />}
@@ -63,7 +63,7 @@ export function BotonVer({ children = 'Ver', className = '', ...props }) {
   return (
     <button
       type="button"
-      className={`${BASE} rounded-md border border-blue-600 px-3 py-1.5 text-xs text-blue-600 hover:bg-blue-600 hover:text-white ${className}`}
+      className={`${BASE} rounded-md border border-azul-700 px-3 py-1.5 text-xs text-azul-700 hover:bg-azul-700 hover:text-white ${className}`}
       {...props}
     >
       {children}
