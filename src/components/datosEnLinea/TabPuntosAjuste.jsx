@@ -567,8 +567,8 @@ function TabPuntosAjuste({ usuarioLogueado }) {
                 onClick={() => setSeccion(m.id)}
                 className={`cursor-pointer whitespace-nowrap rounded-md border-l-4 px-4 py-2.5 text-left text-sm font-medium transition-colors ${
                   seccion === m.id
-                    ? 'border-azul-700 bg-azul-50 text-azul-800'
-                    : 'border-transparent text-slate-900 hover:bg-slate-100'
+                    ? 'border-verde-400 bg-white text-azul-800'
+                    : 'border-transparent text-azul-100 hover:bg-azul-800 hover:text-white'
                 }`}
               >
                 {m.texto}

@@ -18,7 +18,7 @@ Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **
 
 | Uso | Clases |
 | --- | --- |
-| Fondo del área de trabajo | `bg-azul-50` |
+| Fondo del área de trabajo | azul marino `bg-azul-900` (mismo tono que el velo de "Datos a Consultar"); todo el contenido va en tarjetas blancas. Lo que quede directo sobre el fondo usa texto claro (`text-azul-100`) y botones verdes |
 | Superficies (tarjetas, formularios) | `bg-white` + `border border-gray-200` |
 | Texto principal / títulos | `text-slate-800` |
 | Etiquetas de campos | `text-gray-700` (`text-sm font-medium`) |

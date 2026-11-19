@@ -328,7 +328,7 @@ function TabEventosMedidor({ medidor }) {
             onClick={solicitar}
             disabled={catalogo.length === 0}
             title={catalogo.length === 0 ? 'Cargando catálogo de eventos…' : undefined}
-            className="transform cursor-pointer rounded-lg bg-azul-700 px-8 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-azul-800 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            className="transform cursor-pointer rounded-lg bg-verde-500 px-8 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-verde-600 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Solicitar
           </button>
