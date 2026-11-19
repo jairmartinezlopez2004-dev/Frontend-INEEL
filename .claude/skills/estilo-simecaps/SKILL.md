@@ -41,7 +41,7 @@ Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **
 - **Pestañas del medidor**: barra blanca con borde; cada pestaña con su ícono; activa con subrayado `border-blue-600 text-blue-600`. El encabezado de cada pestaña de lectura usa `EncabezadoLectura` con el mismo ícono de la pestaña.
 - **Valores de medición**: texto `font-mono tabular-nums` en verde (`text-green-500`), estilo monitor; se mantiene.
 - **Barra superior**: blanca, `h-16 border-b border-gray-200 shadow-sm`, logos con `LogosInstitucionales`, título del sistema en mayúsculas `text-sm font-bold tracking-wide`.
-- **Tarjetas de opción** (pantalla "Datos a Consultar"): `rounded-2xl border border-blue-400 bg-white shadow-lg shadow-blue-100`; círculo del ícono `bg-blue-600 text-white`. Los colores son **fijos**; al pasar el cursor **solo se elevan** (`transition-transform hover:-translate-y-1`), sin cambio de color.
+- **Tarjetas de opción** (pantalla "Datos a Consultar"): fichas **verdes** `rounded-2xl border border-verde-600 bg-verde-500 shadow-lg shadow-verde-200`, texto blanco; círculo del ícono `bg-white text-verde-600`. Los colores son **fijos**; al pasar el cursor **solo se elevan** (`transition-transform hover:-translate-y-1`), sin cambio de color.
 - **Menú lateral**: `bg-slate-900`; opción activa `bg-blue-600 text-white`; cada opción con su ícono Lucide `h-4 w-4`.
 - **Inputs**: usar `claseControl()` de `components/common/clasesFormulario.js` (o `clasesAuth.js` en las pantallas de acceso). No repetir clases a mano.
 - **Botón primario**: `bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 text-sm font-medium`. Secundario: borde `border-gray-300 text-slate-700 hover:bg-slate-50`. Peligro: rojo solo al confirmar.

@@ -92,16 +92,16 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
               type="button"
               disabled={!disponible}
               onClick={() => onSeleccionar(ruta)}
-              className="group relative flex min-h-56 cursor-pointer flex-col items-center justify-center gap-5 rounded-2xl border border-azul-500 bg-white p-8 text-center shadow-lg shadow-azul-100 transition-transform hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-azul-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+              className="group relative flex min-h-56 cursor-pointer flex-col items-center justify-center gap-5 rounded-2xl border border-verde-600 bg-verde-500 p-8 text-center shadow-lg shadow-verde-200 transition-transform hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-azul-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
             >
-              {/* Ícono de la opción. Colores fijos; al pasar el
-                  cursor la tarjeta solo se eleva. */}
-              <span className="flex h-24 w-24 items-center justify-center rounded-full bg-azul-700 text-white">
+              {/* Ícono de la opción. Ficha verde (color institucional) con colores
+                  fijos; al pasar el cursor la tarjeta solo se eleva. */}
+              <span className="flex h-24 w-24 items-center justify-center rounded-full bg-white text-verde-600 shadow-sm">
                 <Icono className="h-12 w-12" strokeWidth={1.5} aria-hidden="true" />
               </span>
               <span className="leading-snug">
-                <span className="block text-lg font-semibold text-slate-800">{titulo}</span>
-                {detalle && <span className="block text-sm text-slate-500">{detalle}</span>}
+                <span className="block text-lg font-semibold text-white">{titulo}</span>
+                {detalle && <span className="block text-sm text-verde-50">{detalle}</span>}
               </span>
               {!disponible && (
                 <span className="absolute right-3 top-3 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
