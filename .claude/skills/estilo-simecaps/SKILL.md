@@ -24,7 +24,7 @@ Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **
 | Etiquetas de campos | `text-gray-700` (`text-sm font-medium`) |
 | Acción principal / acento | `bg-azul-700 hover:bg-azul-800`, foco `ring-azul-600` |
 | Ícono de los títulos, opción activa del menú, subrayado de pestaña activa | verde: `bg-verde-500`, `bg-verde-600`, `border-verde-400` |
-| Menú lateral | **azul marino** `bg-azul-900`, texto `text-azul-200` (hover `bg-azul-800`); opción activa `bg-verde-600 text-white`. Se probaron fondo blanco, todo verde y botones verdes/azules: ninguno gustó más |
+| Menú lateral | **el original** (sin cambios): `bg-slate-900`, texto `text-slate-400`, activa `bg-slate-800 text-white`, sin íconos. Se probaron muchas variantes (blanco, verde, azul, botones) y el usuario prefiere el original: no tocarlo |
 | Barra de pestañas del medidor | **verde** `bg-verde-600`, texto blanco; activa en negritas con subrayado blanco |
 | Encabezados de tabla | **tinte claro + línea de color**: medidores y demás `bg-verde-50 border-b-2 border-verde-500` con texto `text-verde-900`; controladores `bg-azul-50 border-b-2 border-azul-600` con texto `text-azul-900` (el color sólido se probó: había demasiado verde sólido compitiendo) |
 | Barra superior | blanca (por los logos), borde inferior gris fino (la franja verde se probó y no gustó) |
@@ -44,7 +44,7 @@ Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **
 - **Barra superior**: blanca, `h-16 border-b border-gray-200 shadow-sm`, logos con `LogosInstitucionales`, título del sistema en mayúsculas `text-sm font-bold tracking-wide`.
 - **Fondo de "Datos a Consultar"**: la foto de `config.json → fondoAcceso` con velo azul marino (`rgba(19,33,58,.72)`), título en blanco; sin foto, `bg-azul-900`.
 - **Tarjetas de opción** (pantalla "Datos a Consultar"): fondo blanco **sin borde** `rounded-2xl bg-white shadow-md`; círculo del ícono `bg-verde-500 text-white`; texto oscuro (la ficha completa en verde se probó y no gustó). Los colores son **fijos**; al pasar el cursor **solo se elevan** (`transition-transform hover:-translate-y-1`), sin cambio de color.
-- **Menú lateral**: azul marino; opción activa en verde; cada opción con su ícono Lucide `h-4 w-4`.
+- **Menú lateral**: se queda el diseño original (gris oscuro, sin íconos). No proponer más cambios salvo que el usuario lo pida.
 - **Inputs**: usar `claseControl()` de `components/common/clasesFormulario.js` (o `clasesAuth.js` en las pantallas de acceso). No repetir clases a mano.
 - **Botón primario**: `bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 text-sm font-medium`. Secundario: borde `border-gray-300 text-slate-700 hover:bg-slate-50`. Peligro: rojo solo al confirmar.
 - **Tablas**: encabezado `bg-slate-50 text-xs font-semibold uppercase text-slate-600`, filas con `divide-y divide-gray-100` y `hover:bg-slate-50`; números alineados a la derecha con `tabular-nums`.

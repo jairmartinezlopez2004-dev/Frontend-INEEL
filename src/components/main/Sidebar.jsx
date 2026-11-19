@@ -14,27 +14,23 @@
  * No tiene relación directa con el WebService; es puramente de navegación/UI.
  */
 import { Link, NavLink } from 'react-router'
-// Íconos de la librería Lucide (mismo trazo en todo el sistema).
-import {
-  ArrowLeft, BellRing, ChartLine, Clock, Cpu, Layers, Network, Radio, Ruler, TriangleAlert, Users,
-} from 'lucide-react'
 
-// Catálogo estático de opciones del menú lateral (segmento de ruta, ícono y etiqueta visible).
+// Catálogo estático de opciones del menú lateral (segmento de ruta + etiqueta visible).
 // La ruta completa es `${rutaBase}/${ruta}` (p. ej. /configuracion/unidades).
 const NAV_ITEMS = [
-  { ruta: 'controladores-rf', Icono: Radio, label: 'Controladores' },
-  { ruta: 'eventos', Icono: TriangleAlert, label: 'Eventos configurados' },
-  { ruta: 'unidades', Icono: Ruler, label: 'Unidades' },
-  { ruta: 'puntos-io', Icono: Cpu, label: 'Puntos IO' },
-  { ruta: 'grupos-funcionales-io', Icono: Layers, label: 'Grupos funcionales IO' },
-  { ruta: 'grupos-electricos-io', Icono: Network, label: 'Grupos eléctricos IO' },
+  { ruta: 'controladores-rf', label: 'Controladores' },
+  { ruta: 'eventos', label: 'Eventos configurados' },
+  { ruta: 'unidades', label: 'Unidades' },
+  { ruta: 'puntos-io', label: 'Puntos IO' },
+  { ruta: 'grupos-funcionales-io', label: 'Grupos funcionales IO' },
+  { ruta: 'grupos-electricos-io', label: 'Grupos eléctricos IO' },
   // Solo visible para el Administrador (ver prop esAdmin).
-  { ruta: 'usuarios', Icono: Users, label: 'Usuarios', soloAdmin: true },
+  { ruta: 'usuarios', label: 'Usuarios', soloAdmin: true },
   // Solo aparece donde `rutasVisibles` la incluye (opción Perfiles 5 Minutales).
-  { ruta: 'mediciones', Icono: ChartLine, label: 'Mediciones 5 minutales', soloSiVisible: true },
-  { ruta: 'energia-hora', Icono: Clock, label: 'Energía por hora', soloSiVisible: true },
+  { ruta: 'mediciones', label: 'Mediciones 5 minutales', soloSiVisible: true },
+  { ruta: 'energia-hora', label: 'Energía por hora', soloSiVisible: true },
   // Solo aparece en la opción Eventos registrados.
-  { ruta: 'eventos-registrados', Icono: BellRing, label: 'Eventos registrados', soloSiVisible: true },
+  { ruta: 'eventos-registrados', label: 'Eventos registrados', soloSiVisible: true },
 ];
 
 // Props:
@@ -48,7 +44,7 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
     // Menú colapsable: la clase de ancho ("w-64" o "w-0") se anima con transition-[width]
     // para lograr el efecto de expandir/contraer el Sidebar.
     <aside
-      className={`flex shrink-0 overflow-hidden bg-azul-900 text-azul-100 transition-[width] duration-300 ease-in-out ${
+      className={`flex shrink-0 overflow-hidden bg-slate-900 text-slate-200 transition-[width] duration-300 ease-in-out ${
         isOpen ? 'w-64' : 'w-0'
       }`}
     >
@@ -60,10 +56,9 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
           {/* Regresa a la vista principal "¿Consultar datos por medio de?:". */}
           <Link
             to="/"
-            className="mb-3 flex w-full items-center gap-2 rounded-md border border-azul-700 px-3 py-2 text-left text-sm font-medium text-azul-100 transition-colors hover:bg-azul-800 hover:text-white"
+            className="mb-3 block w-full rounded-md border border-slate-700 px-3 py-2 text-left text-sm font-medium text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
           >
-            <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
-            Tipo de consulta
+            ← Tipo de consulta
           </Link>
           {NAV_ITEMS.filter(
             (item) =>
@@ -77,22 +72,20 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
               key={item.ruta}
               to={`${rutaBase}/${item.ruta}`}
               className={({ isActive }) =>
-                // Activa: fondo azul (color de acento del sistema).
-                `flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
+                `block w-full rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-verde-600 text-white shadow-sm'
-                    : 'text-azul-200 hover:bg-azul-800 hover:text-white'
+                    ? 'bg-slate-800 text-white'
+                    : 'text-slate-400 hover:bg-slate-800/60 hover:text-white'
                 }`
               }
             >
-              <item.Icono className="h-4 w-4 shrink-0" aria-hidden="true" />
               {item.label}
             </NavLink>
           ))}
         </nav>
 
         {/* Pie del Menú (Versión) */}
-        <div className="border-t border-azul-800 px-6 py-4 text-xs text-azul-300 text-center">
+        <div className="border-t border-slate-800 px-6 py-4 text-xs text-slate-500 text-center">
           v0.1.0
         </div>
       </div>
