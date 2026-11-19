@@ -226,7 +226,7 @@ export default function Login({ onLoginSuccess }) {
               <button
                 type="submit"
                 disabled={cargando}
-                className="w-full bg-azul-700 hover:bg-azul-800 text-white font-medium py-2.5 rounded-md transition-colors shadow-sm disabled:opacity-50"
+                className="w-full bg-verde-500 hover:bg-verde-600 text-white font-medium py-2.5 rounded-md transition-colors shadow-sm disabled:opacity-50"
               >
                 {cargando ? 'Ingresando al sistema...' : 'Iniciar Sesión'}
               </button>
