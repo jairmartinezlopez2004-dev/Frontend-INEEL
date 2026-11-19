@@ -41,6 +41,7 @@ Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **
 - **Pestañas del medidor**: barra blanca con borde; cada pestaña con su ícono; activa con subrayado `border-blue-600 text-blue-600`. El encabezado de cada pestaña de lectura usa `EncabezadoLectura` con el mismo ícono de la pestaña.
 - **Valores de medición**: texto `font-mono tabular-nums` en verde (`text-green-500`), estilo monitor; se mantiene.
 - **Barra superior**: blanca, `h-16 border-b border-gray-200 shadow-sm`, logos con `LogosInstitucionales`, título del sistema en mayúsculas `text-sm font-bold tracking-wide`.
+- **Fondo de "Datos a Consultar"**: la foto de `config.json → fondoAcceso` con velo azul marino (`rgba(19,33,58,.72)`), título en blanco; sin foto, `bg-azul-900`.
 - **Tarjetas de opción** (pantalla "Datos a Consultar"): fondo blanco **sin borde** `rounded-2xl bg-white shadow-md`; círculo del ícono `bg-verde-500 text-white`; texto oscuro (la ficha completa en verde se probó y no gustó). Los colores son **fijos**; al pasar el cursor **solo se elevan** (`transition-transform hover:-translate-y-1`), sin cambio de color.
 - **Menú lateral**: `bg-slate-900`; opción activa `bg-blue-600 text-white`; cada opción con su ícono Lucide `h-4 w-4`.
 - **Inputs**: usar `claseControl()` de `components/common/clasesFormulario.js` (o `clasesAuth.js` en las pantallas de acceso). No repetir clases a mano.

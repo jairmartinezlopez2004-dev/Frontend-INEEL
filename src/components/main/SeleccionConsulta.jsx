@@ -42,7 +42,14 @@ const OPCIONES = [
 // - onLogout: callback para cerrar la sesión y volver al Login.
 export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout }) {
   // Pie de página (config.json); los logos los pone LogosInstitucionales.
-  const { piePagina, tituloSistema } = obtenerConfiguracion()
+  const { piePagina, tituloSistema, fondoAcceso, creditoFondo, enlaceCreditoFondo } = obtenerConfiguracion()
+  // Fondo: la misma foto del login (config.json → fondoAcceso) con un velo azul
+  // marino institucional para que el título y las fichas resalten. Sin foto,
+  // queda solo el azul marino.
+  const VELO = 'rgba(19, 33, 58, 0.72)' // azul-950 al 72 %
+  const estiloFondo = fondoAcceso
+    ? { background: `linear-gradient(${VELO}, ${VELO}), url("${fondoAcceso}") center / cover` }
+    : undefined
   // true mientras se muestra la confirmación de "¿Cerrar sesión?".
   const [confirmandoSalida, setConfirmandoSalida] = useState(false)
 
@@ -80,8 +87,8 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
       </header>
 
       {/* Pregunta y tarjetas de opciones. */}
-      <main className="flex flex-1 flex-col items-center justify-center px-4 py-10 sm:px-8">
-        <h1 className="mb-10 text-center text-2xl font-bold tracking-wide text-slate-800 sm:text-3xl">
+      <main className="relative flex flex-1 flex-col items-center justify-center bg-azul-900 px-4 py-10 sm:px-8" style={estiloFondo}>
+        <h1 className="mb-10 text-center text-2xl font-bold tracking-wide text-white drop-shadow sm:text-3xl">
           Datos a Consultar:
         </h1>
 
@@ -111,6 +118,19 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
             </button>
           ))}
         </div>
+
+        {/* Crédito de la foto de fondo (config.json → creditoFondo). */}
+        {fondoAcceso && creditoFondo && (
+          <p className="absolute bottom-1 right-2 text-[10px] text-white/70">
+            {enlaceCreditoFondo ? (
+              <a href={enlaceCreditoFondo} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                {creditoFondo}
+              </a>
+            ) : (
+              creditoFondo
+            )}
+          </p>
+        )}
       </main>
 
       {/* Pie oscuro, igual que el del resto del sistema (LayoutSistema). */}
