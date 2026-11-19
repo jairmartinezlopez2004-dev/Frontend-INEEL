@@ -17,17 +17,13 @@ import EstadoBadge from './EstadoBadge'
 import MainForm from '../../datosEnLinea/MainForm'
 import { ArrowLeft, Gauge } from 'lucide-react'
 import TituloSeccion from '../../common/TituloSeccion'
-import {
-  CLASE_DATOS_AZUL, CLASE_ENCABEZADO_AZUL, CLASE_ETIQUETA_DATO_VERDE, CLASE_TARJETA_VERDE, CLASE_VALOR_DATO_AZUL,
-  CLASE_VOLVER_VERDE,
-} from '../../common/clasesEncabezado'
 
 // Dato de solo lectura para el encabezado del medidor (etiqueta + valor).
 function DatoMedidor({ etiqueta, valor }) {
   return (
     <div>
-      <dt className={CLASE_ETIQUETA_DATO_VERDE}>{etiqueta}</dt>
-      <dd className={CLASE_VALOR_DATO_AZUL}>{valor}</dd>
+      <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">{etiqueta}</dt>
+      <dd className="mt-0.5 font-mono text-sm text-slate-800">{valor}</dd>
     </div>
   )
 }
@@ -49,21 +45,25 @@ export default function DetalleMedidor({
   return (
     <div className="flex flex-col gap-4">
       {/* ── Encabezado: regreso al catálogo + datos generales del medidor ── */}
-      <div className={CLASE_TARJETA_VERDE}>
-        {/* Parte superior: regreso + nombre y estado del medidor. */}
-        <div className={CLASE_ENCABEZADO_AZUL}>
-          <button type="button" onClick={onVolver} className={CLASE_VOLVER_VERDE}>
+      <div className="shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        {/* Parte superior: regreso + nombre y estado del medidor (ícono verde, color de los medidores). */}
+        <div className="px-4 pt-4 pb-4 md:px-6 md:pt-5">
+          <button
+            type="button"
+            onClick={onVolver}
+            className="mb-3 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
+          >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             {textoVolver}
           </button>
 
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <TituloSeccion Icono={Gauge} etiqueta="Medidor" titulo={medidor.descripcion} mayusculas={false} invertido />
+            <TituloSeccion Icono={Gauge} etiqueta="Medidor" titulo={medidor.descripcion} mayusculas={false} />
             <EstadoBadge edo={medidor.edo} />
           </div>
         </div>
 
-        <dl className={CLASE_DATOS_AZUL}>
+        <dl className="grid grid-cols-2 gap-4 border-t border-gray-200 px-4 py-4 sm:grid-cols-4 md:px-6">
           <DatoMedidor etiqueta="Controlador RF" valor={medidor.nombreControlador} />
           <DatoMedidor etiqueta="Dir. Red" valor={medidor.dirRed} />
           <DatoMedidor etiqueta="Dir. RF" valor={medidor.dirRF} />
