@@ -77,12 +77,12 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
               key={item.ruta}
               to={`${rutaBase}/${item.ruta}`}
               className={({ isActive }) =>
-                // Opciones como botones verde medio con letras blancas; la activa va en
-                // verde oscuro, en negritas.
+                // Opciones como botones verdes con letras blancas (contraste suficiente para
+                // leerse bien); la activa en verde más oscuro, negritas y barrita blanca.
                 `flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-verde-700 font-semibold text-white shadow-sm'
-                    : 'bg-verde-400 text-white hover:bg-verde-500'
+                    ? 'bg-verde-800 font-semibold text-white shadow-[inset_4px_0_0_#ffffff]'
+                    : 'bg-verde-600 text-white hover:bg-verde-700'
                 }`
               }
             >
