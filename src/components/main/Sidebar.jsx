@@ -48,7 +48,7 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
     // Menú colapsable: la clase de ancho ("w-64" o "w-0") se anima con transition-[width]
     // para lograr el efecto de expandir/contraer el Sidebar.
     <aside
-      className={`flex shrink-0 overflow-hidden border-r border-gray-200 bg-white text-verde-700 transition-[width] duration-300 ease-in-out ${
+      className={`flex shrink-0 overflow-hidden border-r border-gray-200 bg-white text-azul-700 transition-[width] duration-300 ease-in-out ${
         isOpen ? 'w-64' : 'w-0'
       }`}
     >
@@ -60,7 +60,7 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
           {/* Regresa a la vista principal "¿Consultar datos por medio de?:". */}
           <Link
             to="/"
-            className="mb-3 flex w-full items-center gap-2 rounded-md border border-verde-300 px-3 py-2 text-left text-sm font-medium text-verde-700 transition-colors hover:bg-verde-50"
+            className="mb-3 flex w-full items-center gap-2 rounded-md border border-azul-300 px-3 py-2 text-left text-sm font-medium text-azul-700 transition-colors hover:bg-azul-50"
           >
             <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
             Tipo de consulta
@@ -77,12 +77,12 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
               key={item.ruta}
               to={`${rutaBase}/${item.ruta}`}
               className={({ isActive }) =>
-                // Opciones como botones verdes con letras blancas (contraste suficiente para
-                // leerse bien); la activa en verde más oscuro, negritas y barrita blanca.
+                // Opciones como botones azules con letras blancas; la activa en azul más
+                // oscuro, negritas y barrita blanca.
                 `flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-verde-800 font-semibold text-white shadow-[inset_4px_0_0_#ffffff]'
-                    : 'bg-verde-600 text-white hover:bg-verde-700'
+                    ? 'bg-azul-800 font-semibold text-white shadow-[inset_4px_0_0_#ffffff]'
+                    : 'bg-azul-600 text-white hover:bg-azul-700'
                 }`
               }
             >
@@ -93,7 +93,7 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
         </nav>
 
         {/* Pie del Menú (Versión) */}
-        <div className="border-t border-gray-200 px-6 py-4 text-xs text-verde-600 text-center">
+        <div className="border-t border-gray-200 px-6 py-4 text-xs text-azul-500 text-center">
           v0.1.0
         </div>
       </div>
