@@ -119,9 +119,32 @@ export default function Login({ onLoginSuccess }) {
     }
   };
 
+  // Imagen de fondo opcional (config.json → fondoAcceso). Cubre toda la
+  // pantalla sin deformarse; la tarjeta blanca queda encima.
+  const { fondoAcceso, creditoFondo, enlaceCreditoFondo } = obtenerConfiguracion();
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-50 p-4">
+      {fondoAcceso && (
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url("${fondoAcceso}")` }}
+        />
+      )}
+      {/* Crédito de la foto de fondo (config.json → creditoFondo). */}
+      {fondoAcceso && creditoFondo && (
+        <p className="absolute bottom-1 right-2 text-[10px] text-white/80 [text-shadow:0_1px_2px_rgb(0_0_0/0.7)]">
+          {enlaceCreditoFondo ? (
+            <a href={enlaceCreditoFondo} target="_blank" rel="noopener noreferrer" className="hover:underline">
+              {creditoFondo}
+            </a>
+          ) : (
+            creditoFondo
+          )}
+        </p>
+      )}
+      <div className="relative w-full max-w-md bg-white rounded-xl shadow-lg border border-gray-200 p-8">
         
         {/* Logotipos institucionales (config.json), centrados y apilados: arriba
             el de la empresa (INEEL) y debajo los adicionales (SECIHTI). Este

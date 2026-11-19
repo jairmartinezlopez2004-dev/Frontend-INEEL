@@ -1,7 +1,8 @@
 /**
  * SeleccionConsulta.jsx
  * ---------------------------------------------------------------------------
- * Vista principal que aparece después del inicio de sesión: fondo oscuro, la pregunta "¿Consultar datos por medio
+ * Vista principal que aparece después del inicio de sesión: fondo claro (mismo
+ * estilo que el resto del sistema: barra blanca, tarjetas blancas), la pregunta "¿Consultar datos por medio
  * de?:" y cuatro tarjetas grandes para elegir el tipo de consulta.
  *
  * Rol en el sistema:
@@ -76,24 +77,29 @@ const OPCIONES = [
 // - onLogout: callback para cerrar la sesión y volver al Login.
 export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout }) {
   // Pie de página (config.json); los logos los pone LogosInstitucionales.
-  const { piePagina } = obtenerConfiguracion()
+  const { piePagina, tituloSistema } = obtenerConfiguracion()
   // true mientras se muestra la confirmación de "¿Cerrar sesión?".
   const [confirmandoSalida, setConfirmandoSalida] = useState(false)
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-900 text-slate-100">
-      {/* Barra superior: logotipo, usuario y cerrar sesión. El logo trae fondo
-          blanco, por eso va sobre una placa blanca. */}
-      <header className="flex items-center justify-between gap-4 border-b border-slate-800 px-4 py-3 sm:px-8">
-        <div className="min-w-0 rounded-md bg-white px-2 py-1">
-          <LogosInstitucionales clasePrincipal="h-10" claseAdicional="hidden h-6 sm:block" />
+    <div className="flex min-h-screen flex-col bg-slate-50 text-slate-800">
+      {/* Barra superior blanca, igual que el Header del sistema: logotipos,
+          título, usuario y cerrar sesión. */}
+      <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:px-6">
+        <div className="flex min-w-0 items-center gap-4">
+          <LogosInstitucionales clasePrincipal="h-14" claseAdicional="hidden h-7 md:block" />
+          <div className="hidden min-w-0 border-l border-gray-200 pl-4 leading-tight lg:block">
+            <p className="truncate text-sm font-bold uppercase tracking-wide text-slate-800 sm:text-base">
+              {tituloSistema}
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-3">
           <div className="hidden text-right leading-tight sm:block">
-            <p className="text-sm font-medium text-white">
+            <p className="text-sm font-medium text-gray-800">
               {currentUser.nombre} {currentUser.apellido}
             </p>
-            <p className="text-xs text-slate-400">{currentUser.rol}</p>
+            <p className="text-xs text-gray-500">{currentUser.rol}</p>
           </div>
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">
             {currentUser.iniciales}
@@ -101,7 +107,7 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
           <button
             type="button"
             onClick={() => setConfirmandoSalida(true)}
-            className="cursor-pointer rounded-md border border-slate-700 px-3 py-1.5 text-sm font-medium text-slate-300 transition-colors hover:border-red-500 hover:text-red-400"
+            className="cursor-pointer rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600"
           >
             Cerrar sesión
           </button>
@@ -110,7 +116,7 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
 
       {/* Pregunta y tarjetas de opciones. */}
       <main className="flex flex-1 flex-col items-center justify-center px-4 py-10 sm:px-8">
-        <h1 className="mb-10 text-center text-2xl font-bold tracking-wide text-white sm:text-3xl">
+        <h1 className="mb-10 text-center text-2xl font-bold tracking-wide text-slate-800 sm:text-3xl">
           Datos a Consultar:
         </h1>
 
@@ -121,18 +127,19 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
               type="button"
               disabled={!disponible}
               onClick={() => onSeleccionar(ruta)}
-              className="group relative flex min-h-56 cursor-pointer flex-col items-center justify-center gap-5 rounded-2xl border border-slate-700 bg-slate-800 p-8 text-center shadow-lg transition-all hover:-translate-y-1 hover:border-blue-500 hover:bg-slate-800/80 hover:shadow-blue-900/40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:border-slate-700"
+              className="group relative flex min-h-56 cursor-pointer flex-col items-center justify-center gap-5 rounded-2xl border border-blue-400 bg-white p-8 text-center shadow-lg shadow-blue-100 transition-transform hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
             >
-              {/* Espacio del ícono (provisional). */}
-              <span className="flex h-24 w-24 items-center justify-center rounded-full bg-slate-700/60 text-blue-400 transition-colors group-enabled:group-hover:bg-blue-600 group-enabled:group-hover:text-white">
+              {/* Espacio del ícono (provisional). Colores fijos; al pasar el
+                  cursor la tarjeta solo se eleva. */}
+              <span className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-white">
                 <Icono />
               </span>
               <span className="leading-snug">
-                <span className="block text-lg font-semibold text-white">{titulo}</span>
-                {detalle && <span className="block text-sm text-slate-400">{detalle}</span>}
+                <span className="block text-lg font-semibold text-slate-800">{titulo}</span>
+                {detalle && <span className="block text-sm text-slate-500">{detalle}</span>}
               </span>
               {!disponible && (
-                <span className="absolute right-3 top-3 rounded-full bg-slate-700 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-slate-300">
+                <span className="absolute right-3 top-3 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
                   Próximamente
                 </span>
               )}
@@ -141,7 +148,8 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
         </div>
       </main>
 
-      <footer className="border-t border-slate-800 py-2 text-center text-[11px] font-medium tracking-wide text-slate-500">
+      {/* Pie oscuro, igual que el del resto del sistema (LayoutSistema). */}
+      <footer className="border-t border-slate-800 bg-slate-900 py-2 text-center text-[11px] font-medium tracking-wide text-slate-400">
         {piePagina}
       </footer>
 

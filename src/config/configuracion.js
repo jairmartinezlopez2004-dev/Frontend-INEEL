@@ -10,7 +10,7 @@
  * obtenerConfiguracion(): logo y nombre de la empresa y logos adicionales
  * (Header, Login, SeleccionConsulta), título del sistema (Header), pie de página
  * (LayoutSistema, SeleccionConsulta), leyenda de la barra de estado
- * (StatusBar), siglas del sistema (pantallas de acceso)
+ * (StatusBar), siglas e imagen de fondo de las pantallas de acceso
  * y título e ícono de la pestaña.
  *
  * Para otra empresa basta con editar config.json en la carpeta publicada y
@@ -36,6 +36,14 @@ const POR_DEFECTO = {
   // Nombre corto que se muestra bajo los logos en inicio de sesión, registro
   // y restablecer contraseña.
   siglasSistema: 'SIMECAPS',
+  // Imagen de fondo de las pantallas de acceso (ruta en public/, p. ej.
+  // '/fondo-acceso.jpg'). Vacía = fondo gris claro liso.
+  fondoAcceso: '',
+  // Crédito de la imagen de fondo (autor y licencia), en la esquina inferior
+  // derecha; algunas licencias libres (CC BY, CC BY-SA) lo exigen.
+  creditoFondo: '',
+  // Página de la imagen (licencia completa); vuelve enlace al crédito.
+  enlaceCreditoFondo: '',
   tituloPestana: 'Medición Calidad de la Potencia',
   iconoPestana: '/favicon-32.png',
   // Leyenda del lado derecho de la barra de estado.
@@ -75,6 +83,9 @@ function combinar(leido) {
     },
     tituloSistema: texto(leido?.tituloSistema, POR_DEFECTO.tituloSistema),
     siglasSistema: texto(leido?.siglasSistema, POR_DEFECTO.siglasSistema),
+    fondoAcceso: texto(leido?.fondoAcceso, POR_DEFECTO.fondoAcceso),
+    creditoFondo: texto(leido?.creditoFondo, POR_DEFECTO.creditoFondo),
+    enlaceCreditoFondo: texto(leido?.enlaceCreditoFondo, POR_DEFECTO.enlaceCreditoFondo),
     tituloPestana: texto(leido?.tituloPestana, POR_DEFECTO.tituloPestana),
     iconoPestana: texto(leido?.iconoPestana, POR_DEFECTO.iconoPestana),
     leyendaSistema: texto(leido?.leyendaSistema, POR_DEFECTO.leyendaSistema),
