@@ -73,7 +73,7 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
             </p>
             <p className="text-xs text-gray-500">{currentUser.rol}</p>
           </div>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-verde-600 text-sm font-semibold text-white">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-azul-700 text-sm font-semibold text-white ring-2 ring-azul-200">
             {currentUser.iniciales}
           </div>
           <button

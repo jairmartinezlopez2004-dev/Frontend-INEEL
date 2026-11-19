@@ -78,7 +78,7 @@ function Header({ currentUser, isSidebarOpen, onToggleSidebar, onLogout }) {
             <p className="text-xs text-gray-500">{currentUser.rol}</p>
           </div>
           {/* Círculo con las iniciales del usuario (ej. "OM"), calculadas en Login.jsx. */}
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-verde-600 text-sm font-semibold text-white">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-azul-700 text-sm font-semibold text-white ring-2 ring-azul-200">
             {currentUser.iniciales}
           </div>
         </div>
