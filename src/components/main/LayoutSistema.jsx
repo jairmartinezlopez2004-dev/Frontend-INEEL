@@ -71,7 +71,7 @@ export default function LayoutSistema({
         <Sidebar rutaBase={rutaBase} isOpen={isSidebarOpen} esAdmin={esAdmin} rutasVisibles={rutasVisibles} />
 
         {/* CONTENIDO PRINCIPAL: el módulo de la ruta actual. */}
-        <main className="relative flex-1 overflow-y-auto bg-neutral-900 p-4 md:p-6">
+        <main className="relative flex-1 overflow-y-auto bg-azul-100 p-4 md:p-6">
           <Outlet />
         </main>
       </div>

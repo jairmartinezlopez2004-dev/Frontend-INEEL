@@ -43,10 +43,10 @@ const OPCIONES = [
 export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout }) {
   // Pie de página (config.json); los logos los pone LogosInstitucionales.
   const { piePagina, tituloSistema, fondoAcceso, creditoFondo, enlaceCreditoFondo } = obtenerConfiguracion()
-  // Fondo: la misma foto del login (config.json → fondoAcceso) con un velo negro
-  // para que el título y las fichas resalten (mismo fondo negro de las demás
-  // vistas). Sin foto, queda solo el negro.
-  const VELO = 'rgba(0, 0, 0, 0.72)' // negro al 72 %
+  // Fondo: la misma foto del login (config.json → fondoAcceso) con un velo azul
+  // marino institucional para que el título y las fichas resalten. Sin foto,
+  // queda solo el azul marino.
+  const VELO = 'rgba(19, 33, 58, 0.72)' // azul-950 al 72 %
   const estiloFondo = fondoAcceso
     ? { background: `linear-gradient(${VELO}, ${VELO}), url("${fondoAcceso}") center / cover` }
     : undefined
@@ -87,7 +87,7 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
       </header>
 
       {/* Pregunta y tarjetas de opciones. */}
-      <main className="relative flex flex-1 flex-col items-center justify-center bg-neutral-900 px-4 py-10 sm:px-8" style={estiloFondo}>
+      <main className="relative flex flex-1 flex-col items-center justify-center bg-azul-900 px-4 py-10 sm:px-8" style={estiloFondo}>
         <h1 className="mb-10 text-center text-2xl font-bold tracking-wide text-white drop-shadow sm:text-3xl">
           Datos a Consultar:
         </h1>
