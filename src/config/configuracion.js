@@ -9,7 +9,9 @@
  * de dibujar la aplicación. Los componentes leen los valores con
  * obtenerConfiguracion(): logo y nombre de la empresa y logos adicionales
  * (Header, Login, SeleccionConsulta), título del sistema (Header), pie de página
- * (LayoutSistema, SeleccionConsulta) y título e ícono de la pestaña.
+ * (LayoutSistema, SeleccionConsulta), leyenda de la barra de estado
+ * (StatusBar), siglas del sistema (pantallas de acceso)
+ * y título e ícono de la pestaña.
  *
  * Para otra empresa basta con editar config.json en la carpeta publicada y
  * copiar ahí su logo/ícono; no hay que recompilar. Si el archivo no existe o
@@ -31,8 +33,14 @@ const POR_DEFECTO = {
     ],
   },
   tituloSistema: 'MEDICIÓN CALIDAD DE LA POTENCIA INEEL V1.0.1',
+  // Nombre corto que se muestra bajo los logos en inicio de sesión, registro
+  // y restablecer contraseña.
+  siglasSistema: 'SIMECAPS',
   tituloPestana: 'Medición Calidad de la Potencia',
   iconoPestana: '/favicon-32.png',
+  // Leyenda del lado derecho de la barra de estado.
+  leyendaSistema:
+    '© 2026 Instituto Nacional de Electricidad y Energías Limpias (INEEL). Visor de Calidad de la Potencia v1.0.1.',
   piePagina:
     'Software desarrollado con el apoyo de la Secretaría de Ciencia, Humanidades, Tecnología e Innovación (SECIHTI), a través del proyecto MADTEC-2025-M-538',
 }
@@ -66,8 +74,10 @@ function combinar(leido) {
       logosAdicionales: logosAdicionales(empresa.logosAdicionales),
     },
     tituloSistema: texto(leido?.tituloSistema, POR_DEFECTO.tituloSistema),
+    siglasSistema: texto(leido?.siglasSistema, POR_DEFECTO.siglasSistema),
     tituloPestana: texto(leido?.tituloPestana, POR_DEFECTO.tituloPestana),
     iconoPestana: texto(leido?.iconoPestana, POR_DEFECTO.iconoPestana),
+    leyendaSistema: texto(leido?.leyendaSistema, POR_DEFECTO.leyendaSistema),
     piePagina: texto(leido?.piePagina, POR_DEFECTO.piePagina),
   }
 }

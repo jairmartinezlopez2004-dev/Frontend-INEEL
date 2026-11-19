@@ -20,6 +20,7 @@ import RestablecerContrasena from './RestablecerContrasena';
 import { CLASE_INPUT, CLASE_INPUT_OK, CLASE_INPUT_ERROR } from './clasesAuth';
 import InputContrasena from '../common/InputContrasena';
 import LogosInstitucionales from '../common/LogosInstitucionales';
+import { obtenerConfiguracion } from '../../config/configuracion';
 
 // Reglas de cada campo. La cuenta debe ser un correo (el WebService rechaza
 // con 400 lo que no lo sea); la contraseña solo no debe estar vacía: las
@@ -123,7 +124,7 @@ export default function Login({ onLoginSuccess }) {
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg border border-gray-200 p-8">
         
         {/* Logotipos institucionales (config.json), centrados y apilados: arriba
-            los adicionales (SECIHTI) y debajo el de la empresa (INEEL). Este
+            el de la empresa (INEEL) y debajo los adicionales (SECIHTI). Este
             bloque es común a inicio de sesión, registro y restablecer contraseña. */}
         <LogosInstitucionales vertical clasePrincipal="h-24" claseAdicional="h-9" className="mb-8" />
 
@@ -221,7 +222,12 @@ export default function Login({ onLoginSuccess }) {
             </p>
           </>
         )}
-        
+
+        {/* Siglas del sistema (config.json → siglasSistema), al final de la
+            tarjeta en inicio de sesión, registro y restablecer contraseña. */}
+        <p className="mt-8 text-center text-2xl font-bold tracking-widest text-gray-700">
+          {obtenerConfiguracion().siglasSistema}
+        </p>
       </div>
     </div>
   );

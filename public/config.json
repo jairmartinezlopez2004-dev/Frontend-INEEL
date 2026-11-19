@@ -10,7 +10,9 @@
     ]
   },
   "tituloSistema": "Sistema de Medición de Calidad de la Potencia Clase S (SIMECAPS)",
+  "siglasSistema": "SIMECAPS",
   "tituloPestana": "Medición Calidad de la Potencia", 
   "iconoPestana": "/favicon-32.png",
+  "leyendaSistema": "© 2026 Instituto Nacional de Electricidad y Energías Limpias (INEEL). Visor de Calidad de la Potencia v1.0.1.",
   "piePagina": "Software desarrollado con el apoyo de la Secretaría de Ciencia, Humanidades, Tecnología e Innovación (SECIHTI), a través del proyecto MADTEC-2025-M-538"
 }

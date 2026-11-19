@@ -11,8 +11,8 @@
  * dos alturas: una para el logo principal y otra, menor, para los adicionales,
  * de modo que ambos se vean con un peso visual parecido.
  *
- * Con `vertical`, los logos se apilan centrados: primero los adicionales
- * (arriba) y debajo el de la empresa. Lo usan las pantallas de acceso
+ * Con `vertical`, los logos se apilan centrados: primero el de la empresa
+ * (arriba) y debajo los adicionales. Lo usan las pantallas de acceso
  * (inicio de sesión, registro y restablecer contraseña).
  */
 import { obtenerConfiguracion } from '../../config/configuracion'
@@ -21,7 +21,7 @@ import { obtenerConfiguracion } from '../../config/configuracion'
 // - clasePrincipal: clases de altura del logo de la empresa (ej. "h-14").
 // - claseAdicional: clases de altura de los logos adicionales (ej. "h-7").
 // - className: clases del contenedor (alineación, ocultar en móvil, etc.).
-// - vertical: true apila los logos centrados, con los adicionales arriba.
+// - vertical: true apila los logos centrados, con el de la empresa arriba.
 export default function LogosInstitucionales({ clasePrincipal, claseAdicional, className = '', vertical = false }) {
   const { empresa } = obtenerConfiguracion()
 
@@ -40,8 +40,8 @@ export default function LogosInstitucionales({ clasePrincipal, claseAdicional, c
   if (vertical) {
     return (
       <div className={`flex flex-col items-center gap-2 ${className}`}>
-        {adicionales}
         {principal}
+        {adicionales}
       </div>
     )
   }
