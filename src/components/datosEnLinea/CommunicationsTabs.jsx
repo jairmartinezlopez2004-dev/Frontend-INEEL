@@ -50,8 +50,8 @@ function CommunicationsTabs({ activeTab, onTabChange, pestanasOcultas = [] }) {
               onClick={() => onTabChange(tab)}
               className={`flex cursor-pointer items-center gap-2 whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
                 isActive
-                  ? 'border-verde-400 text-white'
-                  : 'border-transparent text-azul-200 hover:border-azul-400 hover:text-white'
+                  ? 'border-verde-400 font-semibold text-white'
+                  : 'border-transparent text-white hover:border-azul-400'
               }`}
             >
               {Icono && <Icono className="h-4 w-4" aria-hidden="true" />}
