@@ -29,12 +29,18 @@ export function BotonPrimario({ Icono = Plus, children, className = '', ...props
   )
 }
 
-/** Acción secundaria (borde gris, fondo blanco). */
-export function BotonSecundario({ Icono, children, className = '', ...props }) {
+/**
+ * Acción secundaria (borde gris, fondo blanco). Con `sobreColor` se adapta a
+ * un fondo de color (encabezado en degradado): borde y texto blancos.
+ */
+export function BotonSecundario({ Icono, children, sobreColor = false, className = '', ...props }) {
+  const colores = sobreColor
+    ? 'border-white/40 bg-white/10 text-white hover:bg-white/20'
+    : 'border-gray-300 bg-white text-slate-700 hover:bg-slate-50'
   return (
     <button
       type="button"
-      className={`${BASE} rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 ${className}`}
+      className={`${BASE} rounded-md border px-3 py-1.5 text-xs ${colores} ${className}`}
       {...props}
     >
       {Icono && <Icono className="h-3.5 w-3.5" aria-hidden="true" />}

@@ -26,6 +26,7 @@ import { useFiltroTabla } from '../../../hooks/useFiltroTabla'
 import BuscadorTabla from '../../common/BuscadorTabla'
 import { ArrowLeft, Gauge, Radio } from 'lucide-react'
 import TituloSeccion from '../../common/TituloSeccion'
+import { CLASE_ENCABEZADO_DEGRADADO, CLASE_VOLVER_DEGRADADO } from '../../common/clasesEncabezado'
 import { BotonEditar, BotonPrimario, BotonVer } from '../../common/Botones'
 
 // Encabezados de la tabla de medidores. La última columna (acciones) no tiene título.
@@ -120,49 +121,45 @@ export default function DetalleControlador({
     <div className="flex flex-col gap-4">
       {/* ── Encabezado: regreso a la lista + datos del controlador ── */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <div className="p-4 md:p-6">
-          <button
-            type="button"
-            onClick={onVolver}
-            className="mb-4 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
-          >
+        {/* Franja en degradado azul: regreso + nombre del controlador. */}
+        <div className={CLASE_ENCABEZADO_DEGRADADO}>
+          <button type="button" onClick={onVolver} className={CLASE_VOLVER_DEGRADADO}>
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Volver a Controladores
           </button>
 
-          {error && (
-            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-              {error}
-            </div>
-          )}
-          {!controlador && cargando && (
-            <p className="text-sm text-slate-500">Cargando controlador…</p>
-          )}
+          {!controlador && cargando && <p className="text-sm text-blue-100">Cargando controlador…</p>}
 
           {controlador && (
-            <>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <TituloSeccion Icono={Radio} etiqueta="Controlador" titulo={controlador.nombre} mayusculas={false} />
-                {esAdmin && !formularioAbierto && (
-                  <BotonEditar
-                    onClick={() => {
-                      setAviso(null)
-                      setEditandoControlador(true)
-                    }}
-                  >
-                    Editar controlador
-                  </BotonEditar>
-                )}
-              </div>
-              <dl className="mt-4 grid grid-cols-2 gap-4 border-t border-gray-200 pt-4 sm:grid-cols-4">
-                <DatoControlador etiqueta="Número de serie" valor={controlador.numSerie} />
-                <DatoControlador etiqueta="Dirección IP" valor={controlador.dirIP} />
-                <DatoControlador etiqueta="Estado" valor={<EstadoBadge edo={controlador.edo} />} />
-                <DatoControlador etiqueta="Medidores" valor={controlador.medidores.length} />
-              </dl>
-            </>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <TituloSeccion Icono={Radio} etiqueta="Controlador" titulo={controlador.nombre} mayusculas={false} invertido />
+              {esAdmin && !formularioAbierto && (
+                <BotonEditar
+                  sobreColor
+                  onClick={() => {
+                    setAviso(null)
+                    setEditandoControlador(true)
+                  }}
+                >
+                  Editar controlador
+                </BotonEditar>
+              )}
+            </div>
           )}
         </div>
+
+        {error && (
+          <div className="m-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700 md:m-6">{error}</div>
+        )}
+
+        {controlador && (
+          <dl className="grid grid-cols-2 gap-4 px-4 py-4 sm:grid-cols-4 md:px-6">
+            <DatoControlador etiqueta="Número de serie" valor={controlador.numSerie} />
+            <DatoControlador etiqueta="Dirección IP" valor={controlador.dirIP} />
+            <DatoControlador etiqueta="Estado" valor={<EstadoBadge edo={controlador.edo} />} />
+            <DatoControlador etiqueta="Medidores" valor={controlador.medidores.length} />
+          </dl>
+        )}
 
         {esAdmin && editandoControlador && controlador && (
           <FormularioControlador

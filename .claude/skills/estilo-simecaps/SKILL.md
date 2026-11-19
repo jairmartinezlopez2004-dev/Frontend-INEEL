@@ -34,6 +34,7 @@ No usar fondos oscuros en el área de contenido (se pidió quitar el fondo oscur
   - `components/common/TituloSeccion.jsx`: título de tarjeta con ícono Lucide en círculo azul claro (`Icono`, `titulo`, `subtitulo`, `etiqueta`, `mayusculas={false}` para nombres propios).
   - `components/common/Botones.jsx`: `BotonPrimario` (azul, ícono "+" por defecto), `BotonSecundario`, `BotonEditar` (lápiz), `BotonVer` (flecha).
 - **Tarjetas de contenido**: `rounded-xl border border-gray-200 bg-white shadow-sm` (nunca `shadow-lg ring-1`, ni fondos de color azul/verde en la tarjeta). Ocupan todo el ancho del área (sin `mx-auto max-w-7xl`).
+- **Encabezado en degradado azul** (detalle de controlador y de medidor): franja `CLASE_ENCABEZADO_DEGRADADO` de `components/common/clasesEncabezado.js` con `TituloSeccion invertido`, enlace `CLASE_VOLVER_DEGRADADO` y botones `sobreColor`; los datos van debajo en blanco.
 - **Pestañas del medidor**: barra blanca con borde; cada pestaña con su ícono; activa con subrayado `border-blue-600 text-blue-600`. El encabezado de cada pestaña de lectura usa `EncabezadoLectura` con el mismo ícono de la pestaña.
 - **Valores de medición**: texto `font-mono tabular-nums` en verde (`text-green-500`), estilo monitor; se mantiene.
 - **Barra superior**: blanca, `h-16 border-b border-gray-200 shadow-sm`, logos con `LogosInstitucionales`, título del sistema en mayúsculas `text-sm font-bold tracking-wide`.

@@ -14,20 +14,34 @@
 // - subtitulo: (opcional) texto secundario debajo del título.
 // - etiqueta: (opcional) texto pequeño ARRIBA del título (p. ej. "Controlador").
 // - mayusculas: (opcional, true) false para nombres propios (p. ej. el de un controlador).
-export default function TituloSeccion({ Icono, titulo, subtitulo, etiqueta, mayusculas = true }) {
+// - invertido: (opcional) true sobre un fondo de color (encabezado en degradado azul):
+//   ícono, etiqueta y título en blanco.
+export default function TituloSeccion({ Icono, titulo, subtitulo, etiqueta, mayusculas = true, invertido = false }) {
   return (
     <div className="flex min-w-0 items-center gap-3">
       {Icono && (
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white shadow-sm shadow-blue-200">
+        <span
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
+            invertido ? 'bg-white/20 text-white ring-1 ring-white/30' : 'bg-blue-600 text-white shadow-sm shadow-blue-200'
+          }`}
+        >
           <Icono className="h-5 w-5" aria-hidden="true" />
         </span>
       )}
       <div className="min-w-0 leading-tight">
         {etiqueta && (
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{etiqueta}</p>
+          <p className={`text-xs font-semibold uppercase tracking-wide ${invertido ? 'text-blue-100' : 'text-slate-500'}`}>
+            {etiqueta}
+          </p>
         )}
-        <h2 className={`truncate text-lg font-bold text-slate-800 ${mayusculas ? 'uppercase tracking-wide' : ''}`}>{titulo}</h2>
-        {subtitulo && <p className="mt-0.5 text-sm text-slate-500">{subtitulo}</p>}
+        <h2
+          className={`truncate text-lg font-bold ${invertido ? 'text-white' : 'text-slate-800'} ${
+            mayusculas ? 'uppercase tracking-wide' : ''
+          }`}
+        >
+          {titulo}
+        </h2>
+        {subtitulo && <p className={`mt-0.5 text-sm ${invertido ? 'text-blue-100' : 'text-slate-500'}`}>{subtitulo}</p>}
       </div>
     </div>
   )

@@ -17,6 +17,7 @@ import EstadoBadge from './EstadoBadge'
 import MainForm from '../../datosEnLinea/MainForm'
 import { ArrowLeft, Gauge } from 'lucide-react'
 import TituloSeccion from '../../common/TituloSeccion'
+import { CLASE_ENCABEZADO_DEGRADADO, CLASE_VOLVER_DEGRADADO } from '../../common/clasesEncabezado'
 
 // Dato de solo lectura para el encabezado del medidor (etiqueta + valor).
 function DatoMedidor({ etiqueta, valor }) {
@@ -45,22 +46,21 @@ export default function DetalleMedidor({
   return (
     <div className="flex flex-col gap-4">
       {/* ── Encabezado: regreso al catálogo + datos generales del medidor ── */}
-      <div className="shrink-0 rounded-xl border border-gray-200 bg-white p-4 shadow-sm md:p-6">
-        <button
-          type="button"
-          onClick={onVolver}
-          className="mb-4 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
-        >
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-          {textoVolver}
-        </button>
+      <div className="shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        {/* Franja en degradado azul: regreso + nombre y estado del medidor. */}
+        <div className={CLASE_ENCABEZADO_DEGRADADO}>
+          <button type="button" onClick={onVolver} className={CLASE_VOLVER_DEGRADADO}>
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            {textoVolver}
+          </button>
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <TituloSeccion Icono={Gauge} etiqueta="Medidor" titulo={medidor.descripcion} mayusculas={false} />
-          <EstadoBadge edo={medidor.edo} />
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <TituloSeccion Icono={Gauge} etiqueta="Medidor" titulo={medidor.descripcion} mayusculas={false} invertido />
+            <EstadoBadge edo={medidor.edo} />
+          </div>
         </div>
 
-        <dl className="mt-4 grid grid-cols-2 gap-4 border-t border-gray-200 pt-4 sm:grid-cols-4">
+        <dl className="grid grid-cols-2 gap-4 px-4 py-4 sm:grid-cols-4 md:px-6">
           <DatoMedidor etiqueta="Controlador RF" valor={medidor.nombreControlador} />
           <DatoMedidor etiqueta="Dir. Red" valor={medidor.dirRed} />
           <DatoMedidor etiqueta="Dir. RF" valor={medidor.dirRF} />
