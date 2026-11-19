@@ -92,6 +92,15 @@ const TAGS = FASES.flatMap((fase) => fase.medidas.filter(Boolean).map((medida) =
 // Props:
 // - medidor: medidor seleccionado (se usan su id y su dirRed).
 // - usuarioLogueado: usuario autenticado (solo administradores pueden leer).
+// Color de cada grupo (mismos de las gráficas: A azul, B naranja, C verde):
+// franja izquierda de la tarjeta y punto junto al título.
+const COLOR_GRUPO = {
+  faseA: { borde: 'border-l-blue-500', punto: 'bg-blue-500' },
+  faseB: { borde: 'border-l-orange-500', punto: 'bg-orange-500' },
+  faseC: { borde: 'border-l-emerald-500', punto: 'bg-emerald-500' },
+}
+const COLOR_NEUTRO = { borde: 'border-l-slate-400', punto: 'bg-slate-400' }
+
 function TabInstantaneos({ medidor, usuarioLogueado }) {
   const lectura = useLecturaMedidor({ medidor, usuarioLogueado, grupo: 'instantaneos', tagsCatalogo: TAGS })
 
@@ -105,9 +114,10 @@ function TabInstantaneos({ medidor, usuarioLogueado }) {
         {FASES.map((fase) => (
           <section
             key={fase.id}
-            className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+            className={`rounded-xl border border-l-4 border-gray-200 bg-white p-6 shadow-sm ${(COLOR_GRUPO[fase.id] ?? COLOR_NEUTRO).borde}`}
           >
-            <h3 className="mb-6 text-xs font-semibold uppercase tracking-widest text-slate-600">
+            <h3 className="mb-6 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-slate-700">
+              <span className={`h-2.5 w-2.5 rounded-full ${(COLOR_GRUPO[fase.id] ?? COLOR_NEUTRO).punto}`} aria-hidden="true" />
               {fase.etiqueta}
             </h3>
             {/* Grilla responsiva de tarjetas de medida (2 a 6 columnas según el ancho de pantalla). */}

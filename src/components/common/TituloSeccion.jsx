@@ -2,7 +2,7 @@
  * TituloSeccion.jsx
  * ---------------------------------------------------------------------------
  * Título de una sección o tarjeta del sistema con su ícono a la izquierda
- * (círculo azul claro con el ícono en azul), para que todas las vistas
+ * (círculo azul con el ícono en blanco), para que todas las vistas
  * (Controladores, Medidores, Unidades, Puntos IO…) se vean iguales.
  *
  * Ver la guía de estilo en .claude/skills/estilo-simecaps.
@@ -18,7 +18,7 @@ export default function TituloSeccion({ Icono, titulo, subtitulo, etiqueta, mayu
   return (
     <div className="flex min-w-0 items-center gap-3">
       {Icono && (
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white shadow-sm shadow-blue-200">
           <Icono className="h-5 w-5" aria-hidden="true" />
         </span>
       )}
