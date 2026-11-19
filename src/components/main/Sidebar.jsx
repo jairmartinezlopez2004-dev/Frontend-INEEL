@@ -56,7 +56,7 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
       <div className="flex h-full w-64 flex-col">
 
         {/* Menú de Navegación */}
-        <nav className="flex-1 space-y-1 px-3 py-4">
+        <nav className="flex-1 space-y-1.5 px-3 py-4">
           {/* Regresa a la vista principal "¿Consultar datos por medio de?:". */}
           <Link
             to="/"
@@ -77,11 +77,12 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
               key={item.ruta}
               to={`${rutaBase}/${item.ruta}`}
               className={({ isActive }) =>
-                // Activa: fondo verde con letras blancas (el menú es blanco con letras verdes).
+                // Todas las opciones son botones verdes con letras blancas; la activa va en
+                // un verde más oscuro, en negritas y con contorno claro.
                 `flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-verde-600 font-semibold text-white shadow-sm'
-                    : 'text-verde-700 hover:bg-verde-50 hover:text-verde-800'
+                    ? 'bg-verde-800 font-semibold text-white shadow-sm ring-2 ring-verde-300'
+                    : 'bg-verde-500 text-white shadow-sm hover:bg-verde-600'
                 }`
               }
             >
