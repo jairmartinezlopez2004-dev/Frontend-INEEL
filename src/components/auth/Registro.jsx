@@ -153,7 +153,7 @@ export default function Registro({ onRegistrado, onCancelar }) {
         <button
           type="submit"
           disabled={cargando}
-          className="w-full bg-azul-700 hover:bg-azul-800 text-white font-medium py-2.5 rounded-md transition-colors shadow-sm disabled:opacity-50"
+          className="w-full bg-verde-500 hover:bg-verde-600 text-white font-medium py-2.5 rounded-md transition-colors shadow-sm disabled:opacity-50"
         >
           {cargando ? 'Creando cuenta...' : 'Crear cuenta'}
         </button>
@@ -161,7 +161,7 @@ export default function Registro({ onRegistrado, onCancelar }) {
 
       <p className="mt-6 text-center text-sm text-gray-600">
         ¿Ya tienes cuenta?{' '}
-        <button type="button" onClick={onCancelar} className="font-medium text-azul-700 hover:underline">
+        <button type="button" onClick={onCancelar} className="font-medium text-blue-600 hover:text-blue-800 hover:underline">
           Inicia sesión
         </button>
       </p>

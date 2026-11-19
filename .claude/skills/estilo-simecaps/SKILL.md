@@ -47,7 +47,8 @@ Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **
 - **Botón primario**: `bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 text-sm font-medium`. Secundario: borde `border-gray-300 text-slate-700 hover:bg-slate-50`. Peligro: rojo solo al confirmar.
 - **Tablas**: encabezado `bg-slate-50 text-xs font-semibold uppercase text-slate-600`, filas con `divide-y divide-gray-100` y `hover:bg-slate-50`; números alineados a la derecha con `tabular-nums`.
 - **Confirmaciones**: `ConfirmDialog`, nunca `alert`/`confirm` del navegador.
-- **Pantallas de acceso**: tarjeta blanca centrada sobre la imagen de fondo de `config.json`; logos INEEL arriba y SECIHTI abajo; siglas SIMECAPS al final en `text-gray-700`.
+- **Enlaces de texto** (p. ej. «Regístrate», «¿Olvidaste tu contraseña?»): azul estándar de enlace `text-blue-600 hover:text-blue-800 hover:underline` (única excepción a la regla de no usar `blue-*`).
+- **Pantallas de acceso**: botón principal (Iniciar sesión, Crear cuenta, Restablecer) en **verde** `bg-verde-500 hover:bg-verde-600`; tarjeta blanca centrada sobre la imagen de fondo de `config.json`; logos INEEL arriba y SECIHTI abajo; siglas SIMECAPS al final en `text-gray-700`.
 
 ## Reglas de trabajo
 - Cambios pequeños y visibles, uno a la vez; el usuario los revisa en el navegador antes de seguir.

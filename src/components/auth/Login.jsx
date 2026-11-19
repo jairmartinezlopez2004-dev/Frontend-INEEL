@@ -216,7 +216,7 @@ export default function Login({ onLoginSuccess }) {
                   <button
                     type="button"
                     onClick={() => abrir('restablecer')}
-                    className="ml-auto shrink-0 text-sm font-medium text-azul-700 hover:underline"
+                    className="ml-auto shrink-0 text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
                   >
                     ¿Olvidaste tu contraseña?
                   </button>
@@ -238,7 +238,7 @@ export default function Login({ onLoginSuccess }) {
               <button
                 type="button"
                 onClick={() => abrir('registro')}
-                className="font-medium text-azul-700 hover:underline"
+                className="font-medium text-blue-600 hover:text-blue-800 hover:underline"
               >
                 Regístrate
               </button>
