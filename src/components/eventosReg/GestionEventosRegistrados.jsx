@@ -19,6 +19,8 @@ import { listarControladoresRF } from '../../services/controladoresRFService'
 import { listarEventos } from '../../services/eventosConfigService'
 import { useFiltroTabla } from '../../hooks/useFiltroTabla'
 import BuscadorTabla from '../common/BuscadorTabla'
+import { BellRing } from 'lucide-react'
+import TituloSeccion from '../common/TituloSeccion'
 
 // Encabezados de la tabla.
 const COLUMNAS = ['Fecha', 'Controlador RF', 'Medidor', 'Evento', 'Consumo']
@@ -83,12 +85,10 @@ export default function GestionEventosRegistrados() {
   ])
 
   return (
-    <div className="rounded-xl bg-white shadow-md">
+    <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
       {/* Encabezado de la tarjeta. */}
       <div className="border-b border-slate-200 px-6 py-4">
-        <h2 className="text-lg font-bold uppercase tracking-wide text-slate-900">
-          Eventos registrados
-        </h2>
+        <TituloSeccion Icono={BellRing} titulo="Eventos registrados" />
         <p className="mt-1 text-sm text-slate-500">
           Historial de los eventos configurados que han ocurrido en los medidores.
         </p>

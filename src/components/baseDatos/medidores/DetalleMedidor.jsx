@@ -15,13 +15,15 @@
  */
 import EstadoBadge from './EstadoBadge'
 import MainForm from '../../datosEnLinea/MainForm'
+import { ArrowLeft, Gauge } from 'lucide-react'
+import TituloSeccion from '../../common/TituloSeccion'
 
 // Dato de solo lectura para el encabezado del medidor (etiqueta + valor).
 function DatoMedidor({ etiqueta, valor }) {
   return (
     <div>
       <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">{etiqueta}</dt>
-      <dd className="mt-0.5 font-mono text-sm text-slate-900">{valor}</dd>
+      <dd className="mt-0.5 font-mono text-sm text-slate-800">{valor}</dd>
     </div>
   )
 }
@@ -43,21 +45,22 @@ export default function DetalleMedidor({
   return (
     <div className="flex flex-col gap-4">
       {/* ── Encabezado: regreso al catálogo + datos generales del medidor ── */}
-      <div className="shrink-0 rounded-xl bg-white p-4 shadow-md md:p-6">
+      <div className="shrink-0 rounded-xl border border-gray-200 bg-white p-4 shadow-sm md:p-6">
         <button
           type="button"
           onClick={onVolver}
-          className="mb-3 cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
+          className="mb-4 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
         >
-          ← {textoVolver}
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          {textoVolver}
         </button>
 
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <h2 className="text-lg font-bold text-slate-900">{medidor.descripcion}</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <TituloSeccion Icono={Gauge} etiqueta="Medidor" titulo={medidor.descripcion} mayusculas={false} />
           <EstadoBadge edo={medidor.edo} />
         </div>
 
-        <dl className="mt-4 grid grid-cols-2 gap-4 border-t border-slate-200 pt-4 sm:grid-cols-4">
+        <dl className="mt-4 grid grid-cols-2 gap-4 border-t border-gray-200 pt-4 sm:grid-cols-4">
           <DatoMedidor etiqueta="Controlador RF" valor={medidor.nombreControlador} />
           <DatoMedidor etiqueta="Dir. Red" valor={medidor.dirRed} />
           <DatoMedidor etiqueta="Dir. RF" valor={medidor.dirRF} />

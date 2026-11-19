@@ -32,6 +32,9 @@ import FormularioControlador from './FormularioControlador'
 import DetalleControlador from './DetalleControlador'
 import MedidorDeControlador from './MedidorDeControlador'
 import EstadoBadge from '../medidores/EstadoBadge'
+import { Radio } from 'lucide-react'
+import TituloSeccion from '../../common/TituloSeccion'
+import { BotonEditar, BotonPrimario, BotonVer } from '../../common/Botones'
 
 // Encabezados de la tabla. La última columna (acciones) no tiene título.
 const COLUMNAS = ['Nombre', 'Número de serie', 'Dirección IP', 'Estado', 'Medidores', '']
@@ -150,20 +153,12 @@ export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLog
 
   // ── Nivel 1: lista de controladores ──
   return (
-    <div className="rounded-xl bg-white shadow-md">
+    <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
       {/* Encabezado de la tarjeta: título + alta de controlador. */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-6 py-4">
-        <h2 className="text-lg font-bold uppercase tracking-wide text-slate-900">
-          Controladores
-        </h2>
+        <TituloSeccion Icono={Radio} titulo="Controladores" subtitulo="Controladores de radiofrecuencia y sus medidores" />
         {esAdmin && enEdicion === undefined && (
-          <button
-            type="button"
-            onClick={() => abrirFormulario(null)}
-            className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 active:scale-95"
-          >
-            + Nuevo controlador
-          </button>
+          <BotonPrimario onClick={() => abrirFormulario(null)}>Nuevo controlador</BotonPrimario>
         )}
       </div>
 
@@ -234,22 +229,8 @@ export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLog
                   </td>
                   <td className="px-4 py-3 font-mono text-slate-700">{controlador.medidores.length}</td>
                   <td className="whitespace-nowrap px-4 py-3 text-right">
-                    {esAdmin && (
-                      <button
-                        type="button"
-                        onClick={() => abrirFormulario(controlador)}
-                        className="mr-2 cursor-pointer rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-100"
-                      >
-                        Editar
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => abrirControlador(controlador.id)}
-                      className="cursor-pointer rounded-md border border-blue-600 px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:bg-blue-600 hover:text-white"
-                    >
-                      Ver medidores
-                    </button>
+                    {esAdmin && <BotonEditar className="mr-2" onClick={() => abrirFormulario(controlador)} />}
+                    <BotonVer onClick={() => abrirControlador(controlador.id)}>Ver medidores</BotonVer>
                   </td>
                 </tr>
               ))}

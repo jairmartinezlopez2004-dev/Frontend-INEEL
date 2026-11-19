@@ -13,6 +13,7 @@
 import { useEffect, useState } from 'react'
 import { obtenerControladorRF } from '../../../services/controladoresRFService'
 import DetalleMedidor from '../medidores/DetalleMedidor'
+import { ArrowLeft } from 'lucide-react'
 
 // Props:
 // - idControlador / idMedidor: IDs numéricos tomados de la URL.
@@ -42,13 +43,14 @@ export default function MedidorDeControlador({ idControlador, idMedidor, usuario
 
   if (!datos) {
     return (
-      <div className="rounded-xl bg-white p-4 shadow-md md:p-6">
+      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm md:p-6">
         <button
           type="button"
           onClick={onVolver}
-          className="mb-3 cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
+          className="mb-3 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
         >
-          ← Volver al controlador
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Volver al controlador
         </button>
         {error ? (
           <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>

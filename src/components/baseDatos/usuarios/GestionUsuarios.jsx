@@ -25,6 +25,8 @@ import CampoFormulario from '../../common/CampoFormulario'
 import { claseControl } from '../../common/clasesFormulario'
 import { useFiltroTabla } from '../../../hooks/useFiltroTabla'
 import BuscadorTabla from '../../common/BuscadorTabla'
+import { Users } from 'lucide-react'
+import TituloSeccion from '../../common/TituloSeccion'
 
 // Encabezados de la tabla (se mantienen en un arreglo para no repetir markup).
 const COLUMNAS = ['Nombre', 'Correo', 'Rol', 'Estado', 'Sesión (min)', '']
@@ -261,10 +263,10 @@ export default function GestionUsuarios({ esSuperAdmin }) {
   }
 
   return (
-    <div className="rounded-xl bg-white shadow-md">
+    <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
       {/* Encabezado de la tarjeta. */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-6 py-4">
-        <h2 className="text-lg font-bold uppercase tracking-wide text-slate-900">Usuarios</h2>
+        <TituloSeccion Icono={Users} titulo="Usuarios" />
       </div>
 
       {/* `key` reinicia el formulario al cambiar de usuario. */}

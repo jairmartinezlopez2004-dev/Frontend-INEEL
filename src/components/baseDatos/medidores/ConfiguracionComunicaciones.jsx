@@ -23,6 +23,8 @@
  */
 import { useEffect, useState } from 'react'
 import { leerConfiguracionComs, guardarConfiguracionComs } from '../../../services/medidoresService'
+import { Pencil, Settings2 } from 'lucide-react'
+import TituloSeccion from '../../common/TituloSeccion'
 
 // rolId del SuperAdministrador y del Administrador en la UI.
 const ROLES_ADMINISTRADOR = [1, 2]
@@ -223,12 +225,10 @@ export default function ConfiguracionComunicaciones({ medidor, usuarioLogueado, 
   }
 
   return (
-    <form onSubmit={guardar} className="w-full rounded-xl bg-white p-6 shadow-md">
+    <form onSubmit={guardar} className="w-full rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
       {/* Barra superior del formulario: indicador de modo + acciones de Administrador. */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
-        <h2 className="text-lg font-bold uppercase tracking-wide text-slate-900">
-          Configuración de comunicaciones
-        </h2>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 pb-4">
+        <TituloSeccion Icono={Settings2} titulo="Configuración de comunicaciones" />
 
         {/* Usuario Normal: solo se le indica que la vista es de consulta. */}
         {!esAdmin && (
@@ -246,8 +246,9 @@ export default function ConfiguracionComunicaciones({ medidor, usuarioLogueado, 
               setEditando(true)
               setAviso(null)
             }}
-            className="cursor-pointer rounded-lg border border-blue-600 px-4 py-2 text-sm font-semibold text-blue-600 transition-colors hover:bg-blue-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-blue-600 px-4 py-2 text-sm font-semibold text-blue-600 transition-colors hover:bg-blue-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
+            <Pencil className="h-4 w-4" aria-hidden="true" />
             Editar
           </button>
         )}

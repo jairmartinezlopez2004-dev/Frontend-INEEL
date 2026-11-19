@@ -21,6 +21,8 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { conectarMedidor, sincronizarMedidor } from '../../services/conexionMedidorService'
+import { Cable, Plug, RefreshCw } from 'lucide-react'
+import TituloSeccion from '../common/TituloSeccion'
 
 // Estilos del mensaje de resultado según el estado de la operación.
 const CLASES_ESTADO = {
@@ -30,7 +32,7 @@ const CLASES_ESTADO = {
 }
 
 const CLASES_BOTON =
-  'cursor-pointer rounded-lg px-6 py-2 font-semibold text-white transition-colors hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50'
+  'inline-flex cursor-pointer items-center gap-2 rounded-lg px-6 py-2 font-semibold text-white transition-colors hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50'
 
 // Props:
 // - medidor: medidor seleccionado (se usan su id y su dirRed).
@@ -70,10 +72,10 @@ export default function ConexionMedidor({ medidor }) {
     ejecutar('sincronizar', sincronizarMedidor, `Enviando trama de sincronización al medidor ${medidor.dirRed}…`)
 
   return (
-    <section className="w-full rounded-xl bg-white p-6 shadow-md">
-      <h2 className="mb-4 border-b border-slate-200 pb-4 text-lg font-bold uppercase tracking-wide text-slate-900">
-        Conexión con el medidor
-      </h2>
+    <section className="w-full rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="mb-4 border-b border-gray-200 pb-4">
+        <TituloSeccion Icono={Cable} titulo="Conexión con el medidor" />
+      </div>
 
       <div className="flex flex-wrap gap-3">
         <button
@@ -82,6 +84,7 @@ export default function ConexionMedidor({ medidor }) {
           disabled={enCurso}
           className={`${CLASES_BOTON} bg-blue-600 hover:bg-blue-700`}
         >
+          <Plug className="h-4 w-4" aria-hidden="true" />
           {enCurso && estado.operacion === 'conectar' ? 'Conectando…' : 'Conectar'}
         </button>
 
@@ -89,8 +92,9 @@ export default function ConexionMedidor({ medidor }) {
           type="button"
           onClick={sincronizar}
           disabled={enCurso}
-          className={`${CLASES_BOTON} bg-emerald-600 hover:bg-emerald-700`}
+          className={`${CLASES_BOTON} bg-blue-600 hover:bg-blue-700`}
         >
+          <RefreshCw className={`h-4 w-4 ${enCurso && estado.operacion === 'sincronizar' ? 'animate-spin' : ''}`} aria-hidden="true" />
           {enCurso && estado.operacion === 'sincronizar' ? 'Sincronizando…' : 'Sincronizar'}
         </button>
       </div>

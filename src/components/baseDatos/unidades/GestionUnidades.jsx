@@ -17,6 +17,9 @@ import FormularioUnidad from './FormularioUnidad'
 import EstadoActivo from '../../common/EstadoActivo'
 import { useFiltroTabla } from '../../../hooks/useFiltroTabla'
 import BuscadorTabla from '../../common/BuscadorTabla'
+import { Ruler } from 'lucide-react'
+import TituloSeccion from '../../common/TituloSeccion'
+import { BotonEditar } from '../../common/Botones'
 
 // Encabezados de la tabla. La última columna (acciones) no tiene título.
 const COLUMNAS = ['ID', 'Símbolo', 'Nombre', 'Estado', '']
@@ -76,10 +79,10 @@ export default function GestionUnidades({ esAdmin }) {
   }
 
   return (
-    <div className="rounded-xl bg-white shadow-md">
+    <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
       {/* Encabezado de la tarjeta: título + alta de unidad. */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-6 py-4">
-        <h2 className="text-lg font-bold uppercase tracking-wide text-slate-900">Unidades</h2>
+        <TituloSeccion Icono={Ruler} titulo="Unidades" />
         {esAdmin && enEdicion === undefined && (
           <button
             type="button"
@@ -160,13 +163,7 @@ export default function GestionUnidades({ esAdmin }) {
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-right">
                     {esAdmin && (
-                      <button
-                        type="button"
-                        onClick={() => abrirFormulario(unidad)}
-                        className="cursor-pointer rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-100"
-                      >
-                        Editar
-                      </button>
+                      <BotonEditar onClick={() => abrirFormulario(unidad)} />
                     )}
                   </td>
                 </tr>

@@ -21,6 +21,9 @@ import FormularioPuntoIO from './FormularioPuntoIO'
 import EstadoActivo from '../../common/EstadoActivo'
 import { useFiltroTabla } from '../../../hooks/useFiltroTabla'
 import BuscadorTabla from '../../common/BuscadorTabla'
+import { Cpu } from 'lucide-react'
+import TituloSeccion from '../../common/TituloSeccion'
+import { BotonEditar } from '../../common/Botones'
 
 // Encabezados de la tabla. La última columna (acciones) no tiene título.
 const COLUMNAS = [
@@ -119,10 +122,10 @@ export default function GestionPuntosIO({ esSuperAdmin }) {
   }
 
   return (
-    <div className="rounded-xl bg-white shadow-md">
+    <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
       {/* Encabezado de la tarjeta. No hay botón de alta: el backend no la ofrece. */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-6 py-4">
-        <h2 className="text-lg font-bold uppercase tracking-wide text-slate-900">Puntos IO</h2>
+        <TituloSeccion Icono={Cpu} titulo="Puntos IO" />
       </div>
 
       {/* `key` reinicia el formulario al cambiar de punto. */}
@@ -209,13 +212,7 @@ export default function GestionPuntosIO({ esSuperAdmin }) {
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-right">
                     {esSuperAdmin && (
-                      <button
-                        type="button"
-                        onClick={() => abrirFormulario(punto)}
-                        className="cursor-pointer rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-100"
-                      >
-                        Editar
-                      </button>
+                      <BotonEditar onClick={() => abrirFormulario(punto)} />
                     )}
                   </td>
                 </tr>

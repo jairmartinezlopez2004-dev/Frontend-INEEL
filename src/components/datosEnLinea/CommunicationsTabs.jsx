@@ -10,9 +10,25 @@
  * la pestaña activa y notifica los cambios hacia MainForm.jsx (elevación de
  * estado). No tiene relación con el WebService.
  */
+import {
+  AudioWaveform, BellRing, Compass, PlugZap, RadioTower, SlidersHorizontal, Timer, Waves, Zap,
+} from 'lucide-react'
 
 // Catálogo estático de pestañas disponibles en el módulo Medidores.
 const TABS = ['Instantáneos', 'Valores 5M', 'Calidad', 'Fasores', 'Consumos', 'Eventos', 'Armónicos', 'Puntos de ajuste', 'Coms']
+
+// Ícono (lucide-react) de cada pestaña.
+const ICONOS = {
+  Instantáneos: Zap,
+  'Valores 5M': Timer,
+  Calidad: Waves,
+  Fasores: Compass,
+  Consumos: PlugZap,
+  Eventos: BellRing,
+  Armónicos: AudioWaveform,
+  'Puntos de ajuste': SlidersHorizontal,
+  Coms: RadioTower,
+}
 
 // Props:
 // - activeTab: nombre de la pestaña actualmente seleccionada (controlado por MainForm.jsx).
@@ -21,22 +37,24 @@ const TABS = ['Instantáneos', 'Valores 5M', 'Calidad', 'Fasores', 'Consumos', '
 function CommunicationsTabs({ activeTab, onTabChange, pestanasOcultas = [] }) {
   return (
     // Contenedor con scroll horizontal para que las pestañas quepan en pantallas angostas.
-    <div className="overflow-x-auto border-b border-gray-200 bg-gray-100 px-4 pt-2">
+    <div className="overflow-x-auto rounded-t-xl border border-b-0 border-gray-200 bg-white px-2 pt-1">
       <nav className="flex gap-1">
         {TABS.filter((tab) => !pestanasOcultas.includes(tab)).map((tab) => {
-          // Resalta la pestaña activa con un borde inferior y fondo blanco.
+          // Resalta la pestaña activa con un borde inferior azul.
           const isActive = tab === activeTab
+          const Icono = ICONOS[tab]
           return (
             <button
               key={tab}
               type="button"
               onClick={() => onTabChange(tab)}
-              className={`whitespace-nowrap rounded-t-md border-b-2 px-4 py-2.5 text-sm font-medium transition-all cursor-pointer ${
+              className={`flex cursor-pointer items-center gap-2 whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
                 isActive
-                  ? 'border-indigo-600 bg-white text-indigo-600'
-                  : 'border-transparent text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-slate-600 hover:border-gray-300 hover:text-slate-900'
               }`}
             >
+              {Icono && <Icono className="h-4 w-4" aria-hidden="true" />}
               {tab}
             </button>
           )
