@@ -17,14 +17,17 @@ import EstadoBadge from './EstadoBadge'
 import MainForm from '../../datosEnLinea/MainForm'
 import { ArrowLeft, Gauge } from 'lucide-react'
 import TituloSeccion from '../../common/TituloSeccion'
-import { CLASE_ENCABEZADO_DEGRADADO, CLASE_VOLVER_DEGRADADO } from '../../common/clasesEncabezado'
+import {
+  CLASE_DATOS_AZUL, CLASE_ENCABEZADO_AZUL, CLASE_ETIQUETA_DATO_AZUL, CLASE_TARJETA_AZUL, CLASE_VALOR_DATO_AZUL,
+  CLASE_VOLVER_AZUL,
+} from '../../common/clasesEncabezado'
 
 // Dato de solo lectura para el encabezado del medidor (etiqueta + valor).
 function DatoMedidor({ etiqueta, valor }) {
   return (
     <div>
-      <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">{etiqueta}</dt>
-      <dd className="mt-0.5 font-mono text-sm text-slate-800">{valor}</dd>
+      <dt className={CLASE_ETIQUETA_DATO_AZUL}>{etiqueta}</dt>
+      <dd className={CLASE_VALOR_DATO_AZUL}>{valor}</dd>
     </div>
   )
 }
@@ -46,10 +49,10 @@ export default function DetalleMedidor({
   return (
     <div className="flex flex-col gap-4">
       {/* ── Encabezado: regreso al catálogo + datos generales del medidor ── */}
-      <div className="shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        {/* Franja en degradado azul: regreso + nombre y estado del medidor. */}
-        <div className={CLASE_ENCABEZADO_DEGRADADO}>
-          <button type="button" onClick={onVolver} className={CLASE_VOLVER_DEGRADADO}>
+      <div className={CLASE_TARJETA_AZUL}>
+        {/* Parte superior: regreso + nombre y estado del medidor. */}
+        <div className={CLASE_ENCABEZADO_AZUL}>
+          <button type="button" onClick={onVolver} className={CLASE_VOLVER_AZUL}>
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             {textoVolver}
           </button>
@@ -60,7 +63,7 @@ export default function DetalleMedidor({
           </div>
         </div>
 
-        <dl className="grid grid-cols-2 gap-4 px-4 py-4 sm:grid-cols-4 md:px-6">
+        <dl className={CLASE_DATOS_AZUL}>
           <DatoMedidor etiqueta="Controlador RF" valor={medidor.nombreControlador} />
           <DatoMedidor etiqueta="Dir. Red" valor={medidor.dirRed} />
           <DatoMedidor etiqueta="Dir. RF" valor={medidor.dirRF} />

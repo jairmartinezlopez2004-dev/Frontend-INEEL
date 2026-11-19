@@ -26,7 +26,10 @@ import { useFiltroTabla } from '../../../hooks/useFiltroTabla'
 import BuscadorTabla from '../../common/BuscadorTabla'
 import { ArrowLeft, Gauge, Radio } from 'lucide-react'
 import TituloSeccion from '../../common/TituloSeccion'
-import { CLASE_ENCABEZADO_DEGRADADO, CLASE_VOLVER_DEGRADADO } from '../../common/clasesEncabezado'
+import {
+  CLASE_DATOS_AZUL, CLASE_ENCABEZADO_AZUL, CLASE_ETIQUETA_DATO_AZUL, CLASE_TARJETA_AZUL, CLASE_VALOR_DATO_AZUL,
+  CLASE_VOLVER_AZUL,
+} from '../../common/clasesEncabezado'
 import { BotonEditar, BotonPrimario, BotonVer } from '../../common/Botones'
 
 // Encabezados de la tabla de medidores. La última columna (acciones) no tiene título.
@@ -36,8 +39,8 @@ const COLUMNAS = ['Dir. Red', 'Dir. RF', 'Descripción', 'Estado', 'Dirección I
 function DatoControlador({ etiqueta, valor }) {
   return (
     <div>
-      <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">{etiqueta}</dt>
-      <dd className="mt-0.5 font-mono text-sm text-slate-800">{valor}</dd>
+      <dt className={CLASE_ETIQUETA_DATO_AZUL}>{etiqueta}</dt>
+      <dd className={CLASE_VALOR_DATO_AZUL}>{valor}</dd>
     </div>
   )
 }
@@ -120,10 +123,10 @@ export default function DetalleControlador({
   return (
     <div className="flex flex-col gap-4">
       {/* ── Encabezado: regreso a la lista + datos del controlador ── */}
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        {/* Franja en degradado azul: regreso + nombre del controlador. */}
-        <div className={CLASE_ENCABEZADO_DEGRADADO}>
-          <button type="button" onClick={onVolver} className={CLASE_VOLVER_DEGRADADO}>
+      <div className={CLASE_TARJETA_AZUL}>
+        {/* Parte superior azul: regreso + nombre del controlador. */}
+        <div className={CLASE_ENCABEZADO_AZUL}>
+          <button type="button" onClick={onVolver} className={CLASE_VOLVER_AZUL}>
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Volver a Controladores
           </button>
@@ -153,7 +156,7 @@ export default function DetalleControlador({
         )}
 
         {controlador && (
-          <dl className="grid grid-cols-2 gap-4 px-4 py-4 sm:grid-cols-4 md:px-6">
+          <dl className={CLASE_DATOS_AZUL}>
             <DatoControlador etiqueta="Número de serie" valor={controlador.numSerie} />
             <DatoControlador etiqueta="Dirección IP" valor={controlador.dirIP} />
             <DatoControlador etiqueta="Estado" valor={<EstadoBadge edo={controlador.edo} />} />
@@ -166,7 +169,7 @@ export default function DetalleControlador({
             controlador={controlador}
             onGuardado={alGuardar}
             onCancelar={() => setEditandoControlador(false)}
-            claseFondo="border-t border-gray-200 bg-slate-50"
+            claseFondo="border-t border-white/20 bg-slate-50 text-slate-800"
           />
         )}
       </div>
