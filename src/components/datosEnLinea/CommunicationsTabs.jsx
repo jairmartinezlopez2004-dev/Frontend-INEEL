@@ -37,7 +37,7 @@ const ICONOS = {
 function CommunicationsTabs({ activeTab, onTabChange, pestanasOcultas = [] }) {
   return (
     // Contenedor con scroll horizontal para que las pestañas quepan en pantallas angostas.
-    <div className="overflow-x-auto rounded-xl bg-azul-800 px-2 shadow-sm">
+    <div className="overflow-x-auto rounded-xl bg-verde-600 px-2 shadow-sm">
       <nav className="flex gap-1">
         {TABS.filter((tab) => !pestanasOcultas.includes(tab)).map((tab) => {
           // Resalta la pestaña activa con un borde inferior azul.
@@ -50,8 +50,8 @@ function CommunicationsTabs({ activeTab, onTabChange, pestanasOcultas = [] }) {
               onClick={() => onTabChange(tab)}
               className={`flex cursor-pointer items-center gap-2 whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
                 isActive
-                  ? 'border-verde-400 font-semibold text-white'
-                  : 'border-transparent text-white hover:border-azul-400'
+                  ? 'border-white font-semibold text-white'
+                  : 'border-transparent text-white hover:border-verde-300'
               }`}
             >
               {Icono && <Icono className="h-4 w-4" aria-hidden="true" />}
