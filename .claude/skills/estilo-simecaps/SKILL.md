@@ -30,6 +30,12 @@ Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **
 No usar fondos oscuros en el área de contenido (se pidió quitar el fondo oscuro de "Datos a Consultar").
 
 ## Componentes
+- **Componentes comunes (úsalos siempre en vez de repetir clases)**:
+  - `components/common/TituloSeccion.jsx`: título de tarjeta con ícono Lucide en círculo azul claro (`Icono`, `titulo`, `subtitulo`, `etiqueta`, `mayusculas={false}` para nombres propios).
+  - `components/common/Botones.jsx`: `BotonPrimario` (azul, ícono "+" por defecto), `BotonSecundario`, `BotonEditar` (lápiz), `BotonVer` (flecha).
+- **Tarjetas de contenido**: `rounded-xl border border-gray-200 bg-white shadow-sm` (nunca `shadow-lg ring-1`, ni fondos de color azul/verde en la tarjeta). Ocupan todo el ancho del área (sin `mx-auto max-w-7xl`).
+- **Pestañas del medidor**: barra blanca con borde; cada pestaña con su ícono; activa con subrayado `border-blue-600 text-blue-600`. El encabezado de cada pestaña de lectura usa `EncabezadoLectura` con el mismo ícono de la pestaña.
+- **Valores de medición**: texto `font-mono tabular-nums` en verde (`text-green-500`), estilo monitor; se mantiene.
 - **Barra superior**: blanca, `h-16 border-b border-gray-200 shadow-sm`, logos con `LogosInstitucionales`, título del sistema en mayúsculas `text-sm font-bold tracking-wide`.
 - **Tarjetas de opción** (pantalla "Datos a Consultar"): `rounded-2xl border border-blue-400 bg-white shadow-lg shadow-blue-100`; círculo del ícono `bg-blue-600 text-white`. Los colores son **fijos**; al pasar el cursor **solo se elevan** (`transition-transform hover:-translate-y-1`), sin cambio de color.
 - **Menú lateral**: `bg-slate-900`; opción activa `bg-blue-600 text-white`; cada opción con su ícono Lucide `h-4 w-4`.

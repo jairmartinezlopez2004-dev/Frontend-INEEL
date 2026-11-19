@@ -21,6 +21,8 @@ import { VARIABLES_5M, consultarEnergiaHora, formatoValor, listarVariables5M } f
 import { listarControladoresRF } from '../../services/controladoresRFService'
 import { claseControl } from '../common/clasesFormulario'
 import SelectorRangoFechas from '../common/SelectorRangoFechas'
+import { Clock, Search } from 'lucide-react'
+import TituloSeccion from '../common/TituloSeccion'
 
 // Lecturas de 5 minutos de una hora completa.
 const LECTURAS_POR_HORA = 12
@@ -166,13 +168,16 @@ export default function EnergiaPorHora() {
   }))
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-6">
+    <div className="flex flex-col gap-4">
       {/* ── Filtros ── */}
-      <form noValidate onSubmit={alEnviar} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-1 text-lg font-bold uppercase tracking-wide text-slate-800">Energía por hora</h2>
-        <p className="mb-4 text-sm text-slate-500">
-          Total de energía de cada hora y acumulado del día, en fase A.
-        </p>
+      <form noValidate onSubmit={alEnviar} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="mb-5">
+          <TituloSeccion
+            Icono={Clock}
+            titulo="Energía por hora"
+            subtitulo="Total de energía de cada hora y acumulado del día, en fase A."
+          />
+        </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
             Medidor
@@ -228,8 +233,9 @@ export default function EnergiaPorHora() {
           <button
             type="submit"
             disabled={cargando}
-            className="cursor-pointer rounded-lg bg-blue-600 px-8 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
+            <Search className="h-4 w-4" aria-hidden="true" />
             {cargando ? 'Consultando…' : 'Consultar'}
           </button>
         </div>
@@ -246,7 +252,7 @@ export default function EnergiaPorHora() {
       {/* ── Resultado ── */}
       {!error && filas.length > 0 && (
         <>
-          <section className="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-black/5">
+          <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
               <h3 className="text-sm font-semibold text-slate-900">
                 {medidor?.descripcion || `Medidor #${resultado.filtros.idMedidor}`} · {variable?.nombre} · fase A
@@ -276,7 +282,7 @@ export default function EnergiaPorHora() {
 
           {/* Totales por día (solo si hay más de un día). */}
           {totalesPorDia.length > 1 && (
-            <section className="overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-black/5">
+            <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
               <h3 className="border-b border-slate-200 px-4 py-3 text-sm font-semibold text-slate-900">Total por día</h3>
               <table className="w-full text-sm">
                 <thead className="bg-slate-50 text-left">
@@ -298,7 +304,7 @@ export default function EnergiaPorHora() {
           )}
 
           {/* Tabla hora por hora. */}
-          <section className="overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-black/5">
+          <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
             <div className="max-h-[480px] overflow-auto">
               <table className="w-full text-sm">
                 <thead className="sticky top-0 bg-slate-50 text-left">

@@ -48,6 +48,8 @@ import { listarRegistros } from '../../services/eventosRegService'
 import { listarEventos } from '../../services/eventosConfigService'
 import { claseControl } from '../common/clasesFormulario'
 import SelectorRangoFechas from '../common/SelectorRangoFechas'
+import { ChartLine, Search } from 'lucide-react'
+import TituloSeccion from '../common/TituloSeccion'
 // La gráfica se carga bajo demanda: ECharts (~600 KB) solo se descarga al
 // abrir esta vista, no al entrar al sistema.
 const GraficaECharts = lazy(() => import('./GraficaECharts'))
@@ -409,16 +411,20 @@ export default function ConsultaPerfiles5M() {
 
   return (
     // El scroll lo da el área de contenido del LayoutSistema.
-    <div className="mx-auto flex max-w-7xl flex-col gap-6">
+    <div className="flex flex-col gap-4">
       {/* ── Filtros de la consulta ── */}
       <form
         noValidate
         onSubmit={alEnviar}
-        className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+        className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
       >
-        <h2 className="mb-4 text-lg font-bold uppercase tracking-wide text-slate-800">
-          Perfiles 5 minutales
-        </h2>
+        <div className="mb-5">
+          <TituloSeccion
+            Icono={ChartLine}
+            titulo="Perfiles 5 minutales"
+            subtitulo="Mediciones de cinco minutos de un medidor, por variable, fase y periodo."
+          />
+        </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
             Medidor
@@ -508,8 +514,9 @@ export default function ConsultaPerfiles5M() {
           <button
             type="submit"
             disabled={cargando}
-            className="cursor-pointer rounded-lg bg-blue-600 px-8 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
+            <Search className="h-4 w-4" aria-hidden="true" />
             {cargando ? 'Consultando…' : 'Consultar'}
           </button>
         </div>
@@ -528,7 +535,7 @@ export default function ConsultaPerfiles5M() {
       {/* ── Resultado ── */}
       {!error && periodos.length > 0 && (
         <>
-          <section className="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-black/5">
+          <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
               <h3 className="text-sm font-semibold text-slate-900">
                 {medidor?.descripcion || `Medidor #${resultado.filtros.idMedidor}`} · {variable.nombre} ·{' '}
@@ -635,7 +642,7 @@ export default function ConsultaPerfiles5M() {
           </section>
 
           {/* Eventos registrados del medidor en el rango consultado. */}
-          <section className="rounded-xl bg-white shadow-md">
+          <section className="rounded-xl border border-gray-200 bg-white shadow-sm">
             <div className="border-b border-slate-200 px-6 py-4">
               <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-900">
                 Eventos registrados
@@ -697,7 +704,7 @@ export default function ConsultaPerfiles5M() {
           </section>
 
           {/* Tabla de valores con scroll propio (las lecturas crudas pueden ser miles). */}
-          <section className="rounded-xl bg-white shadow-md">
+          <section className="rounded-xl border border-gray-200 bg-white shadow-sm">
             {/* La unidad va aquí y no en cada columna: "Fase A (A)" se confundía
                 con la fase A cuando la variable se mide en amperes. */}
             <div className="border-b border-slate-200 px-6 py-3 text-sm font-semibold text-slate-900">
