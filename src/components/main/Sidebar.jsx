@@ -48,7 +48,7 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
     // Menú colapsable: la clase de ancho ("w-64" o "w-0") se anima con transition-[width]
     // para lograr el efecto de expandir/contraer el Sidebar.
     <aside
-      className={`flex shrink-0 overflow-hidden bg-azul-900 text-azul-100 transition-[width] duration-300 ease-in-out ${
+      className={`flex shrink-0 overflow-hidden border-r border-gray-200 bg-white text-azul-800 transition-[width] duration-300 ease-in-out ${
         isOpen ? 'w-64' : 'w-0'
       }`}
     >
@@ -60,7 +60,7 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
           {/* Regresa a la vista principal "¿Consultar datos por medio de?:". */}
           <Link
             to="/"
-            className="mb-3 flex w-full items-center gap-2 rounded-md border border-azul-700 px-3 py-2 text-left text-sm font-medium text-azul-100 transition-colors hover:bg-azul-800 hover:text-white"
+            className="mb-3 flex w-full items-center gap-2 rounded-md border border-azul-100 px-3 py-2 text-left text-sm font-medium text-azul-700 transition-colors hover:bg-azul-50 hover:text-azul-900"
           >
             <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
             Tipo de consulta
@@ -81,7 +81,7 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
                 `flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
                   isActive
                     ? 'bg-verde-600 text-white shadow-sm'
-                    : 'text-azul-200 hover:bg-azul-800 hover:text-white'
+                    : 'text-azul-800 hover:bg-azul-50 hover:text-azul-900'
                 }`
               }
             >
@@ -92,7 +92,7 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
         </nav>
 
         {/* Pie del Menú (Versión) */}
-        <div className="border-t border-azul-800 px-6 py-4 text-xs text-azul-300 text-center">
+        <div className="border-t border-gray-200 px-6 py-4 text-xs text-azul-400 text-center">
           v0.1.0
         </div>
       </div>
