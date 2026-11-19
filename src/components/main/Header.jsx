@@ -38,7 +38,7 @@ function Header({ currentUser, isSidebarOpen, onToggleSidebar, onLogout }) {
 
   return (
     // Barra superior fija con logo a la izquierda y perfil de usuario a la derecha (layout tipo Gmail).
-    <header className="z-20 flex h-16 w-full shrink-0 items-center justify-between border-b-4 border-verde-500 bg-white px-4 shadow-sm sm:px-6">
+    <header className="z-20 flex h-16 w-full shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 shadow-sm sm:px-6">
       <div className="flex min-w-0 items-center gap-4">
         {/* Botón que colapsa/expande el menú lateral (Sidebar) mediante onToggleSidebar. */}
         <button

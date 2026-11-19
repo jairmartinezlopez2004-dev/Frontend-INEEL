@@ -57,7 +57,7 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
     <div className="flex min-h-screen flex-col bg-azul-50 text-slate-800">
       {/* Barra superior blanca, igual que el Header del sistema: logotipos,
           título, usuario y cerrar sesión. */}
-      <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b-4 border-verde-500 bg-white px-4 shadow-sm sm:px-6">
+      <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:px-6">
         <div className="flex min-w-0 items-center gap-4">
           <LogosInstitucionales clasePrincipal="h-14" claseAdicional="hidden h-7 md:block" />
           <div className="hidden min-w-0 border-l border-gray-200 pl-4 leading-tight lg:block">
