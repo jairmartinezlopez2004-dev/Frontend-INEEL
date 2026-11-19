@@ -6,7 +6,9 @@
  * Rol en el sistema:
  * - Controla el flujo de autenticación: mientras no haya un usuario logueado
  *   (currentUser === null) muestra únicamente <Login />, sin importar la URL;
- *   al iniciar sesión se muestra la vista que pide esa URL.
+ *   al iniciar sesión siempre se entra a la vista principal ("Datos a
+ *   Consultar"). Si al recargar la página la sesión sigue vigente, se queda en
+ *   la vista que pide la URL.
  * - Define las rutas de la aplicación (React Router). La URL es la que decide
  *   qué vista se ve, de modo que los botones Atrás / Adelante del navegador,
  *   recargar la página o abrir un enlace guardado muestran siempre la vista
@@ -87,6 +89,13 @@ function App() {
     navigate('/', { replace: true })
   }
 
+  // Al iniciar sesión (con usuario y contraseña) siempre se entra a "Datos a
+  // Consultar", aunque la URL apuntara a otra vista (p. ej. tras expirar la sesión).
+  const alIniciarSesion = (usuario) => {
+    setCurrentUser(usuario)
+    navigate('/', { replace: true })
+  }
+
   if (verificandoSesion) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 text-sm text-slate-500">
@@ -95,10 +104,10 @@ function App() {
     )
   }
 
-  // Sin sesión solo se muestra el Login. `setCurrentUser` se pasa directo como
-  // `onLoginSuccess`, de modo que el usuario que arma Login.jsx queda aquí.
+  // Sin sesión solo se muestra el Login; el usuario que arma Login.jsx llega a
+  // alIniciarSesion, que lo guarda y lleva a la vista principal.
   if (!currentUser) {
-    return <Login onLoginSuccess={setCurrentUser} />
+    return <Login onLoginSuccess={alIniciarSesion} />
   }
 
   // El SuperAdministrador tiene todos los permisos del Administrador y además
