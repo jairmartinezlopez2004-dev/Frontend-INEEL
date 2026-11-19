@@ -26,10 +26,6 @@ import { useFiltroTabla } from '../../../hooks/useFiltroTabla'
 import BuscadorTabla from '../../common/BuscadorTabla'
 import { ArrowLeft, Gauge, Radio } from 'lucide-react'
 import TituloSeccion from '../../common/TituloSeccion'
-import {
-  CLASE_DATOS_AZUL, CLASE_ENCABEZADO_AZUL, CLASE_ETIQUETA_DATO_AZUL, CLASE_TARJETA_AZUL, CLASE_VALOR_DATO_AZUL,
-  CLASE_VOLVER_AZUL,
-} from '../../common/clasesEncabezado'
 import { BotonEditar, BotonPrimario, BotonVer } from '../../common/Botones'
 
 // Encabezados de la tabla de medidores. La última columna (acciones) no tiene título.
@@ -39,8 +35,8 @@ const COLUMNAS = ['Dir. Red', 'Dir. RF', 'Descripción', 'Estado', 'Dirección I
 function DatoControlador({ etiqueta, valor }) {
   return (
     <div>
-      <dt className={CLASE_ETIQUETA_DATO_AZUL}>{etiqueta}</dt>
-      <dd className={CLASE_VALOR_DATO_AZUL}>{valor}</dd>
+      <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">{etiqueta}</dt>
+      <dd className="mt-0.5 font-mono text-sm text-slate-800">{valor}</dd>
     </div>
   )
 }
@@ -122,23 +118,26 @@ export default function DetalleControlador({
 
   return (
     <div className="flex flex-col gap-4">
-      {/* ── Encabezado: regreso a la lista + datos del controlador ── */}
-      <div className={CLASE_TARJETA_AZUL}>
-        {/* Parte superior azul: regreso + nombre del controlador. */}
-        <div className={CLASE_ENCABEZADO_AZUL}>
-          <button type="button" onClick={onVolver} className={CLASE_VOLVER_AZUL}>
+      {/* ── Encabezado: regreso a la lista + datos del controlador. Tarjeta
+          blanca con ícono azul, igual que la lista de controladores. ── */}
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="px-4 pt-4 pb-4 md:px-6 md:pt-5">
+          <button
+            type="button"
+            onClick={onVolver}
+            className="mb-3 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
+          >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Volver a Controladores
           </button>
 
-          {!controlador && cargando && <p className="text-sm text-azul-100">Cargando controlador…</p>}
+          {!controlador && cargando && <p className="text-sm text-slate-500">Cargando controlador…</p>}
 
           {controlador && (
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <TituloSeccion Icono={Radio} etiqueta="Controlador" titulo={controlador.nombre} mayusculas={false} invertido />
+              <TituloSeccion Icono={Radio} color="azul" etiqueta="Controlador" titulo={controlador.nombre} mayusculas={false} />
               {esAdmin && !formularioAbierto && (
                 <BotonEditar
-                  sobreColor
                   onClick={() => {
                     setAviso(null)
                     setEditandoControlador(true)
@@ -156,7 +155,7 @@ export default function DetalleControlador({
         )}
 
         {controlador && (
-          <dl className={CLASE_DATOS_AZUL}>
+          <dl className="grid grid-cols-2 gap-4 border-t border-gray-200 px-4 py-4 sm:grid-cols-4 md:px-6">
             <DatoControlador etiqueta="Número de serie" valor={controlador.numSerie} />
             <DatoControlador etiqueta="Dirección IP" valor={controlador.dirIP} />
             <DatoControlador etiqueta="Estado" valor={<EstadoBadge edo={controlador.edo} />} />
@@ -169,7 +168,7 @@ export default function DetalleControlador({
             controlador={controlador}
             onGuardado={alGuardar}
             onCancelar={() => setEditandoControlador(false)}
-            claseFondo="border-t border-white/20 bg-slate-50 text-slate-800"
+            claseFondo="border-t border-gray-200 bg-slate-50"
           />
         )}
       </div>

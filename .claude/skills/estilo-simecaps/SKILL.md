@@ -33,7 +33,7 @@ Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **
 | Éxito | `text-verde-700`, `bg-verde-50`, `border-verde-200` |
 
 ## Componentes
-- **Código de color por entidad**: todo lo de **controladores** va en **azul** (`TituloSeccion color="azul"`, encabezado de tabla `bg-azul-700`, tarjeta de encabezado `CLASE_TARJETA_AZUL`) y todo lo de **medidores** en **verde** (`TituloSeccion` verde, encabezado de tabla `bg-verde-600`, tarjeta `CLASE_TARJETA_VERDE`), para identificarlos de un vistazo.
+- **Código de color por entidad**: todo lo de **controladores** va en **azul** (`TituloSeccion color="azul"`, encabezado de tabla `bg-azul-700`, encabezado del detalle en tarjeta blanca igual que la lista) y todo lo de **medidores** en **verde** (`TituloSeccion` verde, encabezado de tabla `bg-verde-600`, tarjeta `CLASE_TARJETA_VERDE`), para identificarlos de un vistazo.
 - **Componentes comunes (úsalos siempre en vez de repetir clases)**:
   - `components/common/TituloSeccion.jsx`: título de tarjeta con ícono Lucide en círculo azul claro (`Icono`, `titulo`, `subtitulo`, `etiqueta`, `mayusculas={false}` para nombres propios).
   - `components/common/Botones.jsx`: `BotonPrimario` (azul, ícono "+" por defecto), `BotonSecundario`, `BotonEditar` (lápiz), `BotonVer` (flecha).
