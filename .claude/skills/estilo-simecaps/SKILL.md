@@ -1,0 +1,46 @@
+---
+name: estilo-simecaps
+description: Guía de estilo visual de SIMECAPS (visor de calidad de la potencia, INEEL). Úsala SIEMPRE antes de crear o modificar cualquier pantalla, componente, tabla, formulario, tarjeta, ícono o color del frontend, para que todo se vea consistente con lo ya aprobado.
+---
+
+# Guía de estilo de SIMECAPS
+
+Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **sobrio, claro y consistente**: todas las pantallas deben parecer parte del mismo sistema. No se inventan estilos nuevos por pantalla.
+
+## Tecnología
+- React + Tailwind CSS **v3** (no usar clases que solo existen en v4, como `blur-xs` o `bg-linear-*`).
+- Íconos: **solo `lucide-react`** (`import { Database } from 'lucide-react'`). No dibujar SVG a mano ni mezclar otras librerías. Siempre con `aria-hidden="true"` si son decorativos.
+- Tipografía: **Inter** (`@fontsource-variable/inter`, ya configurada como `font-sans`). No cargar fuentes externas.
+- Textos de marca (logos, título, siglas, leyendas, pie, fondo del login) se leen de `public/config.json` mediante `obtenerConfiguracion()`; nunca se escriben fijos en el código.
+
+## Colores
+| Uso | Clases |
+| --- | --- |
+| Fondo del área de trabajo | `bg-slate-50` |
+| Superficies (barras, tarjetas, tablas, modales) | `bg-white` + `border border-gray-200` |
+| Texto principal / títulos | `text-slate-800` |
+| Etiquetas de campos | `text-gray-700` (`text-sm font-medium`) |
+| Texto secundario | `text-slate-500` / `text-gray-500` |
+| Acento (acciones, activo, íconos) | azul: `bg-blue-600`, `text-blue-600`, `border-blue-400`, foco `ring-blue-500` |
+| Menú lateral y pies de página | oscuro: `bg-slate-900`, texto `text-slate-400` |
+| Error | `text-red-600`, `bg-red-50`, `border-red-500` |
+| Éxito | `text-green-700`, `bg-green-50`, `border-green-200` |
+| Avatar del usuario | `bg-indigo-600 text-white` |
+
+No usar fondos oscuros en el área de contenido (se pidió quitar el fondo oscuro de "Datos a Consultar").
+
+## Componentes
+- **Barra superior**: blanca, `h-16 border-b border-gray-200 shadow-sm`, logos con `LogosInstitucionales`, título del sistema en mayúsculas `text-sm font-bold tracking-wide`.
+- **Tarjetas de opción** (pantalla "Datos a Consultar"): `rounded-2xl border border-blue-400 bg-white shadow-lg shadow-blue-100`; círculo del ícono `bg-blue-600 text-white`. Los colores son **fijos**; al pasar el cursor **solo se elevan** (`transition-transform hover:-translate-y-1`), sin cambio de color.
+- **Menú lateral**: `bg-slate-900`; opción activa `bg-blue-600 text-white`; cada opción con su ícono Lucide `h-4 w-4`.
+- **Inputs**: usar `claseControl()` de `components/common/clasesFormulario.js` (o `clasesAuth.js` en las pantallas de acceso). No repetir clases a mano.
+- **Botón primario**: `bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 text-sm font-medium`. Secundario: borde `border-gray-300 text-slate-700 hover:bg-slate-50`. Peligro: rojo solo al confirmar.
+- **Tablas**: encabezado `bg-slate-50 text-xs font-semibold uppercase text-slate-600`, filas con `divide-y divide-gray-100` y `hover:bg-slate-50`; números alineados a la derecha con `tabular-nums`.
+- **Confirmaciones**: `ConfirmDialog`, nunca `alert`/`confirm` del navegador.
+- **Pantallas de acceso**: tarjeta blanca centrada sobre la imagen de fondo de `config.json`; logos INEEL arriba y SECIHTI abajo; siglas SIMECAPS al final en `text-gray-700`.
+
+## Reglas de trabajo
+- Cambios pequeños y visibles, uno a la vez; el usuario los revisa en el navegador antes de seguir.
+- Mantener los comentarios en español que explican el rol de cada componente.
+- Respetar el lint (`npx eslint`) y comprobar que `npm run build` compila.
+- Imágenes: solo libres de derechos (dominio público, CC0 o CC BY/BY-SA con crédito en `config.json`).

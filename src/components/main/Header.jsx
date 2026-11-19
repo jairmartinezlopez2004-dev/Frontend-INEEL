@@ -21,43 +21,9 @@ import { useState } from 'react'
 import ConfirmDialog from '../common/ConfirmDialog'
 import { obtenerConfiguracion } from '../../config/configuracion'
 import LogosInstitucionales from '../common/LogosInstitucionales'
+// Íconos de la librería Lucide (mismo trazo en todo el sistema).
+import { LogOut, Menu } from 'lucide-react'
 
-// Ícono de menú hamburguesa (SVG) usado en el botón de colapsar/expandir el Sidebar.
-function HamburgerIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      className="h-6 w-6"
-    >
-      <line x1="3" y1="6" x2="21" y2="6" />
-      <line x1="3" y1="12" x2="21" y2="12" />
-      <line x1="3" y1="18" x2="21" y2="18" />
-    </svg>
-  )
-}
-
-// Ícono de "salir" (SVG) usado en el botón de cerrar sesión.
-function LogoutIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-5 w-5"
-    >
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-      <polyline points="16 17 21 12 16 7" />
-      <line x1="21" y1="12" x2="9" y2="12" />
-    </svg>
-  )
-}
 
 // Props:
 // - currentUser: objeto { nombre, apellido, rolId, rol, iniciales } que llega desde App.jsx.
@@ -83,7 +49,7 @@ function Header({ currentUser, isSidebarOpen, onToggleSidebar, onLogout }) {
           aria-pressed={isSidebarOpen}
           className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-md text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
         >
-          <HamburgerIcon />
+          <Menu className="h-6 w-6" aria-hidden="true" />
         </button>
 
         {/* Logotipo institucional del INEEL. El PNG trae margen blanco alrededor,
@@ -126,7 +92,7 @@ function Header({ currentUser, isSidebarOpen, onToggleSidebar, onLogout }) {
           title="Cerrar sesión"
           className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-md text-slate-600 transition-colors hover:bg-red-50 hover:text-red-600"
         >
-          <LogoutIcon />
+          <LogOut className="h-5 w-5" aria-hidden="true" />
         </button>
       </div>
 

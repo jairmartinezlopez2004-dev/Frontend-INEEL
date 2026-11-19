@@ -23,52 +23,17 @@ import { useState } from 'react'
 import ConfirmDialog from '../common/ConfirmDialog'
 import { obtenerConfiguracion } from '../../config/configuracion'
 import LogosInstitucionales from '../common/LogosInstitucionales'
+// Íconos de la librería Lucide (mismo trazo en todo el sistema).
+import { Activity, BellRing, ChartColumn, Database } from 'lucide-react'
 
-// Íconos provisionales (SVG de trazo). Se pueden reemplazar por los definitivos
-// cambiando solo estos componentes.
-function IconoBaseDatos() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-12 w-12" aria-hidden="true">
-      <ellipse cx="12" cy="5.5" rx="7.5" ry="2.75" />
-      <path d="M4.5 5.5v6.5c0 1.52 3.36 2.75 7.5 2.75s7.5-1.23 7.5-2.75V5.5" />
-      <path d="M4.5 12v6.5c0 1.52 3.36 2.75 7.5 2.75s7.5-1.23 7.5-2.75V12" />
-    </svg>
-  )
-}
-
-function IconoPerfiles() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-12 w-12" aria-hidden="true">
-      <path d="M3.5 20.5h17" />
-      <path d="M6 17v-4M10 17V8M14 17v-6M18 17V5" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function IconoEnLinea() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-12 w-12" aria-hidden="true">
-      <path d="M2.5 12h4l2.5-6 4 12 2.5-6h6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function IconoEventos() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-12 w-12" aria-hidden="true">
-      <path d="M6 9.5a6 6 0 0 1 12 0c0 4.5 2 6 2 6H4s2-1.5 2-6Z" strokeLinejoin="round" />
-      <path d="M10 19a2 2 0 0 0 4 0" strokeLinecap="round" />
-    </svg>
-  )
-}
 
 // Opciones de consulta. `ruta` = dirección a la que lleva la tarjeta (ver App.jsx);
 // `disponible: false` = aún sin vista (tarjeta deshabilitada).
 const OPCIONES = [
-  { id: 'baseDatos', ruta: '/configuracion', titulo: 'Base de Datos', detalle: '(Configuración)', Icono: IconoBaseDatos, disponible: true },
-  { id: 'perfiles5M', ruta: '/perfiles-5m', titulo: 'Perfiles 5 Minutales', Icono: IconoPerfiles, disponible: true },
-  { id: 'enLinea', ruta: '/en-linea', titulo: 'Datos en línea', Icono: IconoEnLinea, disponible: true },
-  { id: 'eventos', ruta: '/eventos', titulo: 'Eventos registrados', Icono: IconoEventos, disponible: true },
+  { id: 'baseDatos', ruta: '/configuracion', titulo: 'Base de Datos', detalle: '(Configuración)', Icono: Database, disponible: true },
+  { id: 'perfiles5M', ruta: '/perfiles-5m', titulo: 'Perfiles 5 Minutales', Icono: ChartColumn, disponible: true },
+  { id: 'enLinea', ruta: '/en-linea', titulo: 'Datos en línea', Icono: Activity, disponible: true },
+  { id: 'eventos', ruta: '/eventos', titulo: 'Eventos registrados', Icono: BellRing, disponible: true },
 ]
 
 // Props:
@@ -129,10 +94,10 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
               onClick={() => onSeleccionar(ruta)}
               className="group relative flex min-h-56 cursor-pointer flex-col items-center justify-center gap-5 rounded-2xl border border-blue-400 bg-white p-8 text-center shadow-lg shadow-blue-100 transition-transform hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
             >
-              {/* Espacio del ícono (provisional). Colores fijos; al pasar el
+              {/* Ícono de la opción. Colores fijos; al pasar el
                   cursor la tarjeta solo se eleva. */}
               <span className="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-white">
-                <Icono />
+                <Icono className="h-12 w-12" strokeWidth={1.5} aria-hidden="true" />
               </span>
               <span className="leading-snug">
                 <span className="block text-lg font-semibold text-slate-800">{titulo}</span>
