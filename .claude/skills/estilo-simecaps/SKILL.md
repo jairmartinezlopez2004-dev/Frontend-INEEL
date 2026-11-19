@@ -18,7 +18,7 @@ Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **
 
 | Uso | Clases |
 | --- | --- |
-| Fondo del área de trabajo | **azul claro** `bg-azul-100` (se probaron azul marino y negro: el fondo oscuro le roba protagonismo a los datos). Contenido en tarjetas blancas; lo que quede directo sobre el fondo usa texto `text-azul-800` |
+| Fondo del área de trabajo | **la foto de `config.json → fondoAcceso` con velo azul marino** (`rgba(19,33,58,.72)`, `fixed`), igual que "Datos a Consultar"; sin foto, `bg-azul-900`. Todo el contenido en tarjetas blancas; lo que quede directo sobre el fondo lleva **texto blanco** (menús de Coms y Puntos de ajuste). Se probaron azul claro, azul marino y negro |
 | Superficies (tarjetas, formularios) | `bg-white` + `border border-gray-200` |
 | Texto principal / títulos | `text-slate-800` |
 | Etiquetas de campos | `text-gray-700` (`text-sm font-medium`) |
@@ -48,6 +48,7 @@ Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **
 - **Inputs**: usar `claseControl()` de `components/common/clasesFormulario.js` (o `clasesAuth.js` en las pantallas de acceso). No repetir clases a mano.
 - **Botón primario**: `bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 text-sm font-medium`. Secundario: borde `border-gray-300 text-slate-700 hover:bg-slate-50`. Peligro: rojo solo al confirmar.
 - **Tablas**: encabezado `bg-slate-50 text-xs font-semibold uppercase text-slate-600`, filas con `divide-y divide-gray-100` y `hover:bg-slate-50`; números alineados a la derecha con `tabular-nums`.
+- **Botón de regreso** («Volver a …»): `BotonVolver` de `common/Botones.jsx` (letra azul con flecha), debajo del nombre en el encabezado del detalle.
 - **Confirmaciones**: `ConfirmDialog`, nunca `alert`/`confirm` del navegador.
 - **Enlaces de texto** (p. ej. «Regístrate», «¿Olvidaste tu contraseña?»): azul estándar de enlace `text-blue-600 hover:text-blue-800 hover:underline` (única excepción a la regla de no usar `blue-*`).
 - **Pantallas de acceso**: botón principal (Iniciar sesión, Crear cuenta, Restablecer) en **verde** `bg-verde-500 hover:bg-verde-600`; tarjeta blanca centrada sobre la imagen de fondo de `config.json`; logos INEEL arriba y SECIHTI abajo; siglas SIMECAPS al final en `text-gray-700`.

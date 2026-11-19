@@ -24,9 +24,9 @@ import EstadoBadge from '../medidores/EstadoBadge'
 import { textoEstadoEquipo } from '../../../services/medidoresService'
 import { useFiltroTabla } from '../../../hooks/useFiltroTabla'
 import BuscadorTabla from '../../common/BuscadorTabla'
-import { ArrowLeft, Gauge, Radio } from 'lucide-react'
+import { Gauge, Radio } from 'lucide-react'
 import TituloSeccion from '../../common/TituloSeccion'
-import { BotonEditar, BotonPrimario, BotonVer } from '../../common/Botones'
+import { BotonEditar, BotonPrimario, BotonVer, BotonVolver } from '../../common/Botones'
 
 // Encabezados de la tabla de medidores. La última columna (acciones) no tiene título.
 const COLUMNAS = ['Dir. Red', 'Dir. RF', 'Descripción', 'Estado', 'Dirección IP', '']
@@ -122,15 +122,6 @@ export default function DetalleControlador({
           blanca con ícono azul, igual que la lista de controladores. ── */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <div className="px-4 pt-4 pb-4 md:px-6 md:pt-5">
-          <button
-            type="button"
-            onClick={onVolver}
-            className="mb-3 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
-          >
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-            Volver a Controladores
-          </button>
-
           {!controlador && cargando && <p className="text-sm text-slate-500">Cargando controlador…</p>}
 
           {controlador && (
@@ -148,6 +139,12 @@ export default function DetalleControlador({
               )}
             </div>
           )}
+
+          {/* Regreso a la lista, debajo del nombre, como botón (mismo estilo que
+              "Editar controlador") pero con letra azul para distinguirlo. */}
+          <BotonVolver onClick={onVolver} className={controlador ? 'mt-4' : ''}>
+            Volver a Controladores
+          </BotonVolver>
         </div>
 
         {error && (

@@ -6,11 +6,12 @@
  * - BotonPrimario: acción principal de una sección (p. ej. "Nuevo medidor").
  * - BotonSecundario: acción con borde gris (p. ej. "Editar controlador").
  * - BotonEditar / BotonVer: acciones pequeñas dentro de las filas de una tabla.
+ * - BotonVolver: regreso a la vista anterior (letra azul de enlace, con flecha).
  *
  * Todos aceptan las props normales de <button> (onClick, disabled, title…).
  * Ver la guía de estilo en .claude/skills/estilo-simecaps.
  */
-import { ChevronRight, Pencil, Plus } from 'lucide-react'
+import { ArrowLeft, ChevronRight, Pencil, Plus } from 'lucide-react'
 
 const BASE =
   'inline-flex cursor-pointer items-center justify-center gap-1.5 font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50'
@@ -68,6 +69,20 @@ export function BotonVer({ children = 'Ver', className = '', ...props }) {
     >
       {children}
       <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+    </button>
+  )
+}
+
+/** "Volver a …": botón con letra azul de enlace (se distingue de las acciones) y flecha. */
+export function BotonVolver({ children = 'Volver', className = '', ...props }) {
+  return (
+    <button
+      type="button"
+      className={`${BASE} rounded-md border border-blue-200 bg-white px-3 py-1.5 text-xs text-blue-600 hover:bg-blue-50 hover:text-blue-800 ${className}`}
+      {...props}
+    >
+      <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+      {children}
     </button>
   )
 }

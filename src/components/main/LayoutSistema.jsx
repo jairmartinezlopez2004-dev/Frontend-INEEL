@@ -71,7 +71,18 @@ export default function LayoutSistema({
         <Sidebar rutaBase={rutaBase} isOpen={isSidebarOpen} esAdmin={esAdmin} rutasVisibles={rutasVisibles} />
 
         {/* CONTENIDO PRINCIPAL: el módulo de la ruta actual. */}
-        <main className="relative flex-1 overflow-y-auto bg-azul-100 p-4 md:p-6">
+        {/* Fondo: la foto de config.json (fondoAcceso) con velo azul marino, igual que
+            "Datos a Consultar"; sin foto, azul marino liso. */}
+        <main
+          className="relative flex-1 overflow-y-auto bg-azul-900 p-4 md:p-6"
+          style={
+            obtenerConfiguracion().fondoAcceso
+              ? {
+                  background: `linear-gradient(rgba(19, 33, 58, 0.72), rgba(19, 33, 58, 0.72)), url("${obtenerConfiguracion().fondoAcceso}") center / cover fixed`,
+                }
+              : undefined
+          }
+        >
           <Outlet />
         </main>
       </div>
