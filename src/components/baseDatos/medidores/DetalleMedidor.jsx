@@ -18,15 +18,15 @@ import MainForm from '../../datosEnLinea/MainForm'
 import { ArrowLeft, Gauge } from 'lucide-react'
 import TituloSeccion from '../../common/TituloSeccion'
 import {
-  CLASE_DATOS_AZUL, CLASE_ENCABEZADO_AZUL, CLASE_ETIQUETA_DATO_AZUL, CLASE_TARJETA_AZUL, CLASE_VALOR_DATO_AZUL,
-  CLASE_VOLVER_AZUL,
+  CLASE_DATOS_AZUL, CLASE_ENCABEZADO_AZUL, CLASE_ETIQUETA_DATO_VERDE, CLASE_TARJETA_VERDE, CLASE_VALOR_DATO_AZUL,
+  CLASE_VOLVER_VERDE,
 } from '../../common/clasesEncabezado'
 
 // Dato de solo lectura para el encabezado del medidor (etiqueta + valor).
 function DatoMedidor({ etiqueta, valor }) {
   return (
     <div>
-      <dt className={CLASE_ETIQUETA_DATO_AZUL}>{etiqueta}</dt>
+      <dt className={CLASE_ETIQUETA_DATO_VERDE}>{etiqueta}</dt>
       <dd className={CLASE_VALOR_DATO_AZUL}>{valor}</dd>
     </div>
   )
@@ -49,10 +49,10 @@ export default function DetalleMedidor({
   return (
     <div className="flex flex-col gap-4">
       {/* ── Encabezado: regreso al catálogo + datos generales del medidor ── */}
-      <div className={CLASE_TARJETA_AZUL}>
+      <div className={CLASE_TARJETA_VERDE}>
         {/* Parte superior: regreso + nombre y estado del medidor. */}
         <div className={CLASE_ENCABEZADO_AZUL}>
-          <button type="button" onClick={onVolver} className={CLASE_VOLVER_AZUL}>
+          <button type="button" onClick={onVolver} className={CLASE_VOLVER_VERDE}>
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             {textoVolver}
           </button>

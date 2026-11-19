@@ -156,7 +156,7 @@ export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLog
     <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
       {/* Encabezado de la tarjeta: título + alta de controlador. */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-6 py-4">
-        <TituloSeccion Icono={Radio} titulo="Controladores" subtitulo="Controladores de radiofrecuencia y sus medidores" />
+        <TituloSeccion Icono={Radio} color="azul" titulo="Controladores" subtitulo="Controladores de radiofrecuencia y sus medidores" />
         {esAdmin && enEdicion === undefined && (
           <BotonPrimario onClick={() => abrirFormulario(null)}>Nuevo controlador</BotonPrimario>
         )}
@@ -205,7 +205,7 @@ export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLog
       {!error && controladores.length > 0 && (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200 text-sm">
-            <thead className="bg-verde-600">
+            <thead className="bg-azul-700">
               <tr>
                 {COLUMNAS.map((col) => (
                   <th

@@ -9,6 +9,13 @@
 // Tarjeta completa del encabezado: azul sólido con texto blanco.
 export const CLASE_TARJETA_AZUL = 'shrink-0 overflow-hidden rounded-xl bg-azul-800 text-white shadow-sm'
 
+// Variante verde del encabezado: la usan los medidores (los controladores van
+// en azul) para distinguirlos de un vistazo.
+export const CLASE_TARJETA_VERDE = 'shrink-0 overflow-hidden rounded-xl bg-verde-600 text-white shadow-sm'
+export const CLASE_ETIQUETA_DATO_VERDE = 'text-xs font-medium uppercase tracking-wide text-verde-100'
+export const CLASE_VOLVER_VERDE =
+  'mb-3 inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-verde-50 hover:text-white hover:underline'
+
 // Parte superior: regreso + ícono, etiqueta y nombre.
 export const CLASE_ENCABEZADO_AZUL = 'px-4 pt-4 pb-4 md:px-6 md:pt-5'
 
