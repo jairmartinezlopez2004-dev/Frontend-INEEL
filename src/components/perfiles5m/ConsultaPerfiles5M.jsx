@@ -153,7 +153,7 @@ function MuestraFase({ color }) {
 }
 
 const CLASE_TH =
-  'whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wide text-white'
+  'whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wide text-verde-900'
 
 export default function ConsultaPerfiles5M() {
   // Controladores RF con sus medidores, para el selector de medidor.
@@ -559,7 +559,7 @@ export default function ConsultaPerfiles5M() {
             {/* Resumen: tarjetas con una fase; tabla por fase con varias. */}
             {variasFases ? (
               <table className="mb-6 w-full text-sm">
-                <thead className="bg-verde-600">
+                <thead className="bg-verde-50 border-b-2 border-verde-500">
                   <tr>
                     <th scope="col" className={`${CLASE_TH} text-left`}>
                       Fase
@@ -665,7 +665,7 @@ export default function ConsultaPerfiles5M() {
             {!errorEventos && eventosDelRango.length > 0 && (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-slate-200 text-sm">
-                  <thead className="bg-verde-600">
+                  <thead className="bg-verde-50 border-b-2 border-verde-500">
                     <tr>
                       {['Fecha', 'Evento', 'Consumo', ''].map((titulo) => (
                         <th key={titulo} scope="col" className={`${CLASE_TH} text-left`}>
@@ -713,7 +713,7 @@ export default function ConsultaPerfiles5M() {
             </div>
             <div className="max-h-96 overflow-auto">
               <table className="min-w-full divide-y divide-slate-200 text-sm">
-                <thead className="sticky top-0 bg-verde-600">
+                <thead className="sticky top-0 bg-verde-50 border-b-2 border-verde-500">
                   <tr>
                     <th scope="col" className={`${CLASE_TH} text-left`}>
                       Periodo

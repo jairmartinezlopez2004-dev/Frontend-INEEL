@@ -205,13 +205,13 @@ export default function GestionControladoresRF({ esAdmin: esAdminRol, usuarioLog
       {!error && controladores.length > 0 && (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200 text-sm">
-            <thead className="bg-azul-700">
+            <thead className="bg-azul-50 border-b-2 border-azul-600">
               <tr>
                 {COLUMNAS.map((col) => (
                   <th
                     key={col}
                     scope="col"
-                    className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-white"
+                    className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-azul-900"
                   >
                     {col}
                   </th>

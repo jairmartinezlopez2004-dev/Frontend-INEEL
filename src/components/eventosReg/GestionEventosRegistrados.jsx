@@ -120,13 +120,13 @@ export default function GestionEventosRegistrados() {
       {!error && registros.length > 0 && (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200 text-sm">
-            <thead className="bg-verde-600">
+            <thead className="bg-verde-50 border-b-2 border-verde-500">
               <tr>
                 {COLUMNAS.map((col) => (
                   <th
                     key={col}
                     scope="col"
-                    className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-white"
+                    className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-verde-900"
                   >
                     {col}
                   </th>

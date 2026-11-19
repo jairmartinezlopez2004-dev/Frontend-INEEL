@@ -70,7 +70,7 @@ function DatoResumen({ etiqueta, valor, unidad, detalle }) {
   )
 }
 
-const CLASE_TH = 'whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wide text-white'
+const CLASE_TH = 'whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wide text-verde-900'
 
 export default function EnergiaPorHora() {
   const [controladores, setControladores] = useState([])
@@ -285,7 +285,7 @@ export default function EnergiaPorHora() {
             <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
               <h3 className="border-b border-slate-200 px-4 py-3 text-sm font-semibold text-slate-900">Total por día</h3>
               <table className="w-full text-sm">
-                <thead className="bg-verde-600 text-left">
+                <thead className="bg-verde-50 border-b-2 border-verde-500 text-left">
                   <tr>
                     <th className={CLASE_TH}>Fecha</th>
                     <th className={`${CLASE_TH} text-right`}>Total ({unidad})</th>
@@ -307,7 +307,7 @@ export default function EnergiaPorHora() {
           <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
             <div className="max-h-[480px] overflow-auto">
               <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-verde-600 text-left">
+                <thead className="sticky top-0 bg-verde-50 border-b-2 border-verde-500 text-left">
                   <tr>
                     <th className={CLASE_TH}>Fecha</th>
                     <th className={CLASE_TH}>Hora</th>

@@ -228,7 +228,7 @@ function TabArmonicos() {
                     </h3>
                     <div className="overflow-x-auto rounded-lg ring-1 ring-gray-200">
                       <table className="w-full text-sm">
-                        <thead className="bg-verde-600 text-xs font-semibold text-white">
+                        <thead className="bg-verde-50 border-b-2 border-verde-500 text-xs font-semibold text-verde-900">
                           <tr>
                             <th className="px-3 py-2 text-left">#</th>
                             <th className="px-3 py-2 text-left">Hora</th>

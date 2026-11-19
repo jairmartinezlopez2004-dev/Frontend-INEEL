@@ -26,14 +26,14 @@ Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **
 | Ícono de los títulos, opción activa del menú, subrayado de pestaña activa | verde: `bg-verde-500`, `bg-verde-600`, `border-verde-400` |
 | Menú lateral | fondo **blanco**; opciones como botones `bg-verde-600` con **letras blancas** (hover `bg-verde-700`; tonos más claros no dejan leer el blanco); la activa `bg-verde-800` en negritas con barrita blanca a la izquierda. Se probaron: todo verde, botones verdes sólidos y activa invertida |
 | Barra de pestañas del medidor | **verde** `bg-verde-600`, texto blanco; activa en negritas con subrayado blanco |
-| Encabezados de tabla | **verde** `bg-verde-600` con texto blanco (en todas las tablas) |
+| Encabezados de tabla | **tinte claro + línea de color**: medidores y demás `bg-verde-50 border-b-2 border-verde-500` con texto `text-verde-900`; controladores `bg-azul-50 border-b-2 border-azul-600` con texto `text-azul-900` (el color sólido se probó: había demasiado verde sólido compitiendo) |
 | Barra superior | blanca (por los logos), borde inferior gris fino (la franja verde se probó y no gustó) |
 | Pies y barra de estado | `bg-azul-950`, texto `text-azul-200` |
 | Error | `text-red-600`, `bg-red-50`, `border-red-500` |
 | Éxito | `text-verde-700`, `bg-verde-50`, `border-verde-200` |
 
 ## Componentes
-- **Código de color por entidad**: todo lo de **controladores** va en **azul** (`TituloSeccion color="azul"`, encabezado de tabla `bg-azul-700`, encabezado del detalle en tarjeta blanca igual que la lista) y todo lo de **medidores** en **verde** (`TituloSeccion` verde, encabezado de tabla `bg-verde-600`), para identificarlos de un vistazo.
+- **Código de color por entidad**: todo lo de **controladores** va en **azul** (`TituloSeccion color="azul"`, encabezado de tabla con tinte azul, encabezado del detalle en tarjeta blanca igual que la lista) y todo lo de **medidores** en **verde** (`TituloSeccion` verde, encabezado de tabla con tinte verde), para identificarlos de un vistazo.
 - **Componentes comunes (úsalos siempre en vez de repetir clases)**:
   - `components/common/TituloSeccion.jsx`: título de tarjeta con ícono Lucide en círculo azul claro (`Icono`, `titulo`, `subtitulo`, `etiqueta`, `mayusculas={false}` para nombres propios).
   - `components/common/Botones.jsx`: `BotonPrimario` (azul, ícono "+" por defecto), `BotonSecundario`, `BotonEditar` (lápiz), `BotonVer` (flecha).
