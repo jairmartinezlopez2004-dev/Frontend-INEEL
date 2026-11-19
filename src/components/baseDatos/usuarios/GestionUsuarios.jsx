@@ -27,6 +27,7 @@ import { useFiltroTabla } from '../../../hooks/useFiltroTabla'
 import BuscadorTabla from '../../common/BuscadorTabla'
 import { Users } from 'lucide-react'
 import TituloSeccion from '../../common/TituloSeccion'
+import { BotonEditar } from '../../common/Botones'
 
 // Encabezados de la tabla (se mantienen en un arreglo para no repetir markup).
 const COLUMNAS = ['Nombre', 'Correo', 'Rol', 'Estado', 'Sesión (min)', '']
@@ -333,13 +334,7 @@ export default function GestionUsuarios({ esSuperAdmin }) {
                   <td className="px-4 py-3 font-mono text-slate-700">{usuario.tiempoSesion}</td>
                   <td className="px-4 py-3 text-right">
                     {puedeEditar(usuario) && (
-                      <button
-                        type="button"
-                        onClick={() => abrirFormulario(usuario)}
-                        className="cursor-pointer rounded-md border border-azul-700 px-3 py-1.5 text-xs font-semibold text-azul-700 transition-colors hover:bg-azul-700 hover:text-white"
-                      >
-                        Editar
-                      </button>
+                      <BotonEditar onClick={() => abrirFormulario(usuario)} />
                     )}
                   </td>
                 </tr>
