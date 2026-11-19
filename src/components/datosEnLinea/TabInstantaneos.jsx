@@ -19,6 +19,7 @@
 import MonitorMedidaTile from '../common/MonitorMedidaTile'
 import EncabezadoLectura, { OtrosPuntos } from './EncabezadoLectura'
 import { useLecturaMedidor } from '../../hooks/useLecturaMedidor'
+import { Zap } from 'lucide-react'
 
 // Catálogo de variables eléctricas instantáneas, agrupadas por fase.
 // `tag` es el Tag del punto en PuntosIO (grupo funcional 1). Los `null`
@@ -96,17 +97,17 @@ function TabInstantaneos({ medidor, usuarioLogueado }) {
 
   return (
     // Contenedor con scroll propio para acomodar todas las secciones de fases.
-    <div className="flex-1 overflow-auto bg-gray-50 p-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6">
-        <EncabezadoLectura titulo="Valores instantáneos" lectura={lectura} medidor={medidor} />
+    <div className="flex-1 overflow-auto pt-4">
+      <div className="flex flex-col gap-4">
+        <EncabezadoLectura Icono={Zap} titulo="Valores instantáneos" lectura={lectura} medidor={medidor} />
 
         {/* Una sección (tarjeta) por cada fase/grupo de medidas. */}
         {FASES.map((fase) => (
           <section
             key={fase.id}
-            className="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-black/5"
+            className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
           >
-            <h3 className="mb-6 text-xs font-semibold uppercase tracking-widest text-gray-900">
+            <h3 className="mb-6 text-xs font-semibold uppercase tracking-widest text-slate-600">
               {fase.etiqueta}
             </h3>
             {/* Grilla responsiva de tarjetas de medida (2 a 6 columnas según el ancho de pantalla). */}

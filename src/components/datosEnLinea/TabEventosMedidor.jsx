@@ -24,6 +24,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { listarEventos } from '../../services/eventosConfigService'
 import { listarUnidades, SIN_UNIDAD, claseCeldaUnidad } from '../../services/unidadesService'
+import { BellRing } from 'lucide-react'
+import TituloSeccion from '../common/TituloSeccion'
 
 // Columnas ordenables: clave del renglón, encabezado y alineación.
 const COLUMNAS = [
@@ -232,10 +234,10 @@ function TabEventosMedidor({ medidor }) {
     'cursor-pointer rounded-lg bg-gray-100 px-6 py-2.5 font-semibold text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50 p-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6">
+    <div className="flex-1 overflow-auto pt-4">
+      <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-bold uppercase tracking-wide text-slate-800">Eventos registrados en el medidor</h2>
+          <TituloSeccion Icono={BellRing} titulo="Eventos registrados en el medidor" />
           <span className="text-sm font-medium text-gray-600">
             {eventos.length} {eventos.length === 1 ? 'evento' : 'eventos'}
           </span>
@@ -251,7 +253,7 @@ function TabEventosMedidor({ medidor }) {
           </div>
         )}
 
-        <section className="overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-black/5">
+        <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
           <div className="max-h-[60vh] overflow-auto">
             <table className="w-full text-sm">
               <thead className="sticky top-0 bg-gray-50 text-xs font-semibold text-gray-700">
@@ -279,7 +281,7 @@ function TabEventosMedidor({ medidor }) {
                         disabled={eventos.length === 0}
                         onChange={(e) => setMarcados(e.target.checked ? new Set(eventos.map((ev) => ev.clave)) : new Set())}
                         aria-label="Marcar todos para guardar"
-                        className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-emerald-500"
+                        className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-blue-600"
                       />
                     </label>
                   </th>
@@ -309,7 +311,7 @@ function TabEventosMedidor({ medidor }) {
                           checked={marcados.has(e.clave)}
                           onChange={alternarMarcado(e.clave)}
                           aria-label={`Guardar evento ${e.numEvento} del ${e.fecha} ${e.hora}`}
-                          className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-emerald-500"
+                          className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-blue-600"
                         />
                       </td>
                     </tr>

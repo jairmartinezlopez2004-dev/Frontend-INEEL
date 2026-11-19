@@ -17,6 +17,7 @@
 import MonitorMedidaTile from '../common/MonitorMedidaTile'
 import EncabezadoLectura, { OtrosPuntos } from './EncabezadoLectura'
 import { useLecturaMedidor } from '../../hooks/useLecturaMedidor'
+import { Timer } from 'lucide-react'
 
 // Catálogo de variables de 5 minutos, agrupadas por categoría. `tag` es el
 // Tag del punto en PuntosIO (grupo funcional 2). Los `null` son espacios
@@ -94,14 +95,14 @@ function TabValores5M({ medidor, usuarioLogueado }) {
 
   return (
     // Contenedor con scroll propio para acomodar todas las categorías de medidas.
-    <div className="h-full overflow-auto bg-gray-50 p-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6">
-        <EncabezadoLectura titulo="Últimos valores 5 minutales" lectura={lectura} medidor={medidor} />
+    <div className="h-full overflow-auto pt-4">
+      <div className="flex flex-col gap-4">
+        <EncabezadoLectura Icono={Timer} titulo="Últimos valores 5 minutales" lectura={lectura} medidor={medidor} />
 
         {/* Una sección (tarjeta) por cada categoría de medidas. */}
         {FILAS.map((fila) => (
-          <section key={fila.id} className="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-black/5">
-            <h3 className="mb-6 text-xs font-semibold uppercase tracking-widest text-gray-900">
+          <section key={fila.id} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <h3 className="mb-6 text-xs font-semibold uppercase tracking-widest text-slate-600">
               {fila.etiqueta}
             </h3>
             {/* Grilla responsiva de tarjetas de medida (2 a 6 columnas según el ancho de pantalla). */}

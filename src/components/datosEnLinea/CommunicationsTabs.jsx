@@ -37,7 +37,7 @@ const ICONOS = {
 function CommunicationsTabs({ activeTab, onTabChange, pestanasOcultas = [] }) {
   return (
     // Contenedor con scroll horizontal para que las pestañas quepan en pantallas angostas.
-    <div className="overflow-x-auto rounded-t-xl border border-b-0 border-gray-200 bg-white px-2 pt-1">
+    <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white px-2 shadow-sm">
       <nav className="flex gap-1">
         {TABS.filter((tab) => !pestanasOcultas.includes(tab)).map((tab) => {
           // Resalta la pestaña activa con un borde inferior azul.

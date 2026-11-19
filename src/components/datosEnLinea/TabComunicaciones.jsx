@@ -27,7 +27,7 @@ function TabComunicaciones({ medidor, usuarioLogueado, soloLectura = false }) {
 
   return (
     // Contenedor con scroll propio, para pantallas donde el formulario sea más alto que el viewport.
-    <div className="flex-1 overflow-auto p-6">
+    <div className="flex-1 overflow-auto pt-4">
       {/* En pantallas grandes (lg+), sidebar y formulario se muestran lado a lado;
           en pantallas pequeñas, se apilan en columna. */}
       <div className="flex flex-col lg:flex-row gap-6 lg:items-start w-full">

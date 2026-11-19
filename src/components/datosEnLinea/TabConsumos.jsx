@@ -17,6 +17,7 @@
 import MonitorMedidaTile from '../common/MonitorMedidaTile'
 import EncabezadoLectura, { OtrosPuntos } from './EncabezadoLectura'
 import { useLecturaMedidor } from '../../hooks/useLecturaMedidor'
+import { PlugZap } from 'lucide-react'
 
 // Parámetros de consumo: `prefijo` es la raíz del Tag en PuntosIO (grupo
 // funcional 3); cada uno tiene Fase A, B, C y Total con la misma unidad.
@@ -47,14 +48,14 @@ function TabConsumos({ medidor, usuarioLogueado }) {
 
   return (
     // Contenedor con scroll propio para acomodar todos los parámetros de consumo.
-    <div className="flex-1 overflow-auto bg-gray-50 p-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6">
-        <EncabezadoLectura titulo="Consumos de energía" lectura={lectura} medidor={medidor} />
+    <div className="flex-1 overflow-auto pt-4">
+      <div className="flex flex-col gap-4">
+        <EncabezadoLectura Icono={PlugZap} titulo="Consumos de energía" lectura={lectura} medidor={medidor} />
 
         {/* Una sección (tarjeta) por cada parámetro de consumo (Whe, Whr, VARh I-IV). */}
         {PARAMETROS.map((parametro) => (
-          <section key={parametro.prefijo} className="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-black/5">
-            <h3 className="mb-6 text-xs font-semibold uppercase tracking-widest text-gray-900">
+          <section key={parametro.prefijo} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <h3 className="mb-6 text-xs font-semibold uppercase tracking-widest text-slate-600">
               {parametro.etiqueta}
             </h3>
             {/* Grilla de tarjetas de medida (Fase A, B, C y Total). */}

@@ -22,6 +22,8 @@
  * backend se sustituirá por la llamada que lea los fasores del medidor.
  */
 import { useEffect, useRef, useState } from 'react'
+import { Compass } from 'lucide-react'
+import TituloSeccion from '../common/TituloSeccion'
 
 const FASES = ['A', 'B', 'C']
 
@@ -160,10 +162,10 @@ function TabFasores() {
   }
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50 p-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6">
+    <div className="flex-1 overflow-auto pt-4">
+      <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-bold uppercase tracking-wide text-slate-800">Fasores</h2>
+          <TituloSeccion Icono={Compass} titulo="Fasores" />
           {adquiriendo && (
             <span className="flex items-center gap-2 text-sm font-medium text-emerald-600">
               <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
@@ -174,13 +176,13 @@ function TabFasores() {
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
           {/* Panel de valores por fase y controles de adquisición. */}
-          <section className="flex flex-col gap-6 rounded-2xl bg-white p-8 shadow-lg ring-1 ring-black/5">
+          <section className="flex flex-col gap-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <table className="w-full border-separate border-spacing-x-2 border-spacing-y-3">
               <thead>
                 <tr>
                   <th />
                   {FASES.map((fase) => (
-                    <th key={fase} className="text-xs font-semibold uppercase tracking-widest text-gray-900">
+                    <th key={fase} className="text-xs font-semibold uppercase tracking-widest text-slate-600">
                       Fase {fase}
                     </th>
                   ))}
@@ -246,8 +248,8 @@ function TabFasores() {
           </section>
 
           {/* Diagrama fasorial. */}
-          <section className="flex flex-col rounded-2xl bg-white p-6 shadow-lg ring-1 ring-black/5">
-            <h3 className="mb-4 text-center text-xs font-semibold uppercase tracking-widest text-gray-900">
+          <section className="flex flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <h3 className="mb-4 text-center text-xs font-semibold uppercase tracking-widest text-slate-600">
               Diagrama fasorial voltaje - corriente
             </h3>
             <div className="mx-auto aspect-square w-full max-w-xl rounded-xl bg-slate-900 p-2">

@@ -27,6 +27,8 @@
 import { useEffect, useState } from 'react'
 import ConfirmDialog from '../common/ConfirmDialog'
 import { claseControl } from '../common/clasesFormulario'
+import { SlidersHorizontal } from 'lucide-react'
+import TituloSeccion from '../common/TituloSeccion'
 
 // rolId del SuperAdministrador y del Administrador en la UI.
 const ROLES_ADMINISTRADOR = [1, 2]
@@ -174,7 +176,7 @@ function CasillaModificar({ checked, onChange, disabled }) {
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
         disabled={disabled}
-        className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-emerald-500"
+        className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-blue-600"
       />
       Modificar valores
     </label>
@@ -548,10 +550,10 @@ function TabPuntosAjuste({ usuarioLogueado }) {
   const puedeModificar = ROLES_ADMINISTRADOR.includes(usuarioLogueado?.rolId)
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50 p-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6">
+    <div className="flex-1 overflow-auto pt-4">
+      <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-bold uppercase tracking-wide text-slate-800">Ajustes internos del medidor</h2>
+          <TituloSeccion Icono={SlidersHorizontal} titulo="Ajustes internos del medidor" />
           {!puedeModificar && <span className="text-sm font-medium text-gray-500">Solo lectura</span>}
         </div>
 
@@ -577,7 +579,7 @@ function TabPuntosAjuste({ usuarioLogueado }) {
           {/* `key` reinicia el estado de la sección al cambiar de opción. */}
           <section
             key={seccion}
-            className="flex min-w-0 flex-1 flex-col gap-6 rounded-2xl bg-white p-8 shadow-lg ring-1 ring-black/5"
+            className="flex min-w-0 flex-1 flex-col gap-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
           >
             {SECCIONES_CAMPOS[seccion] && <SeccionCampos id={seccion} medidor={medidor} puedeModificar={puedeModificar} />}
             {seccion === 'fecha' && <SeccionFecha medidor={medidor} puedeModificar={puedeModificar} />}

@@ -41,9 +41,9 @@ function MonitorMedidaTile({ titulo, valor, unidad, checked, onChange, seleccion
 
   return (
     // Tarjeta blanca con sombra suave; se resalta un poco más al pasar el mouse.
-    <div className="flex flex-col gap-3 rounded-lg bg-white p-5 shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md">
+    <div className="flex flex-col gap-3 rounded-lg bg-white p-5 border border-gray-200 shadow-sm transition-shadow hover:shadow-md">
       {/* Nombre de la medida (se trunca si es muy largo para no romper el layout). */}
-      <span className="truncate text-[11px] font-semibold uppercase tracking-wide text-gray-900">
+      <span className="truncate text-[11px] font-semibold uppercase tracking-wide text-slate-600">
         {titulo}
       </span>
 
@@ -63,7 +63,7 @@ function MonitorMedidaTile({ titulo, valor, unidad, checked, onChange, seleccion
             type="checkbox"
             {...(esControlado ? { checked, onChange } : { defaultChecked: false })}
             aria-label={`Incluir ${titulo}`}
-            className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+            className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
           />
         )}
       </div>

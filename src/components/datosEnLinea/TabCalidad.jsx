@@ -16,6 +16,7 @@
  */
 import EncabezadoLectura, { OtrosPuntos } from './EncabezadoLectura'
 import { useLecturaMedidor } from '../../hooks/useLecturaMedidor'
+import { Waves } from 'lucide-react'
 
 // Indicadores de calidad de la potencia, agrupados por categoría. `tag` es
 // el Tag del punto en PuntosIO (grupo funcional 5).
@@ -62,8 +63,8 @@ const TAGS = CATEGORIAS.flatMap((categoria) => categoria.medidas.map((medida) =>
 // Tarjeta de solo lectura para un indicador de calidad: título y valor centrados.
 function DataTile({ titulo, valor }) {
   return (
-    <div className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-black/5">
-      <p className="truncate text-center text-[11px] font-semibold uppercase tracking-wide text-gray-900">
+    <div className="rounded-xl bg-white p-5 border border-gray-200 shadow-sm">
+      <p className="truncate text-center text-[11px] font-semibold uppercase tracking-wide text-slate-600">
         {titulo}
       </p>
       <p className="mt-2 text-center font-mono text-2xl font-semibold tracking-tight text-green-500 tabular-nums">
@@ -81,17 +82,17 @@ function TabCalidad({ medidor, usuarioLogueado }) {
 
   return (
     // Contenedor con scroll propio para acomodar todas las categorías de calidad.
-    <div className="h-full overflow-auto bg-gray-50 p-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6">
-        <EncabezadoLectura titulo="Calidad de la potencia" lectura={lectura} medidor={medidor} />
+    <div className="h-full overflow-auto pt-4">
+      <div className="flex flex-col gap-4">
+        <EncabezadoLectura Icono={Waves} titulo="Calidad de la potencia" lectura={lectura} medidor={medidor} />
 
         {/* Columnas por categoría (THD Tensión, THD Corriente, Factor de
             potencia, Desbalance), responsiva de 1 a 4 columnas. */}
-        <section className="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-black/5">
+        <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {CATEGORIAS.map((categoria) => (
               <div key={categoria.id} className="flex flex-col gap-4">
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-gray-900">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-600">
                   {categoria.etiqueta}
                 </h3>
                 {categoria.medidas.map((medida) => (

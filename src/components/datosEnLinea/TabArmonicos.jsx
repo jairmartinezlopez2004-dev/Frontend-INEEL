@@ -20,6 +20,8 @@
  */
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { FASES as FASES_5M, VARIABLES_5M, listarVariables5M } from '../../services/medicion5MService'
+import { AudioWaveform } from 'lucide-react'
+import TituloSeccion from '../common/TituloSeccion'
 
 // Se carga bajo demanda: ECharts solo se descarga al abrir el Gráfico.
 const GraficaArmonicos = lazy(() => import('./GraficaArmonicos'))
@@ -57,7 +59,7 @@ function calcularThd(valores) {
 const horaActual = () => new Date().toLocaleTimeString('es-MX', { hour12: false })
 
 const claseSelect =
-  'w-full rounded-md border-0 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-200'
+  'w-full rounded-md border-0 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200'
 
 function TabArmonicos() {
   // Catálogo de variables: el de respaldo hasta que responda el WebService.
@@ -135,10 +137,10 @@ function TabArmonicos() {
   const textoVariable = variables.find((v) => String(v.id) === variableLeida)?.nombre
 
   return (
-    <div className="flex-1 overflow-auto bg-gray-50 p-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6">
+    <div className="flex-1 overflow-auto pt-4">
+      <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-bold uppercase tracking-wide text-slate-800">Contenido armónico</h2>
+          <TituloSeccion Icono={AudioWaveform} titulo="Contenido armónico" />
           {textoVariable && (
             <span className="text-sm font-medium text-gray-600">
               Variable: <span className="font-semibold text-gray-900">{textoVariable}</span>
@@ -148,8 +150,8 @@ function TabArmonicos() {
 
         <div className="grid gap-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
           {/* Selección de variable y fase, y acciones. */}
-          <section className="flex flex-col gap-5 self-start rounded-2xl bg-white p-6 shadow-lg ring-1 ring-black/5">
-            <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-widest text-gray-900">
+          <section className="flex flex-col gap-5 self-start rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-widest text-slate-600">
               Variable
               <select value={variable} onChange={(e) => elegirVariable(e.target.value)} className={claseSelect}>
                 <option value="">Seleccione…</option>
@@ -161,7 +163,7 @@ function TabArmonicos() {
               </select>
             </label>
 
-            <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-widest text-gray-900">
+            <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-widest text-slate-600">
               Fase
               <select value={fase} onChange={(e) => setFase(e.target.value)} className={claseSelect}>
                 <option value="todas">Todas</option>
@@ -195,7 +197,7 @@ function TabArmonicos() {
           </section>
 
           {/* Resultados: subpestañas Datos / Gráfico. */}
-          <section className="flex min-w-0 flex-col rounded-2xl bg-white shadow-lg ring-1 ring-black/5">
+          <section className="flex min-w-0 flex-col rounded-xl border border-gray-200 bg-white shadow-sm">
             <nav className="flex gap-1 border-b border-gray-200 px-4 pt-2">
               {[
                 { id: 'datos', texto: 'Datos' },
@@ -207,7 +209,7 @@ function TabArmonicos() {
                   onClick={() => setVista(t.id)}
                   className={`rounded-t-md border-b-2 px-4 py-2 text-sm font-medium transition-all cursor-pointer ${
                     vista === t.id
-                      ? 'border-indigo-600 text-indigo-600'
+                      ? 'border-blue-600 text-blue-600'
                       : 'border-transparent text-gray-700 hover:bg-blue-50 hover:text-blue-600'
                   }`}
                 >
@@ -220,7 +222,7 @@ function TabArmonicos() {
               <div className="flex flex-col gap-6 p-6">
                 {FASES.map((f) => (
                   <div key={f.id}>
-                    <h3 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-gray-900">
+                    <h3 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-slate-600">
                       <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: f.color }} />
                       Fase {f.id}
                     </h3>
@@ -290,7 +292,7 @@ function TabArmonicos() {
                           type="checkbox"
                           checked={conFundamental}
                           onChange={(e) => setConFundamental(e.target.checked)}
-                          className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                          className="h-3.5 w-3.5 cursor-pointer rounded-sm border-gray-300 accent-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
                         />
                         Mostrar fundamental (A1)
                       </label>
