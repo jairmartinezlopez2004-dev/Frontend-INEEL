@@ -24,7 +24,7 @@ Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **
 | Etiquetas de campos | `text-gray-700` (`text-sm font-medium`) |
 | Acción principal / acento | `bg-azul-700 hover:bg-azul-800`, foco `ring-azul-600` |
 | Ícono de los títulos, opción activa del menú, subrayado de pestaña activa | verde: `bg-verde-500`, `bg-verde-600`, `border-verde-400` |
-| Menú lateral | **verde** `bg-verde-600`, texto blanco, hover `bg-verde-700`; opción activa `bg-white text-verde-700` en negritas |
+| Menú lateral | **blanco** con letras e íconos **verdes** (`text-verde-700`), hover `bg-verde-50`; opción activa `bg-verde-600 text-white` en negritas (el menú todo verde se probó y no gustó) |
 | Barra de pestañas del medidor | **verde** `bg-verde-600`, texto blanco; activa en negritas con subrayado blanco |
 | Encabezados de tabla | **verde** `bg-verde-600` con texto blanco (en todas las tablas) |
 | Barra superior | blanca (por los logos), borde inferior gris fino (la franja verde se probó y no gustó) |
@@ -44,7 +44,7 @@ Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **
 - **Barra superior**: blanca, `h-16 border-b border-gray-200 shadow-sm`, logos con `LogosInstitucionales`, título del sistema en mayúsculas `text-sm font-bold tracking-wide`.
 - **Fondo de "Datos a Consultar"**: la foto de `config.json → fondoAcceso` con velo azul marino (`rgba(19,33,58,.72)`), título en blanco; sin foto, `bg-azul-900`.
 - **Tarjetas de opción** (pantalla "Datos a Consultar"): fondo blanco **sin borde** `rounded-2xl bg-white shadow-md`; círculo del ícono `bg-verde-500 text-white`; texto oscuro (la ficha completa en verde se probó y no gustó). Los colores son **fijos**; al pasar el cursor **solo se elevan** (`transition-transform hover:-translate-y-1`), sin cambio de color.
-- **Menú lateral**: verde; opción activa en blanco con letras verdes; cada opción con su ícono Lucide `h-4 w-4`.
+- **Menú lateral**: blanco con letras verdes; opción activa en verde con letras blancas; cada opción con su ícono Lucide `h-4 w-4`.
 - **Inputs**: usar `claseControl()` de `components/common/clasesFormulario.js` (o `clasesAuth.js` en las pantallas de acceso). No repetir clases a mano.
 - **Botón primario**: `bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 text-sm font-medium`. Secundario: borde `border-gray-300 text-slate-700 hover:bg-slate-50`. Peligro: rojo solo al confirmar.
 - **Tablas**: encabezado `bg-slate-50 text-xs font-semibold uppercase text-slate-600`, filas con `divide-y divide-gray-100` y `hover:bg-slate-50`; números alineados a la derecha con `tabular-nums`.

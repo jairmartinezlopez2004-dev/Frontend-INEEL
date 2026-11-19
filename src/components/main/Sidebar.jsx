@@ -48,7 +48,7 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
     // Menú colapsable: la clase de ancho ("w-64" o "w-0") se anima con transition-[width]
     // para lograr el efecto de expandir/contraer el Sidebar.
     <aside
-      className={`flex shrink-0 overflow-hidden bg-verde-600 text-white transition-[width] duration-300 ease-in-out ${
+      className={`flex shrink-0 overflow-hidden border-r border-gray-200 bg-white text-verde-700 transition-[width] duration-300 ease-in-out ${
         isOpen ? 'w-64' : 'w-0'
       }`}
     >
@@ -60,7 +60,7 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
           {/* Regresa a la vista principal "¿Consultar datos por medio de?:". */}
           <Link
             to="/"
-            className="mb-3 flex w-full items-center gap-2 rounded-md border border-white/40 px-3 py-2 text-left text-sm font-medium text-white transition-colors hover:bg-verde-700"
+            className="mb-3 flex w-full items-center gap-2 rounded-md border border-verde-300 px-3 py-2 text-left text-sm font-medium text-verde-700 transition-colors hover:bg-verde-50"
           >
             <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
             Tipo de consulta
@@ -77,11 +77,11 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
               key={item.ruta}
               to={`${rutaBase}/${item.ruta}`}
               className={({ isActive }) =>
-                // Activa: fondo blanco con letras verdes (el menú es verde).
+                // Activa: fondo verde con letras blancas (el menú es blanco con letras verdes).
                 `flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-white font-semibold text-verde-700 shadow-sm'
-                    : 'text-white hover:bg-verde-700'
+                    ? 'bg-verde-600 font-semibold text-white shadow-sm'
+                    : 'text-verde-700 hover:bg-verde-50 hover:text-verde-800'
                 }`
               }
             >
@@ -92,7 +92,7 @@ export default function Sidebar({ rutaBase, isOpen, esAdmin, rutasVisibles }) {
         </nav>
 
         {/* Pie del Menú (Versión) */}
-        <div className="border-t border-white/25 px-6 py-4 text-xs text-verde-100 text-center">
+        <div className="border-t border-gray-200 px-6 py-4 text-xs text-verde-600 text-center">
           v0.1.0
         </div>
       </div>
