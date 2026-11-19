@@ -92,7 +92,7 @@ export default function SeleccionConsulta({ currentUser, onSeleccionar, onLogout
               type="button"
               disabled={!disponible}
               onClick={() => onSeleccionar(ruta)}
-              className="group relative flex min-h-56 cursor-pointer flex-col items-center justify-center gap-5 rounded-2xl border border-verde-500 bg-white p-8 text-center shadow-lg shadow-verde-100 transition-transform hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-azul-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+              className="group relative flex min-h-56 cursor-pointer flex-col items-center justify-center gap-5 rounded-2xl bg-white p-8 text-center shadow-md transition-transform hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-azul-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
             >
               {/* Ícono de la opción. Colores fijos; al pasar el
                   cursor la tarjeta solo se eleva. */}
