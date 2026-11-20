@@ -14,6 +14,9 @@
  *       la "baja" de un usuario se hace desmarcando "Activo".
  * - Las cuentas de SuperAdministrador solo las edita otro SuperAdministrador
  *   (al Administrador no le aparece "Editar" en esas filas).
+ * - Debajo de la tabla, CuentasPendientes avisa cuántas cuentas siguen
+ *   inactivas (por ejemplo, registros nuevos que esperan aprobación) y
+ *   permite activarlas con un clic.
  * - Mientras el formulario está abierto se oculta la tabla, para que solo se
  *   vea la configuración del usuario que se edita.
  */
@@ -28,6 +31,7 @@ import BuscadorTabla from '../../common/BuscadorTabla'
 import { Users } from 'lucide-react'
 import TituloSeccion from '../../common/TituloSeccion'
 import { BotonEditar } from '../../common/Botones'
+import CuentasPendientes from './CuentasPendientes'
 
 // Encabezados de la tabla (se mantienen en un arreglo para no repetir markup).
 const COLUMNAS = ['Nombre', 'Correo', 'Rol', 'Estado', 'Sesión (min)', '']
@@ -347,6 +351,11 @@ export default function GestionUsuarios({ esSuperAdmin }) {
             </p>
           )}
         </div>
+      )}
+
+      {/* Aviso de cuentas inactivas por activar, debajo de la tabla (no aparece si no hay ninguna). */}
+      {!formularioAbierto && !cargando && !error && (
+        <CuentasPendientes usuarios={usuarios} puedeEditar={puedeEditar} onActivada={alGuardar} />
       )}
     </div>
   )
