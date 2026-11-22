@@ -108,17 +108,32 @@ export function registrarCuenta({ nombreUsuario, correo, contrasena }) {
 }
 
 /**
- * Restablece la contraseña de quien la olvidó con POST /Contrasena/restablecer.
- * Es público (no requiere sesión) y no envía correo de verificación; el
- * backend registra cada cambio en su auditoría.
+ * Pide un código de verificación para cambiar la contraseña con
+ * POST /Contrasena/solicitar-codigo. Es público (no requiere sesión).
+ * El backend envía un código de 6 dígitos al correo si pertenece a una cuenta
+ * activa, y siempre responde lo mismo para no revelar qué cuentas existen.
+ * El código vence en 15 minutos; no se puede pedir otro antes de 60 segundos.
  *
- * @param {{ correo: string, nuevaContrasena: string }} datos
+ * @param {string} correo
  * @returns {Promise<object>} Respuesta del backend ({ mensaje }).
- * @throws {ApiError} Si no hay una cuenta activa con ese correo, la contraseña
- *   no cumple la política o es igual a la actual (400), o no hay conexión.
+ * @throws {ApiError} Si el correo no es válido (400) o no hay conexión.
  */
-export function restablecerContrasena({ correo, nuevaContrasena }) {
-  return apiPost('/Contrasena/restablecer', { correo, nuevaContrasena })
+export function solicitarCodigoContrasena(correo) {
+  return apiPost('/Contrasena/solicitar-codigo', { correo })
+}
+
+/**
+ * Cambia la contraseña con el código de verificación recibido por correo
+ * (POST /Contrasena/restablecer). Es público (no requiere sesión) y aplica
+ * igual a Usuario, Administrador y SuperAdministrador.
+ *
+ * @param {{ correo: string, codigo: string, nuevaContrasena: string }} datos
+ * @returns {Promise<object>} Respuesta del backend ({ mensaje }).
+ * @throws {ApiError} Si el código es incorrecto o venció, la contraseña no
+ *   cumple la política o es igual a la actual (400), o no hay conexión.
+ */
+export function restablecerContrasena({ correo, codigo, nuevaContrasena }) {
+  return apiPost('/Contrasena/restablecer', { correo, codigo, nuevaContrasena })
 }
 
 /**
