@@ -20,7 +20,8 @@ import {
   actualizarMedidor,
 } from '../../../services/medidoresService'
 import { useValidacion } from '../../../hooks/useValidacion'
-import { validarTexto, validarIP, validarEntero } from '../../../utils/validaciones'
+import { validarTexto, validarIP } from '../../../utils/validaciones'
+import { formatoDirRed, leerDirRed, validarDirRed } from '../../../utils/direccionRed'
 import CampoFormulario from '../../common/CampoFormulario'
 import { claseControl } from '../../common/clasesFormulario'
 
@@ -31,7 +32,8 @@ const VALIDADORES = {
   idCtrlRF: (v) => (v === '' ? 'Elige el controlador RF al que pertenece el medidor.' : null),
   descripcion: (v) =>
     validarTexto(v, { nombre: 'La descripción', maximo: LIMITES.descripcion, femenino: true }),
-  dirRed: (v) => validarEntero(v, { nombre: 'La dirección de red', minimo: 0 }),
+  // Se captura en hexadecimal (0x0000 a 0xFFFF).
+  dirRed: validarDirRed,
   dirRF: (v) => validarTexto(v, { nombre: 'La dirección RF', maximo: LIMITES.dirRF, femenino: true }),
   dirIP: validarIP,
   edo: (v) => (v === '' ? 'Elige el estado del medidor.' : null),
@@ -59,7 +61,7 @@ export default function FormularioMedidor({
       ? {
           idCtrlRF: String(medidor.idCtrlRF),
           descripcion: medidor.descripcion,
-          dirRed: String(medidor.dirRed),
+          dirRed: formatoDirRed(medidor.dirRed),
           dirRF: medidor.dirRF,
           dirIP: medidor.dirIP,
           edo: String(medidor.edo),
@@ -102,7 +104,8 @@ export default function FormularioMedidor({
     const datos = {
       ...form,
       idCtrlRF: Number(form.idCtrlRF),
-      dirRed: Number(form.dirRed),
+      // La API recibe el número; en pantalla se escribe en hexadecimal.
+      dirRed: leerDirRed(form.dirRed),
       edo: Number(form.edo),
     }
     try {
@@ -164,9 +167,9 @@ export default function FormularioMedidor({
           id="medidor-dirRed"
           etiqueta="Dirección de red"
           error={errorDe('dirRed')}
-          ayuda="Número entero."
+          ayuda="Hexadecimal, de 0x0000 a 0xFFFF (el prefijo 0x es opcional)."
         >
-          <input type="text" inputMode="numeric" placeholder="25" {...propsDe('dirRed', 'font-mono')} />
+          <input type="text" maxLength={6} placeholder="0x0019" {...propsDe('dirRed', 'font-mono')} />
         </CampoFormulario>
 
         <CampoFormulario

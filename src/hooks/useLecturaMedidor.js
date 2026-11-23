@@ -12,6 +12,7 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { solicitarLecturaGrupo } from '../services/conexionMedidorService'
+import { formatoDirRed } from '../utils/direccionRed'
 
 // rolId del SuperAdministrador y del Administrador en la UI (authService.js).
 const ROLES_ADMINISTRADOR = [1, 2]
@@ -53,7 +54,7 @@ export function useLecturaMedidor({ medidor, usuarioLogueado, grupo, tagsCatalog
     controladorRef.current = controlador
 
     const catalogo = new Set(tagsCatalogo.map((tag) => tag.toLowerCase()))
-    setEstado({ tipo: 'enCurso', texto: `Solicitando lectura al medidor ${medidor.dirRed}…` })
+    setEstado({ tipo: 'enCurso', texto: `Solicitando lectura al medidor ${formatoDirRed(medidor.dirRed)}…` })
     try {
       const { mensaje, puntos } = await solicitarLecturaGrupo(grupo, medidor.id, { signal: controlador.signal })
       setValoresPorTag(new Map(puntos.map((punto) => [String(punto.tag).toLowerCase(), punto.valor])))

@@ -21,6 +21,7 @@ import { useFiltroTabla } from '../../hooks/useFiltroTabla'
 import BuscadorTabla from '../common/BuscadorTabla'
 import { BellRing } from 'lucide-react'
 import TituloSeccion from '../common/TituloSeccion'
+import { formatoDirRed } from '../../utils/direccionRed'
 
 // Encabezados de la tabla.
 const COLUMNAS = ['Fecha', 'Controlador RF', 'Medidor', 'Evento', 'Consumo']
@@ -68,7 +69,7 @@ export default function GestionEventosRegistrados() {
   const textoControlador = (idCtrlRF) => controladorDe(idCtrlRF)?.nombre ?? `ID ${idCtrlRF}`
   const textoMedidor = (idCtrlRF, idMedidor) => {
     const medidor = controladorDe(idCtrlRF)?.medidores.find((m) => m.id === idMedidor)
-    return medidor ? `Dir. ${medidor.dirRed} – ${medidor.descripcion}` : `ID ${idMedidor}`
+    return medidor ? `Dir. ${formatoDirRed(medidor.dirRed)} – ${medidor.descripcion}` : `ID ${idMedidor}`
   }
   const textoEvento = (idEvento) => {
     const evento = eventos.find((e) => e.id === idEvento)

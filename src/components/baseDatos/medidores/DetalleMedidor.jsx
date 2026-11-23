@@ -18,6 +18,7 @@ import MainForm from '../../datosEnLinea/MainForm'
 import { Gauge } from 'lucide-react'
 import TituloSeccion from '../../common/TituloSeccion'
 import { BotonVolver } from '../../common/Botones'
+import { formatoDirRed } from '../../../utils/direccionRed'
 
 // Dato de solo lectura para el encabezado del medidor (etiqueta + valor).
 function DatoMedidor({ etiqueta, valor }) {
@@ -62,7 +63,7 @@ export default function DetalleMedidor({
 
         <dl className="grid grid-cols-2 gap-4 border-t border-gray-200 px-4 py-4 sm:grid-cols-4 md:px-6">
           <DatoMedidor etiqueta="Controlador RF" valor={medidor.nombreControlador} />
-          <DatoMedidor etiqueta="Dir. Red" valor={medidor.dirRed} />
+          <DatoMedidor etiqueta="Dir. Red" valor={formatoDirRed(medidor.dirRed)} />
           <DatoMedidor etiqueta="Dir. RF" valor={medidor.dirRF} />
           <DatoMedidor etiqueta="Dirección IP" valor={medidor.dirIP} />
         </dl>

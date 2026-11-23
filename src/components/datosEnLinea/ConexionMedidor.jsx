@@ -26,6 +26,7 @@ import TituloSeccion from '../common/TituloSeccion'
 
 // Estilos del mensaje de resultado según el estado de la operación.
 const CLASES_ESTADO = {
+import { formatoDirRed } from '../../utils/direccionRed'
   enCurso: 'border-azul-200 bg-azul-50 text-azul-800',
   exito: 'border-verde-200 bg-verde-50 text-verde-700',
   error: 'border-red-200 bg-red-50 text-red-700',
@@ -66,10 +67,10 @@ export default function ConexionMedidor({ medidor }) {
   }
 
   const conectar = () =>
-    ejecutar('conectar', conectarMedidor, `Conectando con el medidor ${medidor.dirRed} por puerto serial…`)
+    ejecutar('conectar', conectarMedidor, `Conectando con el medidor ${formatoDirRed(medidor.dirRed)} por puerto serial…`)
 
   const sincronizar = () =>
-    ejecutar('sincronizar', sincronizarMedidor, `Enviando trama de sincronización al medidor ${medidor.dirRed}…`)
+    ejecutar('sincronizar', sincronizarMedidor, `Enviando trama de sincronización al medidor ${formatoDirRed(medidor.dirRed)}…`)
 
   return (
     <section className="w-full rounded-xl border border-gray-200 bg-white p-6 shadow-sm">

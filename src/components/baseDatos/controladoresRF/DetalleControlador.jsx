@@ -27,6 +27,7 @@ import BuscadorTabla from '../../common/BuscadorTabla'
 import { Gauge, Radio } from 'lucide-react'
 import TituloSeccion from '../../common/TituloSeccion'
 import { BotonEditar, BotonPrimario, BotonVer, BotonVolver } from '../../common/Botones'
+import { formatoDirRed } from '../../../utils/direccionRed'
 
 // Encabezados de la tabla de medidores. La última columna (acciones) no tiene título.
 const COLUMNAS = ['Dir. Red', 'Dir. RF', 'Descripción', 'Estado', 'Dirección IP', '']
@@ -70,6 +71,8 @@ export default function DetalleControlador({
   // Buscador de la tabla de medidores: filtra por las columnas visibles.
   const medidores = controlador?.medidores ?? []
   const filtro = useFiltroTabla(medidores, (m) => [
+    // El buscador encuentra la dirección en hexadecimal (0x00FF) y en decimal.
+    formatoDirRed(m.dirRed),
     m.dirRed,
     m.dirRF,
     m.descripcion,
@@ -232,7 +235,7 @@ export default function DetalleControlador({
                   <tbody className="divide-y divide-slate-100">
                     {filtro.filtradas.map((medidor) => (
                       <tr key={medidor.id} className="hover:bg-slate-50">
-                        <td className="px-4 py-3 font-mono text-slate-700">{medidor.dirRed}</td>
+                        <td className="px-4 py-3 font-mono text-slate-700">{formatoDirRed(medidor.dirRed)}</td>
                         <td className="px-4 py-3 font-mono text-slate-700">{medidor.dirRF}</td>
                         <td className="px-4 py-3 text-slate-900">{medidor.descripcion}</td>
                         <td className="px-4 py-3">
