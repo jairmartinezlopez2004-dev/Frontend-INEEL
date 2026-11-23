@@ -60,10 +60,13 @@ const MENSAJE_GENERICO =
  * reportado por el WebService de un error de red.
  */
 export class ApiError extends Error {
-  constructor(mensaje, { httpStatus = null } = {}) {
+  constructor(mensaje, { httpStatus = null, datos = null } = {}) {
     super(mensaje)
     this.name = 'ApiError'
     this.httpStatus = httpStatus // Código HTTP (400, 401, 404, ...), si aplica.
+    // Cuerpo JSON de la respuesta de error, si lo hubo (p. ej. una lectura
+    // parcial que el backend devuelve con 503).
+    this.datos = datos
   }
 }
 
@@ -128,7 +131,7 @@ export async function peticion(ruta, { method = 'GET', body, signal } = {}) {
         MENSAJES_HTTP[res.status] ||
         MENSAJE_GENERICO
     }
-    throw new ApiError(mensaje, { httpStatus: res.status })
+    throw new ApiError(mensaje, { httpStatus: res.status, datos })
   }
 
   return datos

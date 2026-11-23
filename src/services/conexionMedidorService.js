@@ -14,7 +14,7 @@
  * backend los lee de Jsons/TransporteConfig.json y Jsons/ProtocoloConfig.json,
  * y toma dirRed y dirRF del medidor en la base de datos.
  */
-import { apiPost } from './api'
+import { ApiError, apiPost } from './api'
 
 /**
  * Pide al backend que conecte con el medidor.
@@ -102,5 +102,49 @@ export async function solicitarLecturaGrupo(grupo, idMedidor, { signal } = {}) {
   return {
     mensaje: respuesta?.mensaje || `Lectura de ${GRUPOS_LECTURA[grupo].descripcion} completada.`,
     puntos: Array.isArray(respuesta?.puntos) ? respuesta.puntos : [],
+  }
+}
+
+/**
+ * Pide al backend los armónicos del medidor: conecta y llama a SolArmonicos
+ * de la DLL una vez por cada punto activo del grupo funcional 6 (ARM_VA,
+ * ARM_VB, ARM_VC de voltaje y ARM_IA, ARM_IB, ARM_IC de corriente). Una sola
+ * solicitud trae voltaje y corriente de las tres fases.
+ *
+ *   POST /ConexionMedidor/armonicos  { idMedidor }
+ *     -> 200 { idMedidor, idGF: 6, conectado: true, lecturaExitosa: true, mensaje,
+ *              puntos: [{ fase, nombreFase, tipo: 'V'|'I', idPunto, tag,
+ *                         dirCCEC, dirModbus, exitosa, valores: number[] }] }
+ *     -> 503 lo mismo con lecturaExitosa: false: no conectó, no hay puntos, el
+ *            puerto estuvo ocupado o algún punto falló (ese punto llega con
+ *            exitosa: false y valores: [], los demás sí traen sus valores)
+ *     -> 404 { mensaje }  no existe el medidor
+ *
+ * `puntos` llega ordenado por fase (A, B, C) y, en cada fase, voltaje antes
+ * que corriente; `valores` conserva el orden en que la DLL los entrega.
+ *
+ * @param {number} idMedidor - Identificador del medidor (MedidorQP.idMedidor).
+ * @param {object} [opciones]
+ * @param {AbortSignal} [opciones.signal] - Para cancelar si el usuario sale de la vista.
+ * @returns {Promise<{ mensaje: string, completa: boolean, puntos: Array<object> }>}
+ *   `completa` es false cuando el backend respondió 503 pero algún punto sí se
+ *   leyó: se devuelven esos puntos junto con el mensaje de lo que falló.
+ * @throws {ApiError} Si no se leyó ningún punto o la petición falló.
+ */
+export async function solicitarArmonicos(idMedidor, { signal } = {}) {
+  try {
+    const respuesta = await apiPost('/ConexionMedidor/armonicos', { idMedidor: Number(idMedidor) }, { signal })
+    return {
+      mensaje: respuesta?.mensaje || 'Lectura de armónicos completada.',
+      completa: true,
+      puntos: Array.isArray(respuesta?.puntos) ? respuesta.puntos : [],
+    }
+  } catch (err) {
+    // Lectura parcial: 503 con algunos puntos leídos. Se conservan esos puntos.
+    const puntos = err instanceof ApiError && Array.isArray(err.datos?.puntos) ? err.datos.puntos : []
+    if (err.httpStatus === 503 && puntos.some((p) => p.exitosa)) {
+      return { mensaje: err.datos?.mensaje || err.message, completa: false, puntos }
+    }
+    throw err
   }
 }

@@ -65,7 +65,7 @@ function MainForm({ medidor, usuarioLogueado, soloLectura = false }) {
       {activeTab === 'Fasores' && <TabFasores />}
       {activeTab === 'Consumos' && <TabConsumos medidor={medidor} usuarioLogueado={usuarioLogueado} />}
       {activeTab === 'Eventos' && <TabEventosMedidor medidor={medidor} />}
-      {activeTab === 'Armónicos' && <TabArmonicos />}
+      {activeTab === 'Armónicos' && <TabArmonicos medidor={medidor} usuarioLogueado={usuarioLogueado} />}
       {/* Puntos de ajuste: solo administradores, e ignora `soloLectura` porque siempre modifican. */}
       {activeTab === 'Puntos de ajuste' && esAdmin && <TabPuntosAjuste usuarioLogueado={usuarioLogueado} />}
       {!TABS_MAQUETADAS.includes(activeTab) && (
