@@ -3,7 +3,9 @@
  * ---------------------------------------------------------------------------
  * Vista "Puntos de ajuste" del medidor (ajustes internos): un menú lateral
  * con las secciones Multiplicadores, Límites de alarmas, Identificadores,
- * Fecha-Hora, Firmware y Reset de fábrica.
+ * Fecha-Hora y Firmware. (La opción Reset de fábrica se retiró a petición
+ * del usuario, para que no se pueda borrar la configuración del medidor
+ * desde el visor.)
  *
  * Rol en el sistema:
  * Replica la pestaña Ajustes del visor de escritorio anterior. En cada
@@ -12,7 +14,7 @@
  * - La casilla "Modificar valores" habilita la edición y "Descargar" envía
  *   los valores al medidor (en el visor anterior, "descargar" = enviar del
  *   visor al medidor).
- * - Firmware solo se lee; Reset de fábrica pide confirmación.
+ * - Firmware solo se lee.
  *
  * Permisos: MainForm.jsx solo muestra esta pestaña al SuperAdministrador y al
  * Administrador; `puedeModificar` se conserva como respaldo. A diferencia del resto de "Datos en
@@ -22,10 +24,9 @@
  * Integración con el WebService:
  * Pendiente (comandos LeerSetPoint / EnviarSetPoint del sistema anterior).
  * `crearMedidorSimulado` imita al medidor; al conectar el backend se
- * sustituirán sus funciones `leer`, `escribir` y `resetFabrica`.
+ * sustituirán sus funciones `leer` y `escribir`.
  */
 import { useEffect, useState } from 'react'
-import ConfirmDialog from '../common/ConfirmDialog'
 import { claseControl } from '../common/clasesFormulario'
 import { SlidersHorizontal } from 'lucide-react'
 import TituloSeccion from '../common/TituloSeccion'
@@ -100,15 +101,7 @@ const MENU = [
   { id: 'identificadores', texto: 'Identificadores' },
   { id: 'fecha', texto: 'Fecha-Hora' },
   { id: 'firmware', texto: 'Firmware' },
-  { id: 'reset', texto: 'Reset fábrica' },
 ]
-
-// Valores de fábrica del medidor simulado.
-const FABRICA = {
-  multiplicadores: { va: 1, vb: 1, vc: 1, ia: 1, ib: 1, ic: 1 },
-  limites: { vMax: 138, vMin: 102, iMax: 100 },
-  identificadores: { dirRed: 1, numSerie: 'QP000001', tipoMedicion: 'Trifásica 4 hilos (estrella)' },
-}
 
 const esperar = (ms) => new Promise((r) => setTimeout(r, ms))
 
@@ -135,10 +128,6 @@ function crearMedidorSimulado() {
       await esperar(300)
       if (seccion === 'fecha') m.desfaseReloj = valores.fechaHora.getTime() - Date.now()
       else m[seccion] = { ...valores }
-    },
-    resetFabrica: async () => {
-      await esperar(500)
-      Object.assign(m, structuredClone(FABRICA), { desfaseReloj: 0 })
     },
   }
 }
@@ -486,57 +475,6 @@ function SeccionFirmware({ medidor }) {
   )
 }
 
-function SeccionReset({ medidor, puedeModificar }) {
-  const [confirmando, setConfirmando] = useState(false)
-  const [ocupado, setOcupado] = useState(false)
-  const [mensaje, setMensaje] = useState(null)
-
-  const restablecer = async () => {
-    setOcupado(true)
-    try {
-      await medidor.resetFabrica()
-      setMensaje({ tipo: 'ok', texto: 'El medidor se restableció a los valores de fábrica.' })
-    } finally {
-      setOcupado(false)
-      setConfirmando(false)
-    }
-  }
-
-  return (
-    <>
-      <h3 className="text-center text-base font-bold uppercase tracking-wide text-slate-800">Reset de fábrica</h3>
-      <div className="mx-auto w-full max-w-lg rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-        Regresa el medidor a sus valores de fábrica: multiplicadores, límites de alarmas, identificadores y reloj.
-        Los ajustes actuales se pierden y el medidor puede dejar de comunicarse si cambia su dirección de red.
-      </div>
-
-      <Mensaje mensaje={mensaje} />
-
-      <div className="flex justify-center border-t border-gray-100 pt-5">
-        <button
-          type="button"
-          onClick={() => setConfirmando(true)}
-          disabled={!puedeModificar || ocupado}
-          title={puedeModificar ? undefined : 'Solo el Administrador puede restablecer el medidor'}
-          className="cursor-pointer rounded-lg bg-red-600 px-6 py-2.5 font-semibold text-white shadow-sm transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Restablecer valores de fábrica
-        </button>
-      </div>
-
-      <ConfirmDialog
-        abierto={confirmando}
-        titulo="¿Restablecer el medidor?"
-        mensaje="Se borrarán todos los ajustes del medidor y quedarán los de fábrica. Esta acción no se puede deshacer."
-        textoConfirmar={ocupado ? 'Restableciendo…' : 'Restablecer'}
-        onConfirmar={restablecer}
-        onCancelar={() => setConfirmando(false)}
-        ocupado={ocupado}
-      />
-    </>
-  )
-}
-
 // --------------------------------------------------------------------------
 // Pestaña
 // --------------------------------------------------------------------------
@@ -584,7 +522,6 @@ function TabPuntosAjuste({ usuarioLogueado }) {
             {SECCIONES_CAMPOS[seccion] && <SeccionCampos id={seccion} medidor={medidor} puedeModificar={puedeModificar} />}
             {seccion === 'fecha' && <SeccionFecha medidor={medidor} puedeModificar={puedeModificar} />}
             {seccion === 'firmware' && <SeccionFirmware medidor={medidor} />}
-            {seccion === 'reset' && <SeccionReset medidor={medidor} puedeModificar={puedeModificar} />}
           </section>
         </div>
       </div>
