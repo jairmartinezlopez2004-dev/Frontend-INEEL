@@ -2,14 +2,14 @@
  * TabArmonicos.jsx
  * ---------------------------------------------------------------------------
  * Vista de "Contenido armónico" del medidor: el usuario elige la variable
- * (del catálogo Vars5M) y la fase, solicita la lectura y ve los armónicos
+ * (solo Voltaje o Corriente) y la fase, solicita la lectura y ve los armónicos
  * A1 a A10 de cada fase en tablas (Datos) o en una gráfica de barras
  * (Gráfico).
  *
  * Rol en el sistema:
  * Replica la pestaña Armónicos del visor de escritorio anterior. Cada
- * "Solicitar" agrega un renglón con la hora de la lectura a la tabla de cada
- * fase consultada; "Graficar" muestra la última lectura de cada fase. La
+ * "Solicitar" limpia las lecturas anteriores y muestra solo la nueva (con su
+ * hora) en la tabla de cada fase consultada; "Graficar" la muestra en barras. La
  * gráfica sigue el estilo de un analizador de calidad de la potencia: barra
  * de THD seguida de cada armónico en % de la fundamental.
  *
@@ -18,8 +18,8 @@
  * la fundamental); al conectar el backend se sustituirá por la llamada que
  * lea los armónicos del medidor.
  */
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
-import { FASES as FASES_5M, VARIABLES_5M, listarVariables5M } from '../../services/medicion5MService'
+import { lazy, Suspense, useMemo, useState } from 'react'
+import { FASES as FASES_5M } from '../../services/medicion5MService'
 import { AudioWaveform } from 'lucide-react'
 import TituloSeccion from '../common/TituloSeccion'
 
@@ -28,6 +28,13 @@ const GraficaArmonicos = lazy(() => import('./GraficaArmonicos'))
 
 // Mismos colores por fase que en Perfiles 5 Minutales.
 const FASES = FASES_5M.map(({ nombre, color }) => ({ id: nombre, color }))
+
+// Variables de armónicos: solo voltaje y corriente, las que el medidor mide
+// por fase (puntos ARM_VA/VB/VC y ARM_IA/IB/IC). Las dos son trifásicas.
+const VARIABLES = [
+  { id: 'voltaje', nombre: 'Voltaje' },
+  { id: 'corriente', nombre: 'Corriente' },
+]
 
 const ORDENES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 // % respecto a la fundamental, como lo muestran los analizadores.
@@ -39,11 +46,9 @@ const BASE_SIMULADA = {
   corriente: [100, 1.0, 25, 0.8, 15, 0.5, 8, 0.4, 4, 0.3],
 }
 
-// Datos de ejemplo mientras no exista el método del WebService: las variables
-// de voltaje usan el perfil de voltaje y las demás el de corriente.
+// Datos de ejemplo mientras no exista el método del WebService.
 function lecturaSimulada(variable) {
-  const perfil = /volt/i.test(variable.nombre) ? 'voltaje' : 'corriente'
-  return BASE_SIMULADA[perfil].map((x, k) => (k === 0 ? x : Math.max(0, x * (1 + (Math.random() - 0.5) * 0.3))))
+  return BASE_SIMULADA[variable.id].map((x, k) => (k === 0 ? x : Math.max(0, x * (1 + (Math.random() - 0.5) * 0.3))))
 }
 
 /**
@@ -62,12 +67,10 @@ const claseSelect =
   'w-full rounded-md border-0 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-azul-200'
 
 function TabArmonicos() {
-  // Catálogo de variables: el de respaldo hasta que responda el WebService.
-  const [variables, setVariables] = useState(VARIABLES_5M)
   // id (texto) de la variable elegida en el selector.
   const [variable, setVariable] = useState('')
   const [fase, setFase] = useState('todas')
-  // Lecturas acumuladas por fase: { A: [{ hora, valores }], B: [...], C: [...] }.
+  // Última lectura por fase: { A: [{ hora, valores }], B: [...], C: [...] } (se limpia en cada Solicitar).
   const [lecturas, setLecturas] = useState({ A: [], B: [], C: [] })
   // Variable de las lecturas mostradas; al cambiar de variable se reinician.
   const [variableLeida, setVariableLeida] = useState('')
@@ -76,39 +79,18 @@ function TabArmonicos() {
   // mejor los armónicos pequeños.
   const [conFundamental, setConFundamental] = useState(true)
 
-  // Mismo catálogo que Perfiles 5 Minutales (GET /Vars5M); si falla se
-  // queda el de respaldo.
-  useEffect(() => {
-    const controlador = new AbortController()
-    listarVariables5M({ signal: controlador.signal })
-      .then((lista) => {
-        if (lista.length > 0) setVariables(lista)
-      })
-      .catch((err) => {
-        if (err.name !== 'AbortError') console.warn('Vars5M no disponible; se usa el catálogo de respaldo.', err)
-      })
-    return () => controlador.abort()
-  }, [])
-
-  const variableElegida = variables.find((v) => String(v.id) === variable)
-  // Las variables de una sola fase solo se miden en la fase A.
-  const esMonofasica = variableElegida?.fases === 1
-
-  const elegirVariable = (id) => {
-    setVariable(id)
-    if (variables.find((v) => String(v.id) === id)?.fases === 1 && fase !== 'todas') setFase('A')
-  }
+  const variableElegida = VARIABLES.find((v) => v.id === variable)
 
   const hayDatos = FASES.some((f) => lecturas[f.id].length > 0)
 
   // Punto donde, al conectar el backend, se pedirán los armónicos al medidor.
   const solicitar = () => {
     const hora = horaActual()
-    const fasesALeer = esMonofasica ? ['A'] : fase === 'todas' ? FASES.map((f) => f.id) : [fase]
-    const base = variable === variableLeida ? lecturas : { A: [], B: [], C: [] }
-    const siguiente = { ...base }
+    const fasesALeer = fase === 'todas' ? FASES.map((f) => f.id) : [fase]
+    // Cada solicitud limpia lo anterior: solo queda la lectura nueva.
+    const siguiente = { A: [], B: [], C: [] }
     for (const id of fasesALeer) {
-      siguiente[id] = [...base[id], { hora, valores: lecturaSimulada(variableElegida) }]
+      siguiente[id] = [{ hora, valores: lecturaSimulada(variableElegida) }]
     }
     setLecturas(siguiente)
     setVariableLeida(variable)
@@ -134,7 +116,7 @@ function TabArmonicos() {
     [conFundamental],
   )
 
-  const textoVariable = variables.find((v) => String(v.id) === variableLeida)?.nombre
+  const textoVariable = VARIABLES.find((v) => v.id === variableLeida)?.nombre
 
   return (
     <div className="flex-1 overflow-auto pt-4">
@@ -153,10 +135,10 @@ function TabArmonicos() {
           <section className="flex flex-col gap-5 self-start rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-widest text-slate-600">
               Variable
-              <select value={variable} onChange={(e) => elegirVariable(e.target.value)} className={claseSelect}>
+              <select value={variable} onChange={(e) => setVariable(e.target.value)} className={claseSelect}>
                 <option value="">Seleccione…</option>
-                {variables.map((v) => (
-                  <option key={v.id} value={String(v.id)}>
+                {VARIABLES.map((v) => (
+                  <option key={v.id} value={v.id}>
                     {v.nombre}
                   </option>
                 ))}
@@ -168,7 +150,7 @@ function TabArmonicos() {
               <select value={fase} onChange={(e) => setFase(e.target.value)} className={claseSelect}>
                 <option value="todas">Todas</option>
                 {FASES.map((f) => (
-                  <option key={f.id} value={f.id} disabled={esMonofasica && f.id !== 'A'}>
+                  <option key={f.id} value={f.id}>
                     Fase {f.id}
                   </option>
                 ))}
