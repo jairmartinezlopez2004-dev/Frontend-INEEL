@@ -149,6 +149,8 @@ function TabFasores() {
 
   // Punto donde, al conectar el backend, se pedirán los fasores al medidor.
   const solicitar = () => {
+    // Limpia la lectura anterior antes de mostrar la nueva.
+    setLectura(LECTURA_VACIA)
     setLectura(lecturaSimulada())
     if (periodo > 0) {
       temporizador.current = setInterval(() => setLectura(lecturaSimulada()), periodo * 1000)

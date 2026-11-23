@@ -9,6 +9,10 @@
  * selección), así que cada pestaña solo decide dónde pinta cada `tag`. Los
  * puntos que llegan y no están en el catálogo de la pestaña se devuelven en
  * `otrosPuntos` para no perderlos.
+ *
+ * Cada "Solicitar" limpia primero los valores de la lectura anterior: la
+ * pantalla queda en blanco ("—") mientras se espera y, si la lectura falla,
+ * no quedan a la vista valores viejos que parezcan actuales.
  */
 import { useEffect, useRef, useState } from 'react'
 import { solicitarLecturaGrupo } from '../services/conexionMedidorService'
@@ -54,6 +58,10 @@ export function useLecturaMedidor({ medidor, usuarioLogueado, grupo, tagsCatalog
     controladorRef.current = controlador
 
     const catalogo = new Set(tagsCatalogo.map((tag) => tag.toLowerCase()))
+    // Limpia la lectura anterior antes de pedir la nueva.
+    setValoresPorTag(new Map())
+    setOtrosPuntos([])
+    setUltimaLectura(null)
     setEstado({ tipo: 'enCurso', texto: `Solicitando lectura al medidor ${formatoDirRed(medidor.dirRed)}…` })
     try {
       const { mensaje, puntos } = await solicitarLecturaGrupo(grupo, medidor.id, { signal: controlador.signal })

@@ -209,6 +209,10 @@ function SeccionCampos({ id, medidor, puedeModificar }) {
   }
 
   const solicitar = async () => {
+    // Limpia los valores anteriores (y cualquier edición) antes de leer.
+    setLeidos(null)
+    setBorrador({})
+    setModificando(false)
     setOcupado(true)
     setMensaje(null)
     try {
@@ -335,6 +339,9 @@ function SeccionFecha({ medidor, puedeModificar }) {
   }, [])
 
   const solicitar = async () => {
+    // Limpia la hora leída antes (y cualquier edición) de volver a leer.
+    setDesfase(null)
+    setModificando(false)
     setOcupado(true)
     setMensaje(null)
     try {
@@ -441,6 +448,7 @@ function SeccionFirmware({ medidor }) {
   const [ocupado, setOcupado] = useState(false)
 
   const solicitar = async () => {
+    setFirmware(null) // Limpia la lectura anterior.
     setOcupado(true)
     try {
       setFirmware(await medidor.leer('firmware'))

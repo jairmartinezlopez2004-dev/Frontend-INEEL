@@ -170,6 +170,9 @@ function TabEventosMedidor({ medidor }) {
 
   // Punto donde, al conectar el backend, se pedirán los eventos al medidor.
   const solicitar = () => {
+    // Limpia los eventos anteriores (y lo marcado) antes de leer.
+    reemplazarEventos([])
+    setMensaje(null)
     const lista = lecturaSimulada(catalogo)
     reemplazarEventos(lista)
     setMensaje({ tipo: 'ok', texto: `Se leyeron ${lista.length} eventos del medidor.` })
