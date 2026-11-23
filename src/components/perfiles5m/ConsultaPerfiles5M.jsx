@@ -25,6 +25,8 @@
  *   consultado y los marca en la gráfica, para ver qué pasó en una subida o
  *   bajada. El backend guarda solo la fecha del evento (sin hora), así que se
  *   marca el día completo.
+ * - "Exportar a Excel" descarga lo consultado (todas las fases en una hoja,
+ *   con portada, gráfica y resumen) mediante services/exportarExcel5M.js.
  * - Es de solo consulta para todos los roles: el backend solo expone las
  *   vistas de lectura, no la edición de mediciones.
  *
@@ -48,8 +50,9 @@ import { listarRegistros } from '../../services/eventosRegService'
 import { listarEventos } from '../../services/eventosConfigService'
 import { claseControl } from '../common/clasesFormulario'
 import SelectorRangoFechas from '../common/SelectorRangoFechas'
-import { ChartLine, Search } from 'lucide-react'
+import { ChartLine, FileSpreadsheet, Search } from 'lucide-react'
 import TituloSeccion from '../common/TituloSeccion'
+import { BotonSecundario } from '../common/Botones'
 // La gráfica se carga bajo demanda: ECharts (~600 KB) solo se descarga al
 // abrir esta vista, no al entrar al sistema.
 const GraficaECharts = lazy(() => import('./GraficaECharts'))
@@ -177,6 +180,9 @@ export default function ConsultaPerfiles5M() {
   const [registros, setRegistros] = useState([])
   const [catalogoEventos, setCatalogoEventos] = useState([])
   const [errorEventos, setErrorEventos] = useState(null)
+  // Exportación a Excel en curso y su error (no borra el resultado en pantalla).
+  const [exportando, setExportando] = useState(false)
+  const [errorExportar, setErrorExportar] = useState(null)
 
   // Carga de los medidores. La vista empieza vacía (sin medidor elegido ni
   // consulta), para que al volver a iniciar sesión no aparezcan datos de una
@@ -386,6 +392,32 @@ export default function ConsultaPerfiles5M() {
     .filter((e) => e.indices.length > 0)
     .map((e) => ({ inicio: e.indices[0], fin: e.indices[e.indices.length - 1], texto: `${e.texto} (${e.fecha})` }))
 
+  // Descarga el reporte de Excel de lo consultado (todos los periodos, no
+  // solo el tramo acercado). El módulo se carga solo al exportar.
+  const exportar = async () => {
+    setExportando(true)
+    setErrorExportar(null)
+    try {
+      const { exportarExcel5M } = await import('../../services/exportarExcel5M')
+      const controlador = controladores.find((c) => c.medidores.some((m) => m.id === resultado.filtros.idMedidor))
+      await exportarExcel5M({
+        medidor: medidor?.descripcion || `Medidor #${resultado.filtros.idMedidor}`,
+        controlador: controlador?.nombre || (controlador ? `Controlador #${controlador.id}` : ''),
+        variable,
+        filtros: resultado.filtros,
+        agrupacion: nombreAgrupacion,
+        esTotal: conTotal,
+        periodos,
+        series,
+      })
+    } catch (err) {
+      console.error('No se pudo generar el Excel.', err)
+      setErrorExportar(`No se pudo generar el archivo de Excel: ${err.message}`)
+    } finally {
+      setExportando(false)
+    }
+  }
+
   // ── Navegación de la gráfica ──
   // Fija el tramo visible ajustándolo a los límites; si abarca todo, se quita.
   const fijarVentana = (inicio, tam) => {
@@ -545,11 +577,19 @@ export default function ConsultaPerfiles5M() {
                 {medidor?.descripcion || `Medidor #${resultado.filtros.idMedidor}`} · {variable.nombre} ·{' '}
                 {variasFases ? series.map((s) => s.nombre).join(', ') : series[0].nombre.toLowerCase()}
               </h3>
-              <span className="text-xs text-slate-500">
-                {nombreAgrupacion} · {resultado.filtros.fechaInicio} a {resultado.filtros.fechaFin} ·{' '}
-                {periodos.length} {periodos.length === 1 ? 'periodo' : 'periodos'}
-              </span>
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-xs text-slate-500">
+                  {nombreAgrupacion} · {resultado.filtros.fechaInicio} a {resultado.filtros.fechaFin} ·{' '}
+                  {periodos.length} {periodos.length === 1 ? 'periodo' : 'periodos'}
+                </span>
+                <BotonSecundario Icono={FileSpreadsheet} onClick={exportar} disabled={exportando}>
+                  {exportando ? 'Generando…' : 'Exportar a Excel'}
+                </BotonSecundario>
+              </div>
             </div>
+            {errorExportar && (
+              <div className="mb-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">{errorExportar}</div>
+            )}
 
             {/* Aviso de que el resumen y la tabla corresponden al tramo acercado. */}
             {ventana && (
