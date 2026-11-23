@@ -18,7 +18,7 @@ Sistema institucional de medición (INEEL / SECIHTI). La prioridad es que sea **
 
 | Uso | Clases |
 | --- | --- |
-| Fondo del área de trabajo | **la foto de `config.json → fondoAcceso` con velo azul marino** (`rgba(19,33,58,.72)`, `fixed`), igual que "Datos a Consultar"; sin foto, `bg-azul-900`. Todo el contenido en tarjetas blancas; lo que quede directo sobre el fondo lleva **texto blanco** (menús de Coms y Puntos de ajuste). Se probaron azul claro, azul marino y negro |
+| Fondo del área de trabajo | **la foto de `config.json → fondoAcceso` con velo azul marino** (`rgba(19,33,58,.72)`, `fixed`), igual que "Datos a Consultar"; sin foto, `bg-azul-900`. Todo el contenido en tarjetas blancas; lo que quede directo sobre el fondo lleva **texto blanco** (menú de Puntos de ajuste; Coms ya no tiene menú lateral y ocupa todo el ancho). Se probaron azul claro, azul marino y negro |
 | Superficies (tarjetas, formularios) | `bg-white` + `border border-gray-200` |
 | Texto principal / títulos | `text-slate-800` |
 | Etiquetas de campos | `text-gray-700` (`text-sm font-medium`) |

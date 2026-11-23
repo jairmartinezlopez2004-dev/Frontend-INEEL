@@ -18,15 +18,18 @@
  *   sincronización de su configuración.
  * - Las dos operaciones usan el mismo puerto, así que mientras una está en
  *   curso ambos botones se deshabilitan.
+ * - Orden obligatorio: primero "Conectar". "Sincronizar" queda deshabilitado
+ *   hasta que la conexión responda con éxito; si un intento de conexión falla
+ *   vuelve a deshabilitarse. Al salir de la pestaña se pide conectar de nuevo.
  */
 import { useEffect, useRef, useState } from 'react'
 import { conectarMedidor, sincronizarMedidor } from '../../services/conexionMedidorService'
 import { Cable, Plug, RefreshCw } from 'lucide-react'
 import TituloSeccion from '../common/TituloSeccion'
+import { formatoDirRed } from '../../utils/direccionRed'
 
 // Estilos del mensaje de resultado según el estado de la operación.
 const CLASES_ESTADO = {
-import { formatoDirRed } from '../../utils/direccionRed'
   enCurso: 'border-azul-200 bg-azul-50 text-azul-800',
   exito: 'border-verde-200 bg-verde-50 text-verde-700',
   error: 'border-red-200 bg-red-50 text-red-700',
@@ -40,6 +43,8 @@ const CLASES_BOTON =
 export default function ConexionMedidor({ medidor }) {
   // estado: null (sin intento) | { tipo: 'enCurso' | 'exito' | 'error', operacion, texto }
   const [estado, setEstado] = useState(null)
+  // true después de un "Conectar" exitoso: habilita "Sincronizar".
+  const [conectado, setConectado] = useState(false)
   const controladorRef = useRef(null)
 
   // Si el usuario sale de la pestaña con una operación en curso, se cancela.
@@ -60,9 +65,12 @@ export default function ConexionMedidor({ medidor }) {
     try {
       const mensaje = await llamada(medidor.id, { signal: controlador.signal })
       setEstado({ tipo: 'exito', operacion, texto: mensaje })
+      if (operacion === 'conectar') setConectado(true)
     } catch (err) {
       if (err.name === 'AbortError') return
       setEstado({ tipo: 'error', operacion, texto: err.message })
+      // Una conexión fallida obliga a volver a conectar antes de sincronizar.
+      if (operacion === 'conectar') setConectado(false)
     }
   }
 
@@ -92,13 +100,20 @@ export default function ConexionMedidor({ medidor }) {
         <button
           type="button"
           onClick={sincronizar}
-          disabled={enCurso}
+          disabled={enCurso || !conectado}
+          title={conectado ? undefined : 'Primero conecta con el medidor'}
           className={`${CLASES_BOTON} bg-azul-700 hover:bg-azul-800`}
         >
           <RefreshCw className={`h-4 w-4 ${enCurso && estado.operacion === 'sincronizar' ? 'animate-spin' : ''}`} aria-hidden="true" />
           {enCurso && estado.operacion === 'sincronizar' ? 'Sincronizando…' : 'Sincronizar'}
         </button>
       </div>
+
+      {!conectado && (
+        <p className="mt-2 text-xs font-medium text-slate-600">
+          Primero pulsa «Conectar»; «Sincronizar» se habilita cuando la conexión se establece.
+        </p>
+      )}
 
       <p className="mt-2 text-xs text-slate-500">
         La conexión es por puerto serial. El puerto COM, la velocidad y el timeout los toma el servidor de su
