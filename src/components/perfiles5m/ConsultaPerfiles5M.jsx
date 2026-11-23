@@ -103,7 +103,7 @@ function filtrosIniciales() {
   haceSeisDias.setDate(hoy.getDate() - 6)
   return {
     idMedidor: null,
-    idVar5M: 9,
+    idVar5M: null,
     fases: [1],
     fechaInicio: fechaISO(haceSeisDias),
     fechaFin: fechaISO(hoy),
@@ -112,8 +112,9 @@ function filtrosIniciales() {
 }
 
 /** Mensaje de error de los filtros, o null si son válidos. */
-function validarFiltros({ idMedidor, fases, fechaInicio, fechaFin, agrupacion }) {
+function validarFiltros({ idMedidor, idVar5M, fases, fechaInicio, fechaFin, agrupacion }) {
   if (!idMedidor) return 'Elige un medidor.'
+  if (!idVar5M) return 'Elige una variable.'
   if (fases.length === 0) return 'Elige al menos una fase.'
   if (!fechaInicio || !fechaFin) return 'Indica la fecha inicial y la final.'
   if (fechaInicio > fechaFin) return 'La fecha inicial no puede ser posterior a la final.'
@@ -457,7 +458,10 @@ export default function ConsultaPerfiles5M() {
           </label>
           <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
             Variable
-            <select value={filtros.idVar5M} onChange={cambiarVariable} className={claseControl()}>
+            <select value={filtros.idVar5M ?? ''} onChange={cambiarVariable} className={claseControl()}>
+              <option value="" disabled>
+                Elige una variable
+              </option>
               {variables.map((v) => (
                 <option key={v.id} value={v.id}>
                   {v.nombre}

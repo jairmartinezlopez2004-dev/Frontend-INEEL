@@ -37,21 +37,22 @@ function fechaISO(fecha) {
   return `${fecha.getFullYear()}-${d(fecha.getMonth() + 1)}-${d(fecha.getDate())}`
 }
 
-/** Filtros iniciales: sin medidor, primera variable de energía, últimos 7 días. */
-function filtrosIniciales(variables) {
+/** Filtros iniciales: sin medidor ni variable elegidos, últimos 7 días. */
+function filtrosIniciales() {
   const hoy = new Date()
   const haceSeisDias = new Date(hoy)
   haceSeisDias.setDate(hoy.getDate() - 6)
   return {
     idMedidor: null,
-    idVar5M: variables.find(esEnergia)?.id ?? 1,
+    idVar5M: null,
     fechaInicio: fechaISO(haceSeisDias),
     fechaFin: fechaISO(hoy),
   }
 }
 
-function validarFiltros({ idMedidor, fechaInicio, fechaFin }) {
+function validarFiltros({ idMedidor, idVar5M, fechaInicio, fechaFin }) {
   if (!idMedidor) return 'Elige un medidor.'
+  if (!idVar5M) return 'Elige una variable.'
   if (!fechaInicio || !fechaFin) return 'Indica la fecha inicial y la final.'
   if (fechaInicio > fechaFin) return 'La fecha inicial no puede ser posterior a la final.'
   return null
@@ -75,7 +76,7 @@ const CLASE_TH = 'whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tr
 export default function EnergiaPorHora() {
   const [controladores, setControladores] = useState([])
   const [variables, setVariables] = useState(VARIABLES_5M)
-  const [filtros, setFiltros] = useState(() => filtrosIniciales(VARIABLES_5M))
+  const [filtros, setFiltros] = useState(filtrosIniciales)
   // Filtros aplicados (null = sin consulta); un objeto nuevo vuelve a consultar.
   const [consulta, setConsulta] = useState(null)
   const [resultado, setResultado] = useState(null) // { filtros, filas, mensaje }
@@ -106,11 +107,12 @@ export default function EnergiaPorHora() {
       .then((lista) => {
         if (lista.length === 0) return
         setVariables(lista)
-        // Si la variable elegida no es de energía en el catálogo real, se toma la primera que sí lo sea.
+        // Si ya se había elegido una variable que en el catálogo real no es de
+        // energía, se quita para que el usuario elija otra.
         setFiltros((prev) =>
-          lista.some((v) => v.id === prev.idVar5M && esEnergia(v))
+          prev.idVar5M === null || lista.some((v) => v.id === prev.idVar5M && esEnergia(v))
             ? prev
-            : { ...prev, idVar5M: lista.find(esEnergia)?.id ?? prev.idVar5M },
+            : { ...prev, idVar5M: null },
         )
       })
       .catch((err) => {
@@ -210,10 +212,13 @@ export default function EnergiaPorHora() {
           <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
             Variable de energía
             <select
-              value={filtros.idVar5M}
+              value={filtros.idVar5M ?? ''}
               onChange={(e) => setFiltros((prev) => ({ ...prev, idVar5M: Number(e.target.value) }))}
               className={claseControl()}
             >
+              <option value="" disabled>
+                Elige una variable
+              </option>
               {variablesEnergia.map((v) => (
                 <option key={v.id} value={v.id}>
                   {v.nombre} ({v.unidad})
