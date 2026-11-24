@@ -15,11 +15,13 @@
  *   como «—». Si el backend responde 503 con algunos valores, se muestran y
  *   el mensaje indica qué falló.
  *
- * Convención del diagrama (la del backend):
- * Los ángulos se miden desde el eje horizontal positivo y crecen en sentido
- * antihorario: VA 0°, VB 240°, VC 120°; cada corriente va en su
- * anguloCorriente. Sin lectura, los voltajes se dibujan a escala completa en
- * sus ángulos nominales como referencia.
+ * Convención del diagrama (la del visor de escritorio anterior, acordada con
+ * el backend):
+ * Los ángulos se miden desde el eje horizontal positivo (VA en 0°) y crecen
+ * en sentido horario, es decir, 90° queda hacia abajo: VA 0°, VB 120°,
+ * VC 240°. El backend ya manda anguloVoltaje y anguloCorriente en esta
+ * convención, así que se dibujan tal como llegan. Sin lectura, los voltajes se dibujan a escala completa en sus
+ * ángulos nominales como referencia.
  */
 import { useEffect, useRef, useState } from 'react'
 import { Compass, Download } from 'lucide-react'
@@ -29,9 +31,8 @@ import { formatoDirRed } from '../../utils/direccionRed'
 
 const FASES = ['A', 'B', 'C']
 
-// Ángulos nominales de los voltajes de fase, en grados (sentido antihorario),
-// los mismos que devuelve el backend en anguloVoltaje.
-const ANGULOS_V = { A: 0, B: 240, C: 120 }
+// Ángulos nominales de los voltajes de fase, en grados (sentido horario).
+const ANGULOS_V = { A: 0, B: 120, C: 240 }
 
 // Filas del panel de valores: campo de la respuesta, etiqueta, decimales y unidad.
 const FILAS = [
@@ -59,11 +60,12 @@ const TAM = 400
 const CENTRO = TAM / 2
 const RADIO = 160
 
-// Punto final de un vector de longitud `largo` y ángulo `grados` (antihorario).
-// En SVG el eje Y crece hacia abajo, por eso se resta el seno.
+// Punto final de un vector de longitud `largo` y ángulo `grados` (horario:
+// 90° queda hacia abajo). En SVG el eje Y crece hacia abajo, así que sumar el
+// seno da directamente el giro horario.
 function punta(largo, grados) {
   const rad = (grados * Math.PI) / 180
-  return { x: CENTRO + largo * Math.cos(rad), y: CENTRO - largo * Math.sin(rad) }
+  return { x: CENTRO + largo * Math.cos(rad), y: CENTRO + largo * Math.sin(rad) }
 }
 
 // Props:
@@ -85,7 +87,8 @@ function DiagramaFasorial({ fases }) {
     const d = datos[k]
     if (!esNumero(d?.anguloCorriente)) return []
     const largo = esNumero(d.corriente) && maxI > 0 ? (0.5 * RADIO * Math.abs(d.corriente)) / maxI : 0.5 * RADIO
-    return [{ fase, angulo: d.anguloCorriente, ...punta(largo, d.anguloCorriente) }]
+    const angulo = d.anguloCorriente
+    return [{ fase, angulo, ...punta(largo, angulo) }]
   })
 
   // Posición de la etiqueta: un poco más allá de la punta del vector.
