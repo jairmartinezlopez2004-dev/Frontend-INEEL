@@ -112,13 +112,18 @@ function sumarPorPeriodo(filas, claveDe, etiquetaDe) {
   const grupos = new Map()
   for (const f of filas) {
     const clave = claveDe(f)
-    if (!grupos.has(clave)) grupos.set(clave, { fila: f, suma: 0 })
-    grupos.get(clave).suma += f.totalHora ?? 0
+    if (!grupos.has(clave)) grupos.set(clave, { fila: f, suma: null, lecturas: 0 })
+    // Registros de 5 minutos del periodo: suma de los intervalos de sus horas.
+    grupos.get(clave).lecturas += f.intervalos ?? 0
+    // Las horas sin datos (totalHora null) no se suman; un periodo sin
+    // ninguna hora con datos queda en null («—»), no en 0.
+    if (f.totalHora != null) grupos.get(clave).suma = (grupos.get(clave).suma ?? 0) + f.totalHora
   }
-  return [...grupos.entries()].map(([clave, { fila, suma }]) => ({
+  return [...grupos.entries()].map(([clave, { fila, suma, lecturas }]) => ({
     clave,
     etiqueta: etiquetaDe(fila),
     valor: suma,
+    lecturas,
   }))
 }
 
@@ -154,6 +159,8 @@ export const AGRUPACIONES = [
   {
     id: 'crudo',
     nombre: 'Cada 5 minutos',
+    // tipoValor: qué es cada valor que se muestra (encabezados de la tabla y eje de la gráfica).
+    tipoValor: 'Lectura',
     ruta: 'crudo',
     normalizar: (filas) =>
       filas.map((f) => ({
@@ -165,6 +172,7 @@ export const AGRUPACIONES = [
   {
     id: 'hora',
     nombre: 'Promedio por hora',
+    tipoValor: 'Promedio',
     ruta: 'promedio-hora',
     normalizar: (filas) =>
       filas.map((f) => ({
@@ -176,6 +184,7 @@ export const AGRUPACIONES = [
   {
     id: 'dia',
     nombre: 'Promedio por día',
+    tipoValor: 'Promedio',
     ruta: 'promedio-dia',
     normalizar: (filas) =>
       filas.map((f) => ({ clave: f.fecha, etiqueta: f.fecha, valor: f.valorPromedio })),
@@ -183,6 +192,7 @@ export const AGRUPACIONES = [
   {
     id: 'semana',
     nombre: 'Promedio por semana',
+    tipoValor: 'Promedio',
     ruta: 'promedio-semana',
     normalizar: (filas) =>
       agruparPromedio(
@@ -194,6 +204,7 @@ export const AGRUPACIONES = [
   {
     id: 'mes',
     nombre: 'Promedio por mes',
+    tipoValor: 'Promedio',
     ruta: 'promedio-mes',
     normalizar: (filas) =>
       agruparPromedio(
@@ -205,6 +216,7 @@ export const AGRUPACIONES = [
   {
     id: 'anio',
     nombre: 'Promedio mensual del año',
+    tipoValor: 'Promedio',
     ruta: 'promedio-anio',
     normalizar: (filas) =>
       filas.map((f) => ({
@@ -223,17 +235,24 @@ export const AGRUPACIONES_ENERGIA = [
     id: 'totalHora',
     nombre: 'Total por hora',
     energia: true,
+    tipoValor: 'Total',
+    // Lecturas de 5 minutos que forman un periodo completo (para mostrar "12/12").
+    lecturasEsperadas: 12,
     normalizar: (filas) =>
       filas.map((f) => ({
         clave: `${f.fecha} ${dosDigitos(f.hora)}`,
         etiqueta: `${f.fecha} ${f.horaTexto ?? `${dosDigitos(f.hora)}:00`}`,
         valor: f.totalHora,
+        // Registros de 5 minutos de la hora (intervalos que manda el backend).
+        lecturas: f.intervalos,
       })),
   },
   {
     id: 'totalDia',
     nombre: 'Total por día',
     energia: true,
+    tipoValor: 'Total',
+    lecturasEsperadas: 288,
     normalizar: (filas) =>
       sumarPorPeriodo(
         filas,
@@ -245,6 +264,7 @@ export const AGRUPACIONES_ENERGIA = [
     id: 'totalSemana',
     nombre: 'Total por semana',
     energia: true,
+    tipoValor: 'Total',
     normalizar: (filas) =>
       sumarPorPeriodo(
         filas,
@@ -262,6 +282,7 @@ export const AGRUPACIONES_ENERGIA = [
     id: 'totalMes',
     nombre: 'Total por mes',
     energia: true,
+    tipoValor: 'Total',
     normalizar: (filas) =>
       sumarPorPeriodo(
         filas,
@@ -273,6 +294,7 @@ export const AGRUPACIONES_ENERGIA = [
     id: 'totalAnio',
     nombre: 'Total por año',
     energia: true,
+    tipoValor: 'Total',
     normalizar: (filas) =>
       sumarPorPeriodo(
         filas,
@@ -378,31 +400,5 @@ export async function consultarFases({ fases, ...filtros }, { signal } = {}) {
     series,
     periodos: ordenados,
     mensaje: ordenados.length === 0 ? resultados[0].mensaje : null,
-  }
-}
-
-/**
- * Total de energía por hora y acumulado del día (vista vw_Medicion5M_EnergiaHora
- * del backend). El backend suma los 12 intervalos de 5 minutos de cada hora y
- * solo trabaja en fase A, así que no se envía fase.
- *
- * @param {object} filtros
- * @param {number} filtros.idMedidor
- * @param {number} filtros.idVar5M - Variable de energía (P5M_EE, P5M_ER, …).
- * @param {string} filtros.fechaInicio - yyyy-MM-dd.
- * @param {string} filtros.fechaFin - yyyy-MM-dd.
- * @returns {Promise<{ filas: Array<{ fecha, hora, horaTexto, totalHora, acumuladoDia, intervalos }>,
- *   mensaje: string|null }>} `mensaje` trae el aviso del backend cuando no hay datos.
- */
-export async function consultarEnergiaHora({ idMedidor, idVar5M, fechaInicio, fechaFin }, { signal } = {}) {
-  const query = new URLSearchParams({ idMedidor, idVar5M, fechaInicio, fechaFin })
-  try {
-    const filas = await apiGet(`${RUTA}/energia-hora?${query}`, { signal })
-    return { filas: filas ?? [], mensaje: null }
-  } catch (err) {
-    if (err instanceof ApiError && err.httpStatus === 404) {
-      return { filas: [], mensaje: err.message }
-    }
-    throw err
   }
 }

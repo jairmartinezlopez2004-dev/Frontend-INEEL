@@ -132,6 +132,7 @@ function useECharts(opcion, alAplicar) {
 // - periodos: arreglo ordenado de { clave, etiqueta } (todos los de la consulta).
 // - seriesCrudas: `resultado.series` de la consulta: [{ fase, puntos }].
 // - unidad: unidad de la variable.
+// - tipoValor: qué es cada valor ("Lectura", "Promedio" o "Total"); va en el eje Y.
 // - comoBarras: true para variables de energía (cantidad por periodo -> barras).
 // - marcadores: [{ inicio, fin, texto }] con índices de `periodos` (eventos).
 // - ventana: tramo visible { desde, hasta } o null; se sincroniza con el zoom.
@@ -140,6 +141,7 @@ export default function GraficaECharts({
   periodos,
   seriesCrudas,
   unidad,
+  tipoValor,
   comoBarras,
   marcadores,
   ventana,
@@ -283,7 +285,7 @@ export default function GraficaECharts({
         type: 'value',
         // En líneas la escala se ajusta a los datos; en barras arranca en cero.
         scale: !comoBarras,
-        name: unidad,
+        name: tipoValor ? `${tipoValor}${unidad ? ` (${unidad})` : ''}` : unidad,
         nameTextStyle: { color: TINTA_SUAVE },
         axisLabel: { color: TINTA_SUAVE, formatter: (v) => formatoValor(v) },
         splitLine: { lineStyle: { color: REJILLA } },
@@ -297,7 +299,7 @@ export default function GraficaECharts({
     }
     // claveMarcadores representa a `marcadores`.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [periodos, seriesCrudas, unidad, comoBarras, claveMarcadores])
+  }, [periodos, seriesCrudas, unidad, tipoValor, comoBarras, claveMarcadores])
 
   // La ventana más reciente, para reaplicarla después de rehacer la gráfica.
   // Se actualiza en un efecto declarado antes de useECharts, así que ya está

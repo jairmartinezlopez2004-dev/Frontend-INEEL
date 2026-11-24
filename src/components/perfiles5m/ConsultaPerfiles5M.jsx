@@ -12,13 +12,13 @@
  * - En las variables de energía (kWh, kVARh) la agrupación solo ofrece
  *   totales (por hora, día, semana, mes o año): se suman los registros de 5
  *   minutos, sin promedios. Solo se miden en la fase A.
- * - El resultado se muestra como resumen (mínimo, promedio, máximo y, en
- *   variables de energía, total) por fase, una gráfica de ECharts con una
- *   serie por fase (GraficaECharts.jsx) y la tabla de valores con una columna
- *   por fase.
+ * - El resultado se muestra tal como lo envía el backend: una gráfica de
+ *   ECharts con una serie por fase (GraficaECharts.jsx) y la tabla de valores
+ *   con una columna por fase. No se muestra un resumen calculado en pantalla
+ *   (mínimo, promedio, máximo, total): el backend no lo envía.
  * - Navegación: la gráfica se acerca y recorre con la rueda del mouse, el
  *   minimapa inferior o su barra de herramientas (que también tiene "Ver
- *   todo"). El resumen y la tabla siguen al tramo visible.
+ *   todo"). La tabla sigue al tramo visible.
  * - Las fases se ocultan o muestran desde la leyenda de la gráfica, sin
  *   volver a consultar.
  * - Eventos registrados: lista los eventos del medidor dentro del rango
@@ -52,7 +52,7 @@ import { claseControl } from '../common/clasesFormulario'
 import SelectorRangoFechas from '../common/SelectorRangoFechas'
 import { ChartLine, FileSpreadsheet, Search } from 'lucide-react'
 import TituloSeccion from '../common/TituloSeccion'
-import { BotonSecundario } from '../common/Botones'
+import { BotonPrimario } from '../common/Botones'
 // La gráfica se carga bajo demanda: ECharts (~600 KB) solo se descarga al
 // abrir esta vista, no al entrar al sistema.
 const GraficaECharts = lazy(() => import('./GraficaECharts'))
@@ -127,27 +127,23 @@ function validarFiltros({ idMedidor, idVar5M, fases, fechaInicio, fechaFin, agru
   return null
 }
 
-/** Mínimo, promedio, máximo y suma de una lista de valores (null si está vacía). */
-function resumenDe(valores) {
-  if (valores.length === 0) return { minimo: null, promedio: null, maximo: null, suma: null }
-  const suma = valores.reduce((a, b) => a + b, 0)
-  return {
-    minimo: Math.min(...valores),
-    promedio: suma / valores.length,
-    maximo: Math.max(...valores),
-    suma,
-  }
-}
-
-// Tarjeta de resumen (mínimo, promedio, máximo) cuando se consulta una sola fase.
-function DatoResumen({ etiqueta, valor, unidad }) {
+// Celda "Lecturas" de un periodo de energía: cuántas lecturas de 5 minutos
+// forman su total ("12/12" por hora, "288/288" por día; en semana, mes o año
+// solo el número). En ámbar si el periodo está incompleto o no tiene datos.
+function CeldaLecturas({ serie, clave, esperadas }) {
+  const lecturas = serie.lecturas.get(clave)
+  const sinDatos = serie.valores.get(clave) == null
+  const incompleto = sinDatos || (esperadas != null && lecturas < esperadas)
+  let texto = '—'
+  if (sinDatos) texto = 'Sin datos'
+  else if (lecturas != null) texto = esperadas ? `${lecturas}/${esperadas}` : lecturas.toLocaleString('es-MX')
   return (
-    <div className="rounded-lg border border-slate-200 bg-white px-4 py-3">
-      <div className="text-xs font-medium uppercase tracking-wide text-slate-500">{etiqueta}</div>
-      <div className="mt-1 font-mono text-lg font-semibold text-slate-900">
-        {formatoValor(valor)} <span className="text-sm font-normal text-slate-500">{unidad}</span>
-      </div>
-    </div>
+    <td
+      className={`whitespace-nowrap px-4 py-2 text-right font-mono ${incompleto ? 'font-semibold text-amber-700' : 'text-slate-500'}`}
+      title={sinDatos ? 'Periodo sin datos' : incompleto ? 'Periodo incompleto' : undefined}
+    >
+      {texto}
+    </td>
   )
 }
 
@@ -334,39 +330,37 @@ export default function ConsultaPerfiles5M() {
     resultado && controladores.flatMap((c) => c.medidores).find((m) => m.id === resultado.filtros.idMedidor)
   const agrupacion = resultado?.filtros.agrupacion
   const nombreAgrupacion = resultado && buscarAgrupacion(agrupacion).nombre
+  // Qué es cada valor mostrado (Lectura, Promedio o Total) y, en energía,
+  // cuántas lecturas de 5 minutos forman un periodo completo (12 por hora, 288 por día).
+  const { tipoValor = 'Valor', lecturasEsperadas } = (resultado && buscarAgrupacion(agrupacion)) || {}
 
   // Tramo visible (la ventana de navegación, o todos los periodos).
   const desde = ventana?.desde ?? 0
   const hasta = ventana?.hasta ?? periodos.length - 1
   const tamVentana = hasta - desde + 1
   const periodosVisibles = periodos.slice(desde, hasta + 1)
-  const clavesVisibles = new Set(periodosVisibles.map((p) => p.clave))
 
-  // Total solo en variables de energía (kWh, kVARh), donde sumar tiene sentido.
-  // Cada periodo ya es un total real (suma de sus registros de 5 minutos), así
-  // que el total del tramo visible es la suma de los periodos: sin promedios
-  // ni multiplicaciones.
+  // Energía (kWh, kVARh): la gráfica va en barras y, en el Excel, cada periodo
+  // es un total real (suma de sus registros de 5 minutos), por eso el archivo
+  // agrega la columna Total.
   const esEnergia = unidad.endsWith('h')
   const conTotal = Boolean(resultado && buscarAgrupacion(agrupacion).energia)
-  const totalDe = (resumen) => (conTotal ? resumen.suma : null)
 
-  // Una serie por fase consultada: nombre, color, valores por periodo y
-  // resumen del tramo visible.
+  // Una serie por fase consultada: nombre, color y valores por periodo.
   const series = (resultado?.series ?? []).map(({ fase, puntos }) => {
     const { nombre, color } = FASES.find((f) => f.id === fase)
-    const resumen = resumenDe(
-      puntos.filter((p) => p.valor != null && clavesVisibles.has(p.clave)).map((p) => p.valor),
-    )
     return {
       id: fase,
       nombre: `Fase ${nombre}`,
       color,
       valores: new Map(puntos.map((p) => [p.clave, p.valor])),
-      resumen: { ...resumen, total: totalDe(resumen) },
+      // Lecturas de 5 minutos de cada periodo (solo energía; el backend las manda como intervalos).
+      lecturas: new Map(puntos.map((p) => [p.clave, p.lecturas])),
     }
   })
   const variasFases = series.length > 1
-  const totalFases = conTotal ? series.reduce((suma, s) => suma + (s.resumen.total ?? 0), 0) : null
+  // Columna "Lecturas": solo en energía, que se mide en una sola fase.
+  const conLecturas = conTotal && series.length === 1
 
   // Eventos registrados del medidor consultado dentro del rango de fechas, con
   // los periodos de la gráfica que abarca su día (vacío si no se puede ubicar).
@@ -575,92 +569,37 @@ export default function ConsultaPerfiles5M() {
             <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
               <h3 className="text-sm font-semibold text-slate-900">
                 {medidor?.descripcion || `Medidor #${resultado.filtros.idMedidor}`} · {variable.nombre} ·{' '}
-                {variasFases ? series.map((s) => s.nombre).join(', ') : series[0].nombre.toLowerCase()}
+                {variasFases ? series.map((s) => s.nombre).join(', ') : series[0].nombre}
               </h3>
               <div className="flex flex-wrap items-center gap-3">
                 <span className="text-xs text-slate-500">
                   {nombreAgrupacion} · {resultado.filtros.fechaInicio} a {resultado.filtros.fechaFin} ·{' '}
                   {periodos.length} {periodos.length === 1 ? 'periodo' : 'periodos'}
                 </span>
-                <BotonSecundario Icono={FileSpreadsheet} onClick={exportar} disabled={exportando}>
+                {/* Botón principal (azul) para que la descarga del reporte se distinga. */}
+                <BotonPrimario
+                  Icono={FileSpreadsheet}
+                  onClick={exportar}
+                  disabled={exportando}
+                  title="Descargar el reporte de esta consulta en Excel"
+                >
                   {exportando ? 'Generando…' : 'Exportar a Excel'}
-                </BotonSecundario>
+                </BotonPrimario>
               </div>
             </div>
             {errorExportar && (
               <div className="mb-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">{errorExportar}</div>
             )}
 
-            {/* Aviso de que el resumen y la tabla corresponden al tramo acercado. */}
+            {/* Aviso de que la tabla corresponde al tramo acercado. */}
             {ventana && (
               <p className="mb-3 text-xs text-slate-500">
-                Resumen del tramo visible: {periodosVisibles[0].etiqueta} a{' '}
+                Tramo visible: {periodosVisibles[0].etiqueta} a{' '}
                 {periodosVisibles[periodosVisibles.length - 1].etiqueta} ({tamVentana} de {periodos.length}{' '}
                 periodos).
               </p>
             )}
 
-            {/* Resumen: tarjetas con una fase; tabla por fase con varias. */}
-            {variasFases ? (
-              <table className="mb-6 w-full text-sm">
-                <thead className="bg-verde-50 border-b-2 border-verde-500">
-                  <tr>
-                    <th scope="col" className={`${CLASE_TH} text-left`}>
-                      Fase
-                    </th>
-                    {['Mínimo', 'Promedio', 'Máximo', ...(conTotal ? ['Total'] : [])].map((titulo) => (
-                      <th key={titulo} scope="col" className={`${CLASE_TH} text-right`}>
-                        {titulo} {unidad && `(${unidad})`}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {series.map((s) => (
-                    <tr key={s.id}>
-                      <th scope="row" className="py-2 pr-4 text-left font-medium text-slate-900">
-                        <span className="flex items-center gap-2">
-                          <MuestraFase color={s.color} />
-                          {s.nombre}
-                        </span>
-                      </th>
-                      {[
-                        s.resumen.minimo,
-                        s.resumen.promedio,
-                        s.resumen.maximo,
-                        ...(conTotal ? [s.resumen.total] : []),
-                      ].map((v, i) => (
-                        <td key={i} className="px-4 py-2 text-right font-mono text-slate-900">
-                          {formatoValor(v)}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-                {/* Total de las fases juntas (solo energía). */}
-                {conTotal && (
-                  <tfoot>
-                    <tr className="border-t border-slate-300">
-                      <th scope="row" colSpan={4} className="py-2 pr-4 text-left font-semibold text-slate-900">
-                        Total de las fases
-                      </th>
-                      <td className="px-4 py-2 text-right font-mono font-semibold text-slate-900">
-                        {formatoValor(totalFases)}
-                      </td>
-                    </tr>
-                  </tfoot>
-                )}
-              </table>
-            ) : (
-              <div
-                className={`mb-6 grid grid-cols-1 gap-3 ${conTotal ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-3'}`}
-              >
-                <DatoResumen etiqueta="Mínimo" valor={series[0].resumen.minimo} unidad={unidad} />
-                <DatoResumen etiqueta="Promedio" valor={series[0].resumen.promedio} unidad={unidad} />
-                <DatoResumen etiqueta="Máximo" valor={series[0].resumen.maximo} unidad={unidad} />
-                {conTotal && <DatoResumen etiqueta="Total" valor={series[0].resumen.total} unidad={unidad} />}
-              </div>
-            )}
             {/* Tramo visible o, sin zoom, cómo acercarse (el zoom se maneja en la gráfica). */}
             <p className="mb-3 text-xs text-slate-500">
               {ventana
@@ -676,6 +615,7 @@ export default function ConsultaPerfiles5M() {
                   periodos={periodos}
                   seriesCrudas={resultado.series}
                   unidad={unidad}
+                  tipoValor={tipoValor}
                   comoBarras={esEnergia}
                   marcadores={marcadores}
                   ventana={ventana}
@@ -752,8 +692,9 @@ export default function ConsultaPerfiles5M() {
             {/* La unidad va aquí y no en cada columna: "Fase A (A)" se confundía
                 con la fase A cuando la variable se mide en amperes. */}
             <div className="border-b border-slate-200 px-6 py-3 text-sm font-semibold text-slate-900">
-              {variable.nombre}
+              {tipoValor} de {variable.nombre.charAt(0).toLowerCase() + variable.nombre.slice(1)}
               {unidad && <span className="font-normal text-slate-500"> ({unidad})</span>}
+              <span className="ml-2 font-normal text-slate-500">· {nombreAgrupacion}</span>
             </div>
             <div className="max-h-96 overflow-auto">
               <table className="min-w-full divide-y divide-slate-200 text-sm">
@@ -770,10 +711,19 @@ export default function ConsultaPerfiles5M() {
                             {s.nombre}
                           </span>
                         ) : (
-                          'Valor'
+                          tipoValor
                         )}
                       </th>
                     ))}
+                    {conLecturas && (
+                      <th
+                        scope="col"
+                        className={`${CLASE_TH} text-right`}
+                        title="Lecturas de 5 minutos que forman el total del periodo"
+                      >
+                        Lecturas
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -785,6 +735,7 @@ export default function ConsultaPerfiles5M() {
                           {formatoValor(s.valores.get(p.clave))}
                         </td>
                       ))}
+                      {conLecturas && <CeldaLecturas serie={series[0]} clave={p.clave} esperadas={lecturasEsperadas} />}
                     </tr>
                   ))}
                 </tbody>
