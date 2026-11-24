@@ -6,11 +6,15 @@
  * SuperAdministrador.
  *
  * Rol en el sistema:
- * Lo muestra Login.jsx al pulsar "¿Olvidaste tu contraseña?". Tiene dos pasos:
+ * Lo muestra Login.jsx al pulsar "¿Olvidaste tu contraseña?". Tiene tres
+ * pantallas, una después de otra:
  * 1. Correo: pide un código de 6 dígitos (POST /Contrasena/solicitar-codigo).
  *    El backend siempre responde lo mismo, exista o no la cuenta.
- * 2. Código: con el código, la contraseña nueva y su confirmación cambia la
- *    contraseña (POST /Contrasena/restablecer).
+ * 2. Código: comprueba el código sin gastarlo (POST /Contrasena/verificar-codigo).
+ *    Solo si es correcto se pasa a la siguiente pantalla.
+ * 3. Contraseña nueva: con la contraseña y su confirmación cambia la
+ *    contraseña (POST /Contrasena/restablecer, que vuelve a validar el código).
+ *    Si el código venció mientras tanto, se regresa a la pantalla 2.
  * Al terminar se regresa al Login con el correo ya escrito.
  *
  * Reglas del backend que se reflejan aquí: el código vence en 15 minutos, se
@@ -18,7 +22,11 @@
  * segundos (el botón "Reenviar código" espera ese tiempo).
  */
 import { useEffect, useState } from 'react';
-import { restablecerContrasena, solicitarCodigoContrasena } from '../../services/authService';
+import {
+  restablecerContrasena,
+  solicitarCodigoContrasena,
+  verificarCodigoContrasena,
+} from '../../services/authService';
 import { useValidacion } from '../../hooks/useValidacion';
 import {
   validarTexto,
@@ -42,11 +50,14 @@ const validadoresCorreo = {
   correo: (v) => validarCorreo(v) ?? validarTexto(v, { nombre: 'El correo', maximo: CORREO_MAX }),
 };
 
-const validadoresCodigo = (contrasena) => ({
+const validadoresCodigo = {
   codigo: (v) => {
     if (!v) return 'Escribe el código que te llegó por correo.';
     return /^\d{6}$/.test(v) ? null : 'El código tiene 6 dígitos.';
   },
+};
+
+const validadoresContrasena = (contrasena) => ({
   contrasena: validarContrasena,
   confirmacion: (v) => {
     if (!v) return 'Confirma la contraseña.';
@@ -54,12 +65,30 @@ const validadoresCodigo = (contrasena) => ({
   },
 });
 
+// Validadores de la pantalla actual (la confirmación depende de la contraseña).
+const VALIDADORES_DE = {
+  correo: () => validadoresCorreo,
+  codigo: () => validadoresCodigo,
+  contrasena: validadoresContrasena,
+};
+
+// Mensaje genérico del backend cuando el código es incorrecto, venció o se
+// invalidó (lo devuelven verificar-codigo y restablecer).
+const MENSAJE_CODIGO_INVALIDO = 'Código inválido o vencido.';
+
+// Texto bajo el título en cada pantalla.
+const INSTRUCCIONES = {
+  correo: 'Escribe el correo de tu cuenta y te enviaremos un código de verificación.',
+  codigo: 'Escribe el código de 6 dígitos que te enviamos por correo.',
+  contrasena: 'Código verificado. Ahora escribe tu contraseña nueva.',
+};
+
 // Props:
 // - correoInicial: correo que ya estaba escrito en el Login (puede venir vacío).
 // - onRestablecida: callback con el correo y el mensaje del backend al terminar.
 // - onCancelar: callback para volver al Login sin cambiar la contraseña.
 export default function RestablecerContrasena({ correoInicial = '', onRestablecida, onCancelar }) {
-  const [paso, setPaso] = useState('correo'); // 'correo' | 'codigo'
+  const [paso, setPaso] = useState('correo'); // 'correo' | 'codigo' | 'contrasena'
   const [form, setForm] = useState({ correo: correoInicial, codigo: '', contrasena: '', confirmacion: '' });
   const [error, setError] = useState(''); // Error devuelto por el WebService.
   const [aviso, setAviso] = useState(''); // Confirmación de código enviado.
@@ -69,7 +98,7 @@ export default function RestablecerContrasena({ correoInicial = '', onRestableci
   // El id de cada input es `restablecer-<campo>` (lo arma ariaDe).
   const { errorDe, ariaDe, validarAlEnviar } = useValidacion(
     form,
-    paso === 'correo' ? validadoresCorreo : validadoresCodigo(form.contrasena),
+    VALIDADORES_DE[paso](form.contrasena),
     'restablecer',
   );
 
@@ -113,10 +142,29 @@ export default function RestablecerContrasena({ correoInicial = '', onRestableci
     await pedirCodigo();
   };
 
-  // Cambia la contraseña con el código (POST /Contrasena/restablecer). El
-  // backend responde 400 si el código es incorrecto o venció, o si la
-  // contraseña nueva no cumple la política o es igual a la actual.
+  // Pantalla 2: comprueba el código (POST /Contrasena/verificar-codigo) y,
+  // si es correcto, pasa a la pantalla de la contraseña nueva.
   const enviarCodigo = async (e) => {
+    e.preventDefault();
+    if (!validarAlEnviar()) return;
+    setError('');
+    setCargando(true);
+    try {
+      await verificarCodigoContrasena({ correo: form.correo.trim(), codigo: form.codigo });
+      setAviso('');
+      setPaso('contrasena');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  // Pantalla 3: cambia la contraseña (POST /Contrasena/restablecer). El
+  // backend responde 400 si la contraseña no cumple la política o es igual a
+  // la actual (se queda en esta pantalla), o si el código venció entre la
+  // pantalla 2 y esta (se regresa a la pantalla del código).
+  const enviarContrasena = async (e) => {
     e.preventDefault();
     if (!validarAlEnviar()) return;
     setError('');
@@ -131,7 +179,13 @@ export default function RestablecerContrasena({ correoInicial = '', onRestableci
       });
       onRestablecida(correo, respuesta?.mensaje);
     } catch (err) {
-      setError(err.message);
+      if (err.message === MENSAJE_CODIGO_INVALIDO) {
+        setError(`${err.message} Pide un código nuevo.`);
+        setForm((prev) => ({ ...prev, codigo: '', contrasena: '', confirmacion: '' }));
+        setPaso('codigo');
+      } else {
+        setError(err.message);
+      }
       setCargando(false);
     }
   };
@@ -176,9 +230,7 @@ export default function RestablecerContrasena({ correoInicial = '', onRestableci
     <>
       <h1 className="mb-2 text-center text-lg font-semibold text-gray-800">Restablecer contraseña</h1>
       <p className="mb-6 text-center text-sm text-gray-600">
-        {paso === 'correo'
-          ? 'Escribe el correo de tu cuenta y te enviaremos un código de verificación.'
-          : 'Escribe el código que te enviamos y tu contraseña nueva.'}
+        {INSTRUCCIONES[paso]}
       </p>
 
       {/* Mensaje de Error */}
@@ -204,7 +256,7 @@ export default function RestablecerContrasena({ correoInicial = '', onRestableci
         </form>
       ) : (
         <>
-          {/* Aviso de código enviado y correo al que se envió */}
+          {/* Aviso de código enviado */}
           {aviso && (
             <div className="mb-4 p-3 bg-verde-50 border border-verde-200 text-verde-700 text-sm rounded-md text-center">
               {aviso}
@@ -217,52 +269,61 @@ export default function RestablecerContrasena({ correoInicial = '', onRestableci
             </button>
           </p>
 
-          <form noValidate onSubmit={enviarCodigo} className="space-y-5">
-            {campo(
-              'codigo',
-              'Código de verificación',
-              {
-                type: 'text',
-                inputMode: 'numeric',
-                autoComplete: 'one-time-code',
-                maxLength: 6,
-                placeholder: '123456',
-              },
-              <p className="text-xs text-gray-500">
-                {espera > 0 ? (
-                  `¿No te llegó? Podrás pedir otro en ${espera} s.`
-                ) : (
-                  <>
-                    ¿No te llegó?{' '}
-                    <button type="button" onClick={pedirCodigo} disabled={cargando} className={enlace}>
-                      Reenviar código
-                    </button>
-                  </>
-                )}
-              </p>,
-            )}
-            {campo(
-              'contrasena',
-              'Contraseña nueva',
-              {
+          {paso === 'codigo' ? (
+            <form noValidate onSubmit={enviarCodigo} className="space-y-5">
+              {campo(
+                'codigo',
+                'Código de verificación',
+                {
+                  type: 'text',
+                  inputMode: 'numeric',
+                  autoComplete: 'one-time-code',
+                  maxLength: 6,
+                  placeholder: '123456',
+                },
+                <p className="text-xs text-gray-500">
+                  {espera > 0 ? (
+                    `¿No te llegó? Podrás pedir otro en ${espera} s.`
+                  ) : (
+                    <>
+                      ¿No te llegó?{' '}
+                      <button type="button" onClick={pedirCodigo} disabled={cargando} className={enlace}>
+                        Reenviar código
+                      </button>
+                    </>
+                  )}
+                </p>,
+              )}
+
+              <button type="submit" disabled={cargando} className={botonPrincipal}>
+                {cargando ? 'Verificando...' : 'Verificar código'}
+              </button>
+            </form>
+          ) : (
+            <form noValidate onSubmit={enviarContrasena} className="space-y-5">
+              {campo(
+                'contrasena',
+                'Contraseña nueva',
+                {
+                  type: 'password',
+                  maxLength: CONTRASENA_MAX,
+                  autoComplete: 'new-password',
+                  placeholder: '••••••••',
+                },
+                <RequisitosContrasena valor={form.contrasena} />,
+              )}
+              {campo('confirmacion', 'Confirmar contraseña nueva', {
                 type: 'password',
                 maxLength: CONTRASENA_MAX,
                 autoComplete: 'new-password',
                 placeholder: '••••••••',
-              },
-              <RequisitosContrasena valor={form.contrasena} />,
-            )}
-            {campo('confirmacion', 'Confirmar contraseña nueva', {
-              type: 'password',
-              maxLength: CONTRASENA_MAX,
-              autoComplete: 'new-password',
-              placeholder: '••••••••',
-            })}
+              })}
 
-            <button type="submit" disabled={cargando} className={botonPrincipal}>
-              {cargando ? 'Guardando...' : 'Cambiar contraseña'}
-            </button>
-          </form>
+              <button type="submit" disabled={cargando} className={botonPrincipal}>
+                {cargando ? 'Guardando...' : 'Cambiar contraseña'}
+              </button>
+            </form>
+          )}
         </>
       )}
 

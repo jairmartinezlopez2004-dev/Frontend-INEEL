@@ -123,6 +123,21 @@ export function solicitarCodigoContrasena(correo) {
 }
 
 /**
+ * Comprueba el código de verificación sin gastarlo
+ * (POST /Contrasena/verificar-codigo). Es público. Un código incorrecto cuenta
+ * como intento fallido (a los 5 el backend lo invalida). El código se vuelve a
+ * enviar después a /Contrasena/restablecer, que lo valida otra vez.
+ *
+ * @param {{ correo: string, codigo: string }} datos
+ * @returns {Promise<object>} Respuesta del backend ({ mensaje }).
+ * @throws {ApiError} 400 si el código es incorrecto o venció; 404 si el
+ *   backend todavía no publica este servicio.
+ */
+export function verificarCodigoContrasena({ correo, codigo }) {
+  return apiPost('/Contrasena/verificar-codigo', { correo, codigo })
+}
+
+/**
  * Cambia la contraseña con el código de verificación recibido por correo
  * (POST /Contrasena/restablecer). Es público (no requiere sesión) y aplica
  * igual a Usuario, Administrador y SuperAdministrador.
