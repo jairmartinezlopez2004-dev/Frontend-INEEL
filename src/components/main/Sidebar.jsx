@@ -16,7 +16,7 @@
 import { Link, NavLink } from 'react-router'
 // Íconos de la librería Lucide (los mismos del resto del sistema).
 import {
-  ArrowLeft, BellRing, ChartLine, Clock, Cpu, Layers, Network, Radio, Ruler, TriangleAlert, Users,
+  ArrowLeft, BellRing, ChartLine, Cpu, Layers, Network, Radio, Ruler, TriangleAlert, Users,
 } from 'lucide-react'
 
 // Catálogo estático de opciones del menú lateral (segmento de ruta, ícono y etiqueta visible).
@@ -32,7 +32,6 @@ const NAV_ITEMS = [
   { ruta: 'usuarios', Icono: Users, label: 'Usuarios', soloAdmin: true },
   // Solo aparece donde `rutasVisibles` la incluye (opción Perfiles 5 Minutales).
   { ruta: 'mediciones', Icono: ChartLine, label: 'Mediciones 5 minutales', soloSiVisible: true },
-  { ruta: 'energia-hora', Icono: Clock, label: 'Energía por hora', soloSiVisible: true },
   // Solo aparece en la opción Eventos registrados.
   { ruta: 'eventos-registrados', Icono: BellRing, label: 'Eventos registrados', soloSiVisible: true },
 ];
