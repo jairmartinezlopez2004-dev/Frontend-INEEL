@@ -148,3 +148,35 @@ export async function solicitarArmonicos(idMedidor, { signal } = {}) {
     throw err
   }
 }
+
+/**
+ * Lee los fasores del medidor: POST /ConexionMedidor/fasores { idMedidor }.
+ * El backend lee en una sola conexión VA..VC, IA..IC, FPA..FPC, PA..PC y
+ * PRA..PRC, y devuelve por fase (A, B, C) el voltaje (V), la corriente (A),
+ * el factor de potencia (ya entre -1 y 1), φ (anguloFactorPotencia), el
+ * cuadrante, el tipo de carga y los ángulos del diagrama (anguloVoltaje y
+ * anguloCorriente, en grados, crecen en sentido antihorario). Lo que no
+ * llegó viene en null.
+ *
+ * @returns {Promise<{ mensaje: string, completa: boolean, fases: object[] }>}
+ *   completa = false si fue un 503 que aun así trae algún valor.
+ * @throws {ApiError} Si no se leyó nada o la petición falló.
+ */
+export async function solicitarFasores(idMedidor, { signal } = {}) {
+  try {
+    const respuesta = await apiPost('/ConexionMedidor/fasores', { idMedidor: Number(idMedidor) }, { signal })
+    return {
+      mensaje: respuesta?.mensaje || 'Lectura de fasores completada.',
+      completa: true,
+      fases: Array.isArray(respuesta?.fases) ? respuesta.fases : [],
+    }
+  } catch (err) {
+    // Lectura parcial: 503 con algunas fases o valores leídos. Se conservan.
+    const fases = err instanceof ApiError && Array.isArray(err.datos?.fases) ? err.datos.fases : []
+    const algunValor = fases.some((f) => [f.voltaje, f.corriente, f.factorPotencia].some((v) => v != null))
+    if (err.httpStatus === 503 && algunValor) {
+      return { mensaje: err.datos?.mensaje || err.message, completa: false, fases }
+    }
+    throw err
+  }
+}

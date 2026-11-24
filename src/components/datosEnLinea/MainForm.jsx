@@ -62,7 +62,7 @@ function MainForm({ medidor, usuarioLogueado, soloLectura = false }) {
       {activeTab === 'Instantáneos' && <TabInstantaneos medidor={medidor} usuarioLogueado={usuarioLogueado} />}
       {activeTab === 'Valores 5M' && <TabValores5M medidor={medidor} usuarioLogueado={usuarioLogueado} />}
       {activeTab === 'Calidad' && <TabCalidad medidor={medidor} usuarioLogueado={usuarioLogueado} />}
-      {activeTab === 'Fasores' && <TabFasores />}
+      {activeTab === 'Fasores' && <TabFasores medidor={medidor} usuarioLogueado={usuarioLogueado} />}
       {activeTab === 'Consumos' && <TabConsumos medidor={medidor} usuarioLogueado={usuarioLogueado} />}
       {activeTab === 'Eventos' && <TabEventosMedidor medidor={medidor} />}
       {activeTab === 'Armónicos' && <TabArmonicos medidor={medidor} usuarioLogueado={usuarioLogueado} />}
