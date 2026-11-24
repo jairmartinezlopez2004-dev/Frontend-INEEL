@@ -2,8 +2,8 @@
  * GraficaArmonicos.jsx
  * ---------------------------------------------------------------------------
  * Gráfica de barras del contenido armónico hecha con Apache ECharts, al
- * estilo de un analizador de calidad de la potencia: primero la barra de THD
- * y luego cada armónico, todo en % de la fundamental. Una serie por fase con
+ * estilo de un analizador de calidad de la potencia: cada armónico (A1..A30)
+ * en % de la fundamental. Una serie por fase con
  * su última lectura. La usa TabArmonicos, que la carga bajo demanda.
  */
 import { useEffect, useMemo, useRef } from 'react'
@@ -21,7 +21,7 @@ const TINTA_SUAVE = '#64748b'
 const REJILLA = '#e2e8f0'
 
 // Props:
-// - categorias: etiquetas del eje X (p. ej. ['THD', 'A1', …, 'A10']).
+// - categorias: etiquetas del eje X (p. ej. ['A1', 'A2', …, 'A30']).
 // - series: [{ nombre, color, valores }] con `valores` alineado a `categorias`.
 // - unidad: unidad del eje Y.
 export default function GraficaArmonicos({ categorias, series, unidad }) {

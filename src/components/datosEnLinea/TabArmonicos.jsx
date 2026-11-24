@@ -10,15 +10,17 @@
  *   lecturas en línea) llama a POST /ConexionMedidor/armonicos. Una sola
  *   lectura trae los 6 puntos del grupo funcional 6: ARM_VA, ARM_VB, ARM_VC
  *   (voltaje) y ARM_IA, ARM_IB, ARM_IC (corriente).
- * - Los selectores Variable (Voltaje o Corriente) y Fase solo eligen qué
- *   parte de esa lectura se muestra: cambiarlos no vuelve a leer el medidor.
+ * - Los selectores Variable (Voltaje o Corriente) y Fase se aplican al pulsar
+ *   «Solicitar»: cambiarlos no modifica lo que está en pantalla, que sigue
+ *   siendo la variable y fase de la última lectura (se avisa que hay que
+ *   volver a solicitar para ver la nueva selección).
  * - Cada "Solicitar" limpia la lectura anterior antes de pedir la nueva.
  * - Si el backend lee unos puntos y otros no (503 parcial), se muestran los
  *   que sí llegaron y el mensaje indica cuáles fallaron.
- * - La tabla muestra los valores tal como los entrega la DLL (A1 es el
- *   primero de la lista). El THD se calcula con A2..An respecto a A1, y la
- *   gráfica expresa cada armónico en % de A1, al estilo de un analizador de
- *   calidad de la potencia.
+ * - Se muestran siempre los primeros 30 armónicos (A1..A30) de cada fase,
+ *   tal como los entrega la DLL (A1 es el primero de la lista); si la DLL
+ *   entrega menos, los que faltan aparecen como «—». La gráfica expresa cada
+ *   armónico en % de A1, al estilo de un analizador de calidad de la potencia.
  */
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { FASES as FASES_5M } from '../../services/medicion5MService'
@@ -55,15 +57,9 @@ const CLASES_ESTADO = {
 /** Tipo del punto ("V" o "I"): el del backend o, si no viene, el de su tag. */
 const tipoDe = (punto) => punto.tipo ?? (/^ARM_V/i.test(punto.tag) ? 'V' : /^ARM_I/i.test(punto.tag) ? 'I' : null)
 
-/**
- * Distorsión armónica total (%) de una lectura: raíz de la suma de cuadrados
- * de A2..An entre la fundamental A1. null si no hay fundamental.
- */
-function calcularThd(valores) {
-  const [fundamental, ...resto] = valores
-  if (!fundamental) return null
-  return (Math.sqrt(resto.reduce((suma, v) => suma + v * v, 0)) / Math.abs(fundamental)) * 100
-}
+// Armónicos que se muestran por fase: A1 (fundamental) .. A30.
+const NUM_ARMONICOS = 30
+const ORDENES = Array.from({ length: NUM_ARMONICOS }, (_, k) => k + 1)
 
 const claseSelect =
   'w-full rounded-md border-0 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-azul-200'
@@ -77,7 +73,9 @@ function TabArmonicos({ medidor, usuarioLogueado }) {
   const esAdmin = ROLES_ADMINISTRADOR.includes(usuarioLogueado?.rolId)
   const [variable, setVariable] = useState('voltaje')
   const [fase, setFase] = useState('todas')
-  // Última lectura: null | { hora: Date, puntos: [...] } (se limpia en cada Solicitar).
+  // Última lectura: null | { hora: Date, puntos: [...], variable, fase }
+  // (se limpia en cada Solicitar). variable y fase son las que estaban
+  // elegidas al solicitar: son las que se muestran, no las de los selectores.
   const [lectura, setLectura] = useState(null)
   // estado: null | { tipo: 'enCurso' | 'exito' | 'aviso' | 'error', texto }
   const [estado, setEstado] = useState(null)
@@ -99,10 +97,11 @@ function TabArmonicos({ medidor, usuarioLogueado }) {
 
     // Limpia la lectura anterior antes de pedir la nueva.
     setLectura(null)
+    const seleccion = { variable, fase }
     setEstado({ tipo: 'enCurso', texto: `Solicitando armónicos al medidor ${formatoDirRed(medidor.dirRed)}…` })
     try {
       const { mensaje, completa, puntos } = await solicitarArmonicos(medidor.id, { signal: controlador.signal })
-      setLectura({ hora: new Date(), puntos })
+      setLectura({ hora: new Date(), puntos, ...seleccion })
       setEstado({ tipo: completa ? 'exito' : 'aviso', texto: mensaje })
     } catch (err) {
       if (err.name === 'AbortError') return
@@ -110,33 +109,37 @@ function TabArmonicos({ medidor, usuarioLogueado }) {
     }
   }
 
-  const variableElegida = VARIABLES.find((v) => v.id === variable)
-  const fasesMostradas = fase === 'todas' ? FASES : FASES.filter((f) => f.id === fase)
+  // Lo que se muestra es la selección con la que se hizo la última lectura.
+  const variableMostrada = lectura?.variable ?? variable
+  const faseMostrada = lectura?.fase ?? fase
+  const seleccionPendiente = lectura && (variable !== lectura.variable || fase !== lectura.fase)
+  const variableElegida = VARIABLES.find((v) => v.id === variableMostrada)
+  const fasesMostradas = faseMostrada === 'todas' ? FASES : FASES.filter((f) => f.id === faseMostrada)
 
   // Punto de la variable elegida en cada fase mostrada (valores null si no llegó o falló).
   const columnas = fasesMostradas.map((f) => {
     const punto = lectura?.puntos.find((p) => p.nombreFase === f.id && tipoDe(p) === variableElegida.tipo)
-    const valores = punto?.exitosa && punto.valores?.length ? punto.valores : null
-    return { ...f, punto, valores, thd: valores ? calcularThd(valores) : null }
+    // Solo los primeros 30 armónicos que entregó la DLL.
+    const valores = punto?.exitosa && punto.valores?.length ? punto.valores.slice(0, NUM_ARMONICOS) : null
+    return { ...f, punto, valores }
   })
   const conValores = columnas.filter((c) => c.valores)
   const hayDatos = conValores.length > 0
-  // Número de armónicos: el mayor que entregó la DLL entre las fases mostradas.
-  const numOrdenes = Math.max(0, ...conValores.map((c) => c.valores.length))
-  const ordenes = Array.from({ length: numOrdenes }, (_, k) => k + 1)
 
-  // Gráfica: THD y cada armónico en % de la fundamental (A1).
+  // Gráfica: cada armónico (A1..A30) en % de la fundamental (A1).
   const seriesGrafica = conValores.map((c) => {
     const fundamental = Math.abs(c.valores[0]) || null
-    const porcentajes = c.valores.map((v) => (fundamental ? (v / fundamental) * 100 : 0))
+    const porcentajes = ORDENES.map((n) => {
+      const v = c.valores[n - 1]
+      return fundamental && v != null ? (v / fundamental) * 100 : 0
+    })
     return {
       nombre: `Fase ${c.id}`,
       color: c.color,
-      thd: c.thd ?? 0,
-      valores: [c.thd ?? 0, ...(conFundamental ? porcentajes : porcentajes.slice(1))],
+      valores: conFundamental ? porcentajes : porcentajes.slice(1),
     }
   })
-  const categorias = ['THD', ...(conFundamental ? ordenes : ordenes.slice(1)).map((n) => `A${n}`)]
+  const categorias = (conFundamental ? ORDENES : ORDENES.slice(1)).map((n) => `A${n}`)
 
   return (
     <div className="flex-1 overflow-auto pt-4">
@@ -154,6 +157,15 @@ function TabArmonicos({ medidor, usuarioLogueado }) {
           {estado && (
             <div role="status" className={`rounded-md border p-3 text-sm ${CLASES_ESTADO[estado.tipo]}`}>
               {estado.texto}
+            </div>
+          )}
+          {seleccionPendiente && !leyendo && (
+            <div role="status" className={`rounded-md border p-3 text-sm ${CLASES_ESTADO.aviso}`}>
+              Se muestran {variableElegida.nombre.toLowerCase()}
+              {faseMostrada === 'todas' ? ' de todas las fases' : ` de la fase ${faseMostrada}`} (última lectura).{' '}
+              {esAdmin
+                ? 'Pulse «Solicitar» para ver la nueva selección.'
+                : 'Un administrador debe solicitar una nueva lectura para ver la nueva selección.'}
             </div>
           )}
         </div>
@@ -198,7 +210,7 @@ function TabArmonicos({ medidor, usuarioLogueado }) {
               </button>
             </div>
             <p className="text-xs text-slate-500">
-              Una lectura trae voltaje y corriente de las tres fases; Variable y Fase solo eligen qué se muestra.
+              Elija Variable y Fase y pulse «Solicitar» para leerlas del medidor.
             </p>
           </section>
 
@@ -251,31 +263,21 @@ function TabArmonicos({ medidor, usuarioLogueado }) {
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                           {hayDatos ? (
-                            <>
-                              <tr className="bg-slate-50 font-semibold">
-                                <td className="px-3 py-2 text-left text-gray-700">THD (%)</td>
+                            ORDENES.map((n) => (
+                              <tr key={n} className="hover:bg-gray-50">
+                                <td className="px-3 py-2 text-left text-gray-700">A{n}</td>
                                 {columnas.map((c) => (
                                   <td key={c.id} className="px-3 py-2 text-right font-mono tabular-nums text-gray-900">
-                                    {c.thd === null ? '—' : formatearValor(c.thd)}
+                                    {c.valores?.[n - 1] != null ? formatearValor(c.valores[n - 1]) : '—'}
                                   </td>
                                 ))}
                               </tr>
-                              {ordenes.map((n) => (
-                                <tr key={n} className="hover:bg-gray-50">
-                                  <td className="px-3 py-2 text-left text-gray-700">A{n}</td>
-                                  {columnas.map((c) => (
-                                    <td key={c.id} className="px-3 py-2 text-right font-mono tabular-nums text-gray-900">
-                                      {c.valores ? formatearValor(c.valores[n - 1]) : '—'}
-                                    </td>
-                                  ))}
-                                </tr>
-                              ))}
-                            </>
+                            ))
                           ) : (
                             <tr>
                               <td colSpan={columnas.length + 1} className="px-3 py-4 text-center text-gray-400">
                                 El medidor no devolvió armónicos de {variableElegida.nombre.toLowerCase()}{' '}
-                                {fase === 'todas' ? 'en ninguna fase' : `en la fase ${fase}`}.
+                                {faseMostrada === 'todas' ? 'en ninguna fase' : `en la fase ${faseMostrada}`}.
                               </td>
                             </tr>
                           )}
@@ -283,8 +285,8 @@ function TabArmonicos({ medidor, usuarioLogueado }) {
                       </table>
                     </div>
                     <p className="text-xs text-gray-500">
-                      Valores tal como los entrega el medidor; A1 es la fundamental. El THD se calcula con los demás
-                      armónicos respecto a A1. «—» indica un punto que no se pudo leer.
+                      Armónicos A1 a A30 de cada fase, tal como los entrega el medidor; A1 es la fundamental. «—»
+                      indica un valor que no se pudo leer.
                     </p>
                   </>
                 )}
@@ -293,19 +295,8 @@ function TabArmonicos({ medidor, usuarioLogueado }) {
               <div className="p-6">
                 {hayDatos ? (
                   <>
-                    {/* Resumen arriba de la gráfica: THD de cada fase y opción de la fundamental. */}
-                    <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-700">
-                        {seriesGrafica.map((s) => (
-                          <span key={s.nombre} className="flex items-center gap-2">
-                            <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: s.color }} />
-                            {s.nombre}: THD{' '}
-                            <span className="font-mono font-semibold tabular-nums text-gray-900">
-                              {s.thd.toFixed(2)} %
-                            </span>
-                          </span>
-                        ))}
-                      </div>
+                    {/* Opción de mostrar u ocultar la fundamental en la gráfica. */}
+                    <div className="mb-3 flex flex-wrap items-center justify-end gap-3">
                       <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-900">
                         <input
                           type="checkbox"
