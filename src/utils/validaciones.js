@@ -86,6 +86,31 @@ export function validarCorreo(valor) {
   return null
 }
 
+// Nombre de usuario: se muestra en el sistema y también sirve para iniciar
+// sesión, por eso el backend lo hace único (sin importar mayúsculas ni espacios
+// de más). Puede llevar espacios, de 3 a 50 caracteres y sin "@" (así el Login
+// distingue un nombre de un correo). Mismas reglas que NombreUsuarioPolicy.cs.
+export const NOMBRE_USUARIO_MIN = 3
+export const NOMBRE_USUARIO_MAX = 50
+
+/** Quita espacios al inicio y al final y deja uno solo entre palabras (igual que el backend). */
+export function normalizarNombreUsuario(valor) {
+  return String(valor ?? '').trim().replace(/\s+/g, ' ')
+}
+
+/** Nombre de usuario obligatorio: 3 a 50 caracteres, puede tener espacios, sin "@". */
+export function validarNombreUsuario(valor) {
+  const nombre = normalizarNombreUsuario(valor)
+  const error = validarTexto(nombre, {
+    nombre: 'El nombre de usuario',
+    minimo: NOMBRE_USUARIO_MIN,
+    maximo: NOMBRE_USUARIO_MAX,
+  })
+  if (error) return error
+  if (nombre.includes('@')) return 'El nombre de usuario no puede llevar @ (así se distingue del correo).'
+  return null
+}
+
 /** Dirección IPv4 obligatoria: cuatro números de 0 a 255 separados por punto. */
 export function validarIP(valor) {
   const ip = String(valor).trim()
