@@ -155,7 +155,8 @@ export async function solicitarArmonicos(idMedidor, { signal } = {}) {
  * PRA..PRC, y devuelve por fase (A, B, C) el voltaje (V), la corriente (A),
  * el factor de potencia (ya entre -1 y 1), φ (anguloFactorPotencia), el
  * cuadrante, el tipo de carga y los ángulos del diagrama (anguloVoltaje y
- * anguloCorriente, en grados, crecen en sentido antihorario). Lo que no
+ * anguloCorriente, en grados, de 0 a 360, crecen en sentido horario con 0° a
+ * la derecha: VA 0°, VB 120°, VC 240°). Lo que no
  * llegó viene en null.
  *
  * @returns {Promise<{ mensaje: string, completa: boolean, fases: object[] }>}
