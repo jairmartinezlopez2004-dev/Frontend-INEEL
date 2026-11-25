@@ -1,44 +1,20 @@
 /**
  * StatusBar.jsx
  * ---------------------------------------------------------------------------
- * Barra de estado inferior de la aplicación (estilo terminal/consola).
+ * Barra inferior de la aplicación.
  *
  * Rol en el sistema:
- * Muestra de forma compacta el estado de la conexión con el medidor/RTU:
- * identificador del medidor, tiempo de respuesta (RF), protocolo de
- * comunicación y medio de transporte físico (serial/TCP). Del lado derecho
- * muestra la leyenda institucional (config.json → leyendaSistema).
- *
- * Integración con el WebService:
- * Actualmente los valores son estáticos (placeholders). Cuando se conecte
- * la comunicación real con el medidor, estos textos deberán reemplazarse por
- * datos dinámicos obtenidos del backend (por ejemplo, vía polling o WebSocket)
- * en lugar de la constante STATUS_ITEMS.
+ * Muestra centrada la leyenda institucional (config.json → leyendaSistema).
+ * Antes mostraba también medidor, RF, protocolo y transporte, pero eran
+ * valores fijos de ejemplo y no los de la conexión real, así que se quitaron.
  */
 import { obtenerConfiguracion } from '../../config/configuracion'
 
-// Lista de textos a mostrar en la barra de estado, separados visualmente por un punto ("•").
-const STATUS_ITEMS = [
-  'MedidorQP: 0000',
-  'RF: 00:00:00',
-  'Protocolo: ComsCEC',
-  'Transporte: SERIAL-COM3',
-]
-
 function StatusBar() {
   return (
-    // Franja delgada tipo consola, fija en la parte inferior de la aplicación.
-    <footer className="flex h-7 shrink-0 items-center gap-4 overflow-hidden whitespace-nowrap border-t border-azul-900 bg-azul-950 px-6 text-[11px] font-medium tracking-wide text-azul-200">
-      {STATUS_ITEMS.map((item, index) => (
-        <span key={item} className="flex items-center gap-4">
-          {/* Separador visual "•" entre cada item, excepto antes del primero. */}
-          {index > 0 && <span className="text-azul-500">•</span>}
-          {item}
-        </span>
-      ))}
-
-      {/* Leyenda institucional, alineada a la derecha. */}
-      <span className="ml-auto truncate pl-4">{obtenerConfiguracion().leyendaSistema}</span>
+    // Franja delgada fija en la parte inferior de la aplicación.
+    <footer className="flex h-7 shrink-0 items-center justify-center overflow-hidden whitespace-nowrap border-t border-azul-900 bg-azul-950 px-6 text-[11px] font-medium tracking-wide text-azul-200">
+      <span className="truncate">{obtenerConfiguracion().leyendaSistema}</span>
     </footer>
   )
 }
