@@ -128,15 +128,18 @@ function validarFiltros({ idMedidor, idVar5M, fases, fechaInicio, fechaFin, agru
 }
 
 // Celda "Lecturas" de un periodo de energía: cuántas lecturas de 5 minutos
-// forman su total ("12/12" por hora, "288/288" por día; en semana, mes o año
-// solo el número). En ámbar si el periodo está incompleto o no tiene datos.
-function CeldaLecturas({ serie, clave, esperadas }) {
+// forman su total frente a las que tendría completo ("12/12" por hora,
+// "288/288" por día, "2,016/2,016" por semana; las esperadas las manda el
+// backend). En ámbar si el periodo está incompleto o no tiene datos.
+function CeldaLecturas({ serie, clave }) {
   const lecturas = serie.lecturas.get(clave)
+  const esperadas = serie.esperadas.get(clave)
   const sinDatos = serie.valores.get(clave) == null
   const incompleto = sinDatos || (esperadas != null && lecturas < esperadas)
   let texto = '—'
   if (sinDatos) texto = 'Sin datos'
-  else if (lecturas != null) texto = esperadas ? `${lecturas}/${esperadas}` : lecturas.toLocaleString('es-MX')
+  else if (lecturas != null)
+    texto = esperadas ? `${lecturas.toLocaleString('es-MX')}/${esperadas.toLocaleString('es-MX')}` : lecturas.toLocaleString('es-MX')
   return (
     <td
       className={`whitespace-nowrap px-4 py-2 text-right font-mono ${incompleto ? 'font-semibold text-amber-700' : 'text-slate-500'}`}
@@ -330,9 +333,8 @@ export default function ConsultaPerfiles5M() {
     resultado && controladores.flatMap((c) => c.medidores).find((m) => m.id === resultado.filtros.idMedidor)
   const agrupacion = resultado?.filtros.agrupacion
   const nombreAgrupacion = resultado && buscarAgrupacion(agrupacion).nombre
-  // Qué es cada valor mostrado (Lectura, Promedio o Total) y, en energía,
-  // cuántas lecturas de 5 minutos forman un periodo completo (12 por hora, 288 por día).
-  const { tipoValor = 'Valor', lecturasEsperadas } = (resultado && buscarAgrupacion(agrupacion)) || {}
+  // Qué es cada valor mostrado (Lectura, Promedio o Total).
+  const { tipoValor = 'Valor' } = (resultado && buscarAgrupacion(agrupacion)) || {}
 
   // Tramo visible (la ventana de navegación, o todos los periodos).
   const desde = ventana?.desde ?? 0
@@ -354,8 +356,9 @@ export default function ConsultaPerfiles5M() {
       nombre: `Fase ${nombre}`,
       color,
       valores: new Map(puntos.map((p) => [p.clave, p.valor])),
-      // Lecturas de 5 minutos de cada periodo (solo energía; el backend las manda como intervalos).
+      // Lecturas de 5 minutos de cada periodo y las que tendría completo (solo energía).
       lecturas: new Map(puntos.map((p) => [p.clave, p.lecturas])),
+      esperadas: new Map(puntos.map((p) => [p.clave, p.esperadas])),
     }
   })
   const variasFases = series.length > 1
@@ -735,7 +738,7 @@ export default function ConsultaPerfiles5M() {
                           {formatoValor(s.valores.get(p.clave))}
                         </td>
                       ))}
-                      {conLecturas && <CeldaLecturas serie={series[0]} clave={p.clave} esperadas={lecturasEsperadas} />}
+                      {conLecturas && <CeldaLecturas serie={series[0]} clave={p.clave} />}
                     </tr>
                   ))}
                 </tbody>

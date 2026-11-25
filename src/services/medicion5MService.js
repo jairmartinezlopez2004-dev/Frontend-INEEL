@@ -16,6 +16,10 @@
  *   GET /Medicion5M/energia-hora    -> total de energía por hora y acumulado del día (solo fase A):
  *                                      { idVar5M, simbolo, fecha, hora, horaTexto, totalHora,
  *                                        acumuladoDia, intervalos }
+ *   GET /Medicion5M/energia-dia, energia-semana, energia-mes, energia-anio
+ *                                   -> total de energía por periodo (solo fase A):
+ *                                      { idVar5M, simbolo, inicio, fin, etiqueta, anio, mes, semana,
+ *                                        total, registros, registrosEsperados, completo }
  *
  * El backend no permite modificar mediciones: solo se consultan las vistas.
  *
@@ -29,12 +33,12 @@
  * por mes (promedio de los promedios diarios).
  *
  * Variables de energía (kWh, kVARh): no se promedian. Sus agrupaciones son
- * las de AGRUPACIONES_ENERGIA, que usan GET /Medicion5M/energia-hora (suma de
- * los registros de 5 minutos de cada hora) y suman esos totales por día,
- * semana, mes o año. No hay promedios ni multiplicaciones: si de 00:00 a
- * 01:00 hay 12 registros de 1 kWh, el total de esa hora es 12 kWh.
+ * las de AGRUPACIONES_ENERGIA: cada una usa su ruta de energía del backend
+ * (energia-hora, energia-dia, energia-semana, energia-mes, energia-anio), que
+ * ya entrega la suma de los registros de 5 minutos del periodo y cuántos
+ * registros entraron. La pantalla no suma ni promedia: si de 00:00 a 01:00
+ * hay 12 registros de 1 kWh, el total de esa hora es 12 kWh.
  */
-import { getISOWeek, getISOWeekYear, parseISO } from 'date-fns'
 import { ApiError, apiGet } from './api'
 import { listarUnidades } from './unidadesService'
 
@@ -102,36 +106,6 @@ export const formatoValor = (v) =>
  * @param {{ unidad?: string }|undefined} variable
  */
 export const esVariableEnergia = (variable) => Boolean(variable?.unidad?.endsWith('h'))
-
-/**
- * Suma los totales por hora de energía (filas de energia-hora) que comparten
- * la misma clave de periodo. No promedia ni divide: el total de un día es la
- * suma de sus horas, el de una semana la suma de sus días, etc.
- */
-function sumarPorPeriodo(filas, claveDe, etiquetaDe) {
-  const grupos = new Map()
-  for (const f of filas) {
-    const clave = claveDe(f)
-    if (!grupos.has(clave)) grupos.set(clave, { fila: f, suma: null, lecturas: 0 })
-    // Registros de 5 minutos del periodo: suma de los intervalos de sus horas.
-    grupos.get(clave).lecturas += f.intervalos ?? 0
-    // Las horas sin datos (totalHora null) no se suman; un periodo sin
-    // ninguna hora con datos queda en null («—»), no en 0.
-    if (f.totalHora != null) grupos.get(clave).suma = (grupos.get(clave).suma ?? 0) + f.totalHora
-  }
-  return [...grupos.entries()].map(([clave, { fila, suma, lecturas }]) => ({
-    clave,
-    etiqueta: etiquetaDe(fila),
-    valor: suma,
-    lecturas,
-  }))
-}
-
-/** Año y semana ISO (lunes a domingo) de una fecha yyyy-MM-dd. */
-function semanaISO(fecha) {
-  const d = parseISO(fecha)
-  return { anio: getISOWeekYear(d), semana: getISOWeek(d) }
-}
 
 /** Promedia las filas diarias que comparten la misma clave (semana o mes). */
 function agruparPromedio(filas, claveDe, etiquetaDe) {
@@ -227,81 +201,45 @@ export const AGRUPACIONES = [
   },
 ]
 
-// Agrupaciones de las variables de energía: solo totales. Todas consultan
-// energia-hora (suma real de cada hora, solo fase A) y suman esas horas por
-// periodo. Sustituyen a AGRUPACIONES cuando la variable elegida es de energía.
+// Normaliza los totales por periodo de energia-dia/semana/mes/anio. La clave
+// es el primer día del periodo (yyyy-MM-dd), que ordena bien como texto; la
+// etiqueta ("2026-11-18", "2026 · semana 47", "2026-11", "2026") la manda el
+// backend, igual que las lecturas que entraron y las esperadas. Un periodo
+// sin ninguna lectura con valor se muestra "Sin datos", no 0: el backend
+// manda total 0 en los días cuyas lecturas están todas en NULL.
+const normalizarTotalPeriodo = (filas) =>
+  filas.map((f) => ({
+    clave: f.inicio,
+    etiqueta: f.etiqueta,
+    valor: f.registros > 0 ? f.total : null,
+    lecturas: f.registros,
+    esperadas: f.registrosEsperados,
+  }))
+
+// Agrupaciones de las variables de energía: solo totales, todos calculados
+// por el backend (solo fase A). Sustituyen a AGRUPACIONES cuando la variable
+// elegida es de energía.
 export const AGRUPACIONES_ENERGIA = [
   {
     id: 'totalHora',
     nombre: 'Total por hora',
     energia: true,
     tipoValor: 'Total',
-    // Lecturas de 5 minutos que forman un periodo completo (para mostrar "12/12").
-    lecturasEsperadas: 12,
+    ruta: 'energia-hora',
     normalizar: (filas) =>
       filas.map((f) => ({
         clave: `${f.fecha} ${dosDigitos(f.hora)}`,
         etiqueta: `${f.fecha} ${f.horaTexto ?? `${dosDigitos(f.hora)}:00`}`,
         valor: f.totalHora,
-        // Registros de 5 minutos de la hora (intervalos que manda el backend).
+        // Registros de 5 minutos de la hora (intervalos que manda el backend) de 12 posibles.
         lecturas: f.intervalos,
+        esperadas: 12,
       })),
   },
-  {
-    id: 'totalDia',
-    nombre: 'Total por día',
-    energia: true,
-    tipoValor: 'Total',
-    lecturasEsperadas: 288,
-    normalizar: (filas) =>
-      sumarPorPeriodo(
-        filas,
-        (f) => f.fecha,
-        (f) => f.fecha,
-      ),
-  },
-  {
-    id: 'totalSemana',
-    nombre: 'Total por semana',
-    energia: true,
-    tipoValor: 'Total',
-    normalizar: (filas) =>
-      sumarPorPeriodo(
-        filas,
-        (f) => {
-          const { anio, semana } = semanaISO(f.fecha)
-          return `${anio}-${dosDigitos(semana)}`
-        },
-        (f) => {
-          const { anio, semana } = semanaISO(f.fecha)
-          return `${anio} · semana ${semana}`
-        },
-      ),
-  },
-  {
-    id: 'totalMes',
-    nombre: 'Total por mes',
-    energia: true,
-    tipoValor: 'Total',
-    normalizar: (filas) =>
-      sumarPorPeriodo(
-        filas,
-        (f) => f.fecha.slice(0, 7),
-        (f) => f.fecha.slice(0, 7),
-      ),
-  },
-  {
-    id: 'totalAnio',
-    nombre: 'Total por año',
-    energia: true,
-    tipoValor: 'Total',
-    normalizar: (filas) =>
-      sumarPorPeriodo(
-        filas,
-        (f) => f.fecha.slice(0, 4),
-        (f) => f.fecha.slice(0, 4),
-      ),
-  },
+  { id: 'totalDia', nombre: 'Total por día', energia: true, tipoValor: 'Total', ruta: 'energia-dia', normalizar: normalizarTotalPeriodo },
+  { id: 'totalSemana', nombre: 'Total por semana', energia: true, tipoValor: 'Total', ruta: 'energia-semana', normalizar: normalizarTotalPeriodo },
+  { id: 'totalMes', nombre: 'Total por mes', energia: true, tipoValor: 'Total', ruta: 'energia-mes', normalizar: normalizarTotalPeriodo },
+  { id: 'totalAnio', nombre: 'Total por año', energia: true, tipoValor: 'Total', ruta: 'energia-anio', normalizar: normalizarTotalPeriodo },
 ]
 
 // Equivalencias para cambiar de agrupación al pasar de una variable normal a
@@ -354,10 +292,9 @@ export async function consultarMedicion5M(
   { signal } = {},
 ) {
   const { ruta, normalizar, energia } = buscarAgrupacion(agrupacion)
-  // Los totales de energía salen de energia-hora, que solo trabaja en fase A
-  // y por eso no recibe fase.
+  // Las rutas de energía solo trabajan en fase A y por eso no reciben fase.
   const url = energia
-    ? `${RUTA}/energia-hora?${new URLSearchParams({ idMedidor, idVar5M, fechaInicio, fechaFin })}`
+    ? `${RUTA}/${ruta}?${new URLSearchParams({ idMedidor, idVar5M, fechaInicio, fechaFin })}`
     : `${RUTA}/${ruta}?${new URLSearchParams({ idMedidor, idVar5M, fechaInicio, fechaFin, fase })}`
   try {
     const filas = await apiGet(url, { signal })
