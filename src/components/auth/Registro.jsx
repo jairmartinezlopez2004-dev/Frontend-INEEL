@@ -15,6 +15,9 @@ import { registrarCuenta } from '../../services/authService';
 import { useValidacion } from '../../hooks/useValidacion';
 import {
   validarTexto,
+  validarNombreUsuario,
+  normalizarNombreUsuario,
+  NOMBRE_USUARIO_MAX,
   validarCorreo,
   validarContrasena,
   CONTRASENA_MAX,
@@ -24,16 +27,15 @@ import RequisitosContrasena from '../common/RequisitosContrasena';
 import { CLASE_INPUT, CLASE_INPUT_OK, CLASE_INPUT_ERROR } from './clasesAuth';
 import InputContrasena from '../common/InputContrasena';
 
-// Largos de correo y nombre: el correo hasta 50 (igual que el Login) y el
-// nombre hasta 50 (columna nombreUsuario de la BD).
+// Largo del correo: hasta 50 (igual que el Login). El nombre de usuario sigue
+// las reglas de validarNombreUsuario (utils/validaciones.js).
 const CORREO_MAX = 50;
-const NOMBRE_MAX = 50;
 
 const FORM_VACIO = { nombreUsuario: '', correo: '', contrasena: '', confirmacion: '' };
 
 // Reglas de cada campo, en el orden en que aparecen en pantalla.
 const validadoresPara = (contrasena) => ({
-  nombreUsuario: (v) => validarTexto(v, { nombre: 'El nombre', maximo: NOMBRE_MAX }),
+  nombreUsuario: validarNombreUsuario,
   correo: (v) => validarCorreo(v) ?? validarTexto(v, { nombre: 'El correo', maximo: CORREO_MAX }),
   contrasena: validarContrasena,
   confirmacion: (v) => {
@@ -61,8 +63,9 @@ export default function Registro({ onRegistrado, onCancelar }) {
 
   const actualizar = (campo) => (e) => setForm((prev) => ({ ...prev, [campo]: e.target.value }));
 
-  // Crea la cuenta (POST /Auth/register). Si el correo ya existe el backend
-  // responde 409 con "Ya existe un usuario con ese correo.".
+  // Crea la cuenta (POST /Auth/register). Si el correo o el nombre de usuario
+  // ya existen el backend responde 409 con "Ya existe un usuario con ese
+  // correo." o "Ya existe un usuario con ese nombre de usuario.".
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validarAlEnviar()) return;
@@ -72,7 +75,7 @@ export default function Registro({ onRegistrado, onCancelar }) {
     const correo = form.correo.trim();
     try {
       const respuesta = await registrarCuenta({
-        nombreUsuario: form.nombreUsuario.trim(),
+        nombreUsuario: normalizarNombreUsuario(form.nombreUsuario),
         correo,
         contrasena: form.contrasena,
       });
@@ -120,12 +123,19 @@ export default function Registro({ onRegistrado, onCancelar }) {
 
       {/* noValidate desactiva los globos del navegador: se valida con validadoresPara. */}
       <form noValidate onSubmit={handleSubmit} className="space-y-5">
-        {campo('nombreUsuario', 'Nombre', {
-          type: 'text',
-          maxLength: NOMBRE_MAX,
-          autoComplete: 'name',
-          placeholder: 'Nombre y apellido',
-        })}
+        {campo(
+          'nombreUsuario',
+          'Nombre de usuario',
+          {
+            type: 'text',
+            maxLength: NOMBRE_USUARIO_MAX,
+            autoComplete: 'username',
+            placeholder: 'Por ejemplo: Ana López',
+          },
+          <p className="text-xs text-gray-500">
+            También sirve para iniciar sesión. Puede tener espacios; no puede repetirse ni llevar @.
+          </p>,
+        )}
         {campo('correo', 'Correo', {
           type: 'email',
           maxLength: CORREO_MAX,

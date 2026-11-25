@@ -23,7 +23,13 @@
 import { useEffect, useState } from 'react'
 import { ROLES, listarUsuarios, actualizarUsuario } from '../../../services/usuariosService'
 import { useValidacion } from '../../../hooks/useValidacion'
-import { validarTexto, validarCorreo, validarEntero } from '../../../utils/validaciones'
+import {
+  validarTexto,
+  validarCorreo,
+  validarEntero,
+  validarNombreUsuario,
+  normalizarNombreUsuario,
+} from '../../../utils/validaciones'
 import CampoFormulario from '../../common/CampoFormulario'
 import { claseControl } from '../../common/clasesFormulario'
 import { useFiltroTabla } from '../../../hooks/useFiltroTabla'
@@ -40,13 +46,21 @@ const COLUMNAS = ['Nombre', 'Correo', 'Rol', 'Estado', 'Sesión (min)', '']
 const SESION_MIN = 1
 const SESION_MAX = 1440
 
-// Reglas de cada campo del formulario de edición, en el orden en que aparecen en pantalla.
-const VALIDADORES_USUARIO = {
-  nombreUsuario: (v) => validarTexto(v, { nombre: 'El nombre' }),
+// Clave para comparar nombres de usuario: sin espacios de más y en minúsculas.
+const claveNombre = (v) => normalizarNombreUsuario(v).toLowerCase()
+
+// Reglas de cada campo del formulario de edición, en el orden en que aparecen
+// en pantalla. Las reglas del nombre de usuario (3 a 50, sin @) solo se exigen
+// si cambia, igual que en el backend, para poder editar cuentas antiguas.
+const validadoresUsuario = (nombreOriginal) => ({
+  nombreUsuario: (v) =>
+    claveNombre(v) === claveNombre(nombreOriginal)
+      ? validarTexto(v, { nombre: 'El nombre de usuario' })
+      : validarNombreUsuario(v),
   correo: validarCorreo,
   tiempoSesion: (v) =>
     validarEntero(v, { nombre: 'El tiempo de sesión', minimo: SESION_MIN, maximo: SESION_MAX }),
-}
+})
 
 // Badge de estado activo/inactivo.
 function EstadoUsuario({ activo }) {
@@ -80,7 +94,7 @@ function FormularioUsuario({ usuario, onGuardado, onCancelar, esSuperAdmin }) {
   const [form, setForm] = useState({ ...usuario, tiempoSesion: String(usuario.tiempoSesion) })
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState(null) // Error devuelto por el WebService.
-  const { errorDe, ariaDe, validarAlEnviar } = useValidacion(form, VALIDADORES_USUARIO, 'usuario')
+  const { errorDe, ariaDe, validarAlEnviar } = useValidacion(form, validadoresUsuario(usuario.nombreUsuario), 'usuario')
 
   // Genera un manejador onChange para el campo indicado (texto, select o checkbox).
   const actualizar = (campo) => (e) => {
@@ -107,7 +121,7 @@ function FormularioUsuario({ usuario, onGuardado, onCancelar, esSuperAdmin }) {
       const datos = {
         ...form,
         correo: form.correo.trim(),
-        nombreUsuario: form.nombreUsuario.trim(),
+        nombreUsuario: normalizarNombreUsuario(form.nombreUsuario),
         tiempoSesion: Number(form.tiempoSesion),
       }
       await actualizarUsuario(usuario.id, datos)
@@ -119,7 +133,7 @@ function FormularioUsuario({ usuario, onGuardado, onCancelar, esSuperAdmin }) {
   }
 
   return (
-    // noValidate desactiva los globos del navegador: se valida con VALIDADORES_USUARIO.
+    // noValidate desactiva los globos del navegador: se valida con validadoresUsuario.
     <form noValidate onSubmit={guardar} className="bg-slate-50 px-6 py-5">
       <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-800">
         Editar usuario: {usuario.nombreUsuario}
@@ -133,7 +147,7 @@ function FormularioUsuario({ usuario, onGuardado, onCancelar, esSuperAdmin }) {
 
       {/* <fieldset disabled> bloquea todos los controles mientras se guarda. */}
       <fieldset disabled={guardando} className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <CampoFormulario id="usuario-nombreUsuario" etiqueta="Nombre" error={errorDe('nombreUsuario')}>
+        <CampoFormulario id="usuario-nombreUsuario" etiqueta="Nombre de usuario" error={errorDe('nombreUsuario')}>
           <input type="text" {...propsDe('nombreUsuario')} />
         </CampoFormulario>
 

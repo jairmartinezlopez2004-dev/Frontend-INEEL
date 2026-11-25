@@ -82,15 +82,17 @@ function aUsuarioUI(payload) {
 }
 
 /**
- * Inicia sesión con correo y contraseña.
+ * Inicia sesión con el correo o el nombre de usuario, y la contraseña.
+ * El backend decide cuál es: si lleva "@" busca por correo; si no, por nombre
+ * de usuario (sin importar mayúsculas ni espacios de más).
  *
- * @param {string} correo
+ * @param {string} cuenta - Correo o nombre de usuario.
  * @param {string} contrasena
  * @returns {Promise<object>} Usuario listo para guardarse en App.jsx.
  * @throws {ApiError} Si las credenciales son incorrectas o no hay conexión.
  */
-export async function iniciarSesion(correo, contrasena) {
-  const { token } = await apiPost('/Auth/login', { correo, contrasena })
+export async function iniciarSesion(cuenta, contrasena) {
+  const { token } = await apiPost('/Auth/login', { usuario: cuenta, contrasena })
   return guardarToken(token)
 }
 

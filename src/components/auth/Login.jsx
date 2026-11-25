@@ -5,7 +5,8 @@
  *
  * Rol en el sistema:
  * Gestiona las credenciales de acceso del usuario y las valida contra el
- * WebService (POST /Auth/login) mediante services/authService.js.
+ * WebService (POST /Auth/login) mediante services/authService.js. Se entra
+ * con el correo o con el nombre de usuario (el WebService distingue cuál es).
  * Desde aquí también se abren los formularios "Crear cuenta" (Registro.jsx)
  * y "¿Olvidaste tu contraseña?" (RestablecerContrasena.jsx); al terminar
  * cualquiera de los dos se regresa al Login con el correo ya escrito.
@@ -13,7 +14,7 @@
 import { useState } from 'react';
 import { iniciarSesion } from '../../services/authService';
 import { useValidacion } from '../../hooks/useValidacion';
-import { validarTexto, validarCorreo, CONTRASENA_MAX } from '../../utils/validaciones';
+import { validarTexto, CONTRASENA_MAX } from '../../utils/validaciones';
 import { MensajeCampo } from '../common/CampoFormulario';
 import Registro from './Registro';
 import RestablecerContrasena from './RestablecerContrasena';
@@ -22,17 +23,21 @@ import InputContrasena from '../common/InputContrasena';
 import LogosInstitucionales from '../common/LogosInstitucionales';
 import { obtenerConfiguracion } from '../../config/configuracion';
 
-// Reglas de cada campo. La cuenta debe ser un correo (el WebService rechaza
-// con 400 lo que no lo sea); la contraseña solo no debe estar vacía: las
+// Reglas de cada campo. La cuenta es el correo o el nombre de usuario (el
+// WebService decide cuál es); la contraseña solo no debe estar vacía: las
 // credenciales las valida el WebService.
 const VALIDADORES = {
-  cuenta: validarCorreo,
+  cuenta: (v) => validarTexto(v, { nombre: 'El correo o nombre de usuario', maximo: CUENTA_MAX }),
   clave: (v) => validarTexto(v, { nombre: 'La contraseña', femenino: true, recortar: false }),
 };
 
+// Largo máximo de la cuenta: un correo o un nombre de usuario (los dos hasta 50).
+const CUENTA_MAX = 50;
+
 // Texto exacto con el que el WebService rechaza el login de una cuenta con
-// edo = false (Services/AuthService.cs).
-const MENSAJE_INACTIVO_BACKEND = 'El usuario está inactivo.';
+// edo = false (AuthService.MensajeCuentaInactiva en el backend).
+const MENSAJE_INACTIVO_BACKEND =
+  'Tu cuenta está pendiente de aprobación o fue desactivada. Un administrador debe activarla para que puedas iniciar sesión.';
 
 /**
  * Aviso que se muestra después de registrarse, según la respuesta del backend
@@ -155,7 +160,7 @@ export default function Login({ onLoginSuccess }) {
           <Registro onRegistrado={alRegistrarse} onCancelar={() => setVista('login')} />
         ) : vista === 'restablecer' ? (
           <RestablecerContrasena
-            correoInicial={cuenta.trim()}
+            correoInicial={cuenta.includes('@') ? cuenta.trim() : ''}
             onRestablecida={alRestablecer}
             onCancelar={() => setVista('login')}
           />
@@ -181,17 +186,17 @@ export default function Login({ onLoginSuccess }) {
           
               <div>
                 <label htmlFor="login-cuenta" className="block text-sm font-medium text-gray-700 mb-1">
-                  Usuario
+                  Correo o nombre de usuario
                 </label>
                 <input
                   {...ariaDe('cuenta')}
                   type="text"
-                  maxLength={50} // Restricción del WebService[cite: 9]
+                  maxLength={CUENTA_MAX}
                   autoComplete="username"
                   value={cuenta}
                   onChange={(e) => setCuenta(e.target.value)}
                   className={claseDe('cuenta')}
-                  placeholder="usuario@dominio.com"
+                  placeholder="usuario@dominio.com o tu nombre de usuario"
                 />
                 <div className="mt-1">
                   <MensajeCampo id="login-cuenta" error={errorDe('cuenta')} />
